@@ -7,14 +7,15 @@
     <!-- Header Section -->
     <div class="card-header-custom d-flex flex-wrap justify-content-between align-items-center gap-3">
         <div>
-            <h4 class="fw-bold mb-1 text-dark">
-                <i class="bi bi-folder2-open text-primary me-2"></i>Quản lý Danh mục
+            <h4 class="fw-bold mb-1 text-dark d-flex align-items-center gap-2">
+                <i data-lucide="folder-open" class="text-primary" style="width: 26px; height: 26px;"></i>
+                <span>Quản lý Danh mục (Categories)</span>
             </h4>
-            <span class="text-muted small">Phân loại và quản lý tất cả các nhóm ngành hàng sản phẩm</span>
+            <span class="text-muted small">Phân loại và quản lý tất cả các nhóm ngành hàng sản phẩm trên sàn TMDT</span>
         </div>
         <div>
             <a href="{{ route('categories.create') }}" class="btn btn-custom-primary d-inline-flex align-items-center gap-2">
-                <i class="bi bi-plus-lg fs-6"></i>
+                <i data-lucide="plus" style="width: 18px; height: 18px;"></i>
                 <span>Thêm danh mục mới</span>
             </a>
         </div>
@@ -28,8 +29,8 @@
                     <tr>
                         <th style="width: 90px;" class="text-center">Mã ID</th>
                         <th>Tên danh mục</th>
-                        <th style="width: 200px;">Ngày tạo</th>
-                        <th style="width: 200px;">Cập nhật cuối</th>
+                        <th style="width: 220px;">Ngày tạo</th>
+                        <th style="width: 220px;">Cập nhật cuối</th>
                         <th style="width: 230px;" class="text-center">Hành động</th>
                     </tr>
                 </thead>
@@ -40,24 +41,33 @@
                                 <span class="badge-id">#{{ $category->id }}</span>
                             </td>
                             <td>
-                                <span class="fw-semibold text-dark">{{ $category->name }}</span>
+                                <span class="fw-semibold text-dark fs-6">{{ $category->name }}</span>
                             </td>
                             <td class="text-muted small">
-                                <i class="bi bi-calendar3 me-1"></i>{{ $category->created_at ? $category->created_at->format('d/m/Y H:i') : '---' }}
+                                <span class="d-inline-flex align-items-center gap-1">
+                                    <i data-lucide="calendar" style="width: 14px; height: 14px;"></i>
+                                    {{ $category->created_at ? $category->created_at->format('d/m/Y H:i') : '---' }}
+                                </span>
                             </td>
                             <td class="text-muted small">
-                                <i class="bi bi-arrow-repeat me-1"></i>{{ $category->updated_at ? $category->updated_at->format('d/m/Y H:i') : '---' }}
+                                <span class="d-inline-flex align-items-center gap-1">
+                                    <i data-lucide="clock" style="width: 14px; height: 14px;"></i>
+                                    {{ $category->updated_at ? $category->updated_at->format('d/m/Y H:i') : '---' }}
+                                </span>
                             </td>
                             <td class="text-center">
                                 <div class="btn-group btn-group-sm" role="group">
-                                    <a href="{{ route('categories.show', $category) }}" class="btn btn-outline-primary" title="Xem chi tiết">
-                                        <i class="bi bi-eye"></i> Xem
+                                    <a href="{{ route('categories.show', $category) }}" class="btn btn-outline-primary d-inline-flex align-items-center gap-1" title="Xem chi tiết">
+                                        <i data-lucide="eye" style="width: 14px; height: 14px;"></i>
+                                        <span>Xem</span>
                                     </a>
-                                    <a href="{{ route('categories.edit', $category) }}" class="btn btn-outline-warning" title="Chỉnh sửa">
-                                        <i class="bi bi-pencil-square"></i> Sửa
+                                    <a href="{{ route('categories.edit', $category) }}" class="btn btn-outline-warning d-inline-flex align-items-center gap-1" title="Chỉnh sửa">
+                                        <i data-lucide="pencil" style="width: 14px; height: 14px;"></i>
+                                        <span>Sửa</span>
                                     </a>
-                                    <button type="button" class="btn btn-outline-danger" title="Xóa" onclick="handleDelete('{{ $category->id }}', '{{ addslashes($category->name) }}')">
-                                        <i class="bi bi-trash"></i> Xóa
+                                    <button type="button" class="btn btn-outline-danger d-inline-flex align-items-center gap-1" title="Xóa" onclick="handleDelete('{{ $category->id }}', '{{ addslashes($category->name) }}')">
+                                        <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                                        <span>Xóa</span>
                                     </button>
                                 </div>
 
@@ -70,10 +80,11 @@
                     @empty
                         <tr>
                             <td colspan="5" class="text-center py-5 text-muted">
-                                <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary opacity-50"></i>
+                                <i data-lucide="inbox" class="d-block mx-auto mb-2 text-secondary opacity-50" style="width: 48px; height: 48px;"></i>
                                 <p class="mb-2 fw-medium">Chưa có danh mục nào trong hệ thống</p>
-                                <a href="{{ route('categories.create') }}" class="btn btn-sm btn-custom-primary">
-                                    <i class="bi bi-plus-lg me-1"></i>Tạo danh mục đầu tiên
+                                <a href="{{ route('categories.create') }}" class="btn btn-sm btn-custom-primary d-inline-flex align-items-center gap-1">
+                                    <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
+                                    <span>Tạo danh mục đầu tiên</span>
                                 </a>
                             </td>
                         </tr>

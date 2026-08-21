@@ -210,3 +210,14 @@ body {
         transform: translateY(0);
     }
 }
+
+/* ==========================================================================
+   LUCIDE SVG ICONS INTEGRATION (React/Shadcn Standard)
+   ========================================================================== */
+.lucide, svg.lucide {
+    display: inline-block;
+    vertical-align: -0.125em;
+    stroke-width: 2px;
+    flex-shrink: 0;
+}
+

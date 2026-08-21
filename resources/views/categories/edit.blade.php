@@ -7,11 +7,13 @@
     <div class="col-md-8 col-lg-6">
         <div class="card card-custom animate-fade-in">
             <div class="card-header-custom d-flex justify-content-between align-items-center">
-                <h5 class="fw-bold mb-0 text-dark">
-                    <i class="bi bi-pencil-square text-warning me-2"></i>Chỉnh Sửa Danh Mục
+                <h5 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                    <i data-lucide="pencil-line" class="text-warning" style="width: 22px; height: 22px;"></i>
+                    <span>Chỉnh Sửa Danh Mục</span>
                 </h5>
-                <a href="{{ route('categories.index') }}" class="btn btn-sm btn-custom-secondary">
-                    <i class="bi bi-arrow-left me-1"></i>Quay lại
+                <a href="{{ route('categories.index') }}" class="btn btn-sm btn-custom-secondary d-inline-flex align-items-center gap-1">
+                    <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
+                    <span>Quay lại</span>
                 </a>
             </div>
             
@@ -45,9 +47,13 @@
                     </div>
 
                     <div class="d-flex justify-content-end gap-2 pt-2">
-                        <a href="{{ route('categories.index') }}" class="btn btn-custom-secondary">Hủy bỏ</a>
-                        <button type="submit" class="btn btn-custom-primary">
-                            <i class="bi bi-arrow-repeat me-1"></i>Cập nhật thay đổi
+                        <a href="{{ route('categories.index') }}" class="btn btn-custom-secondary d-inline-flex align-items-center gap-1">
+                            <i data-lucide="x" style="width: 16px; height: 16px;"></i>
+                            <span>Hủy bỏ</span>
+                        </a>
+                        <button type="submit" class="btn btn-custom-primary d-inline-flex align-items-center gap-1">
+                            <i data-lucide="refresh-cw" style="width: 16px; height: 16px;"></i>
+                            <span>Cập nhật thay đổi</span>
                         </button>
                     </div>
                 </form>
