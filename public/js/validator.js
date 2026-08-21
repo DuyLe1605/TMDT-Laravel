@@ -75,13 +75,26 @@
     };
 
     /**
-     * Clear inline error on a single form control
+     * Get the outer form group element containing both input and its error message
+     */
+    function getFieldGroup(input) {
+        return input.closest('.form-group-modern') || 
+               input.closest('.mb-4') || 
+               input.closest('.mb-3') || 
+               input.closest('.col-12') || 
+               input.closest('.col-md-6') || 
+               input.closest('.col-md-4') || 
+               input.parentElement;
+    }
+
+    /**
+     * Clear inline error on a single form control (both client and server errors)
      */
     function clearFieldError(input) {
         input.classList.remove('is-invalid');
-        const parent = input.closest('.form-group-modern, .mb-3, .mb-4, .col-md-4, .col-md-6, .col-md-8, .col-12, div');
-        if (parent) {
-            const feedbacks = parent.querySelectorAll('.dynamic-invalid-feedback');
+        const group = getFieldGroup(input);
+        if (group) {
+            const feedbacks = group.querySelectorAll('.dynamic-invalid-feedback, .server-invalid-feedback, .invalid-feedback-msg');
             feedbacks.forEach(el => el.remove());
         }
     }
@@ -91,13 +104,14 @@
      */
     function setFieldError(input, message) {
         input.classList.add('is-invalid');
-        const parent = input.closest('.form-group-modern, .mb-3, .mb-4, .col-md-4, .col-md-6, .col-md-8, .col-12, div') || input.parentElement;
-        if (parent) {
-            const existing = parent.querySelectorAll('.dynamic-invalid-feedback');
+        const group = getFieldGroup(input);
+        if (group) {
+            // Remove ALL existing feedbacks inside the entire field group to prevent duplicates
+            const existing = group.querySelectorAll('.dynamic-invalid-feedback, .server-invalid-feedback, .invalid-feedback-msg');
             existing.forEach(el => el.remove());
 
             const feedback = document.createElement('div');
-            feedback.className = 'text-danger small mt-1.5 d-flex align-items-center gap-1.5 dynamic-invalid-feedback';
+            feedback.className = 'text-danger small mt-1.5 d-flex align-items-center gap-1.5 dynamic-invalid-feedback invalid-feedback-msg';
             feedback.innerHTML = `
                 <i data-lucide="alert-circle" style="width: 15px; height: 15px; flex-shrink: 0;"></i>
                 <span>${message}</span>

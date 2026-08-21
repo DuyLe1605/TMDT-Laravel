@@ -81,14 +81,60 @@
         </div>
     </div>
 
+    <!-- Global Logout Confirmation Modal -->
+    <div class="modal fade" id="globalLogoutModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 430px;">
+            <div class="modal-content modal-content-modern border-0">
+                <div class="p-4 text-center">
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 58px; height: 58px; background: var(--danger-50); color: var(--danger-600);">
+                        <i data-lucide="log-out" style="width: 28px; height: 28px;"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-2">Xác nhận đăng xuất</h5>
+                    <p class="text-secondary small mb-4">
+                        Bạn có chắc chắn muốn kết thúc phiên làm việc quản trị hiện tại không?
+                    </p>
+                    <div class="d-flex justify-content-center gap-3">
+                        <button type="button" class="btn-surface px-4 py-2" data-bs-dismiss="modal">
+                            <span>Ở lại</span>
+                        </button>
+                        <button type="button" class="btn btn-danger px-4 py-2 rounded-3 fw-semibold d-inline-flex align-items-center" onclick="document.getElementById('globalLogoutForm').submit()">
+                            <i data-lucide="log-out" style="width: 16px; height: 16px; margin-right: 0.4rem;"></i>
+                            <span>Đăng xuất ngay</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Global Logout Form -->
+    <form id="globalLogoutForm" action="{{ route('logout') }}" method="POST" class="d-none">
+        @csrf
+    </form>
+
     <!-- Bootstrap 5 Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     
     <!-- Zod-like Client-Side Form Validator & Floating Toast System -->
     <script src="{{ asset('js/validator.js') }}"></script>
 
-    <!-- Global Scripts: Theme, Sidebar & Icons -->
+    <!-- Global Scripts: Theme, Sidebar, Modals & Icons -->
     <script>
+        let logoutModalInstance = null;
+
+        function openLogoutModal() {
+            const modalEl = document.getElementById('globalLogoutModal');
+            if (modalEl) {
+                if (!logoutModalInstance) {
+                    logoutModalInstance = new bootstrap.Modal(modalEl);
+                }
+                logoutModalInstance.show();
+                setTimeout(() => {
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                }, 150);
+            }
+        }
+
         function updateThemeIcon(theme) {
             const sunIcon = document.getElementById('themeIconSun');
             const moonIcon = document.getElementById('themeIconMoon');

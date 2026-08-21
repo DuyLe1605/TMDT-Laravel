@@ -1,39 +1,46 @@
 @extends('layouts.storefront')
 
-@section('title', 'Bộ Sưu Tập Túi Xách Nữ - Cửa Hàng')
+@section('title', 'Bộ Sưu Tập Túi Xách Nữ - Aurelia Luxury Bags')
 
 @section('content')
-<div class="container py-4">
-    <!-- Breadcrumb -->
-    <div class="breadcrumb-modern mb-3">
-        <a href="{{ route('home') }}">Trang chủ</a>
-        <i data-lucide="chevron-right" style="width: 14px; height: 14px;"></i>
-        <span class="text-primary fw-medium">Bộ sưu tập túi xách</span>
-    </div>
-
-    <!-- Page Title & Header -->
-    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
-        <div>
-            <h2 class="fw-bold text-dark mb-1" style="letter-spacing: -0.02em;">Bộ Sưu Tập Túi Xách Nữ</h2>
-            <p class="text-secondary small mb-0">
-                Tìm thấy <strong>{{ $products->total() }}</strong> mẫu túi xách cao cấp đang mở bán
-            </p>
+<div class="container py-4 py-lg-5">
+    <!-- Breadcrumb & Header Hero -->
+    <div class="mb-4">
+        <div class="breadcrumb-modern mb-2">
+            <a href="{{ route('home') }}">Trang chủ</a>
+            <i data-lucide="chevron-right" style="width: 14px; height: 14px;"></i>
+            <span class="text-primary fw-medium">Bộ sưu tập túi xách</span>
+        </div>
+        
+        <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mt-3 pb-3 border-bottom">
+            <div>
+                <h1 class="fw-bold text-dark mb-1" style="font-size: 2rem; letter-spacing: -0.03em;">Bộ Sưu Tập Túi Xách Nữ</h1>
+                <p class="text-secondary mb-0" style="font-size: 0.95rem;">
+                    Tuyển chọn những thiết kế túi da cao cấp, thời thượng từ Aurelia Luxury
+                </p>
+            </div>
+            <div class="d-flex align-items-center">
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill fw-semibold" style="font-size: 0.85rem;">
+                    <i data-lucide="sparkles" style="width: 14px; height: 14px; margin-right: 0.35rem; display: inline-block;"></i>
+                    <span>{{ $products->total() }} sản phẩm đang mở bán</span>
+                </span>
+            </div>
         </div>
     </div>
 
     <div class="row g-4">
         <!-- Sidebar Filter (Left Column) -->
         <div class="col-lg-3">
-            <div class="card-modern p-3.5 sticky-top" style="top: 80px;">
-                <h6 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
-                    <i data-lucide="sliders-horizontal" class="text-primary" style="width: 16px; height: 16px;"></i>
+            <div class="shop-filter-card sticky-top" style="top: 85px;">
+                <div class="shop-filter-title">
+                    <i data-lucide="sliders-horizontal" class="text-primary" style="width: 17px; height: 17px;"></i>
                     <span>Bộ lọc tìm kiếm</span>
-                </h6>
+                </div>
 
                 <form method="GET" action="{{ route('shop.index') }}" id="shopFilterForm">
                     <!-- Search Input -->
                     <div class="mb-3.5">
-                        <label class="form-label-modern mb-1.5 small fw-semibold">Từ khóa</label>
+                        <label class="form-label-modern mb-1.5 small fw-semibold">Từ khóa tìm kiếm</label>
                         <div class="search-box-modern w-100">
                             <i data-lucide="search" class="search-icon" style="width: 15px; height: 15px;"></i>
                             <input 
@@ -49,7 +56,7 @@
                     <!-- Category Filter -->
                     <div class="mb-3.5">
                         <label class="form-label-modern mb-1.5 small fw-semibold">Dòng túi xách</label>
-                        <select name="category_id" class="form-select form-select-modern" onchange="this.form.submit()">
+                        <select name="category_id" class="form-select form-select-modern w-100" onchange="this.form.submit()">
                             <option value="">Tất cả dòng túi</option>
                             @foreach ($categories as $cat)
                                 <option value="{{ $cat->id }}" {{ (isset($categoryId) && $categoryId == $cat->id) ? 'selected' : '' }}>
@@ -62,7 +69,7 @@
                     <!-- Sort Filter -->
                     <div class="mb-4">
                         <label class="form-label-modern mb-1.5 small fw-semibold">Sắp xếp theo</label>
-                        <select name="sort" class="form-select form-select-modern" onchange="this.form.submit()">
+                        <select name="sort" class="form-select form-select-modern w-100" onchange="this.form.submit()">
                             <option value="created_desc" {{ (isset($sort) && $sort == 'created_desc') ? 'selected' : '' }}>Mới nhất trước</option>
                             <option value="price_asc" {{ (isset($sort) && $sort == 'price_asc') ? 'selected' : '' }}>Giá: Thấp &rarr; Cao</option>
                             <option value="price_desc" {{ (isset($sort) && $sort == 'price_desc') ? 'selected' : '' }}>Giá: Cao &rarr; Thấp</option>
@@ -70,13 +77,14 @@
                         </select>
                     </div>
 
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn-brand-primary w-100 py-2 justify-content-center">
-                            <span>Áp dụng</span>
+                    <div class="d-flex gap-2 pt-1">
+                        <button type="submit" class="btn-brand-primary w-100 py-2.5 justify-content-center fw-semibold">
+                            <i data-lucide="filter" style="width: 15px; height: 15px; margin-right: 0.45rem;"></i>
+                            <span>Áp dụng lọc</span>
                         </button>
                         @if ($search || $categoryId || ($sort && $sort != 'created_desc'))
-                            <a href="{{ route('shop.index') }}" class="btn btn-surface py-2 px-3" title="Đặt lại bộ lọc">
-                                <i data-lucide="rotate-ccw" style="width: 15px; height: 15px;"></i>
+                            <a href="{{ route('shop.index') }}" class="btn btn-surface py-2.5 px-3 d-inline-flex align-items-center justify-content-center" title="Đặt lại bộ lọc">
+                                <i data-lucide="rotate-ccw" style="width: 16px; height: 16px;"></i>
                             </a>
                         @endif
                     </div>
@@ -86,15 +94,15 @@
 
         <!-- Products Grid (Right Column) -->
         <div class="col-lg-9">
-            <div class="row g-3">
+            <div class="row g-3 g-xl-4">
                 @forelse ($products as $product)
                     <div class="col-6 col-md-4">
                         <div class="product-store-card h-100 d-flex flex-column">
-                            <!-- Thumbnail -->
-                            <div class="product-store-img-box position-relative">
-                                <a href="{{ route('shop.show', $product) }}">
+                            <!-- Thumbnail with Luxury Badges -->
+                            <div class="product-store-img-box">
+                                <a href="{{ route('shop.show', $product) }}" class="d-block w-100 h-100">
                                     @if ($product->image)
-                                        <img src="{{ $product->image }}" alt="{{ $product->name }}" class="product-store-img w-100 object-fit-cover" loading="lazy">
+                                        <img src="{{ $product->image }}" alt="{{ $product->name }}" class="product-store-img" loading="lazy">
                                     @else
                                         <div class="product-store-placeholder d-flex align-items-center justify-content-center">
                                             <i data-lucide="shopping-bag" style="width: 48px; height: 48px;" class="text-tertiary"></i>
@@ -103,52 +111,56 @@
                                 </a>
 
                                 <!-- Badges -->
-                                <div class="position-absolute top-0 start-0 p-2.5 d-flex flex-column gap-1">
+                                <div class="position-absolute top-0 start-0 p-2.5 d-flex flex-column gap-1.5" style="z-index: 2;">
                                     @if ($product->has_discount)
-                                        <span class="badge bg-danger text-white fw-bold px-2 py-0.5 rounded-pill" style="font-size: 0.68rem;">
+                                        <span class="badge-discount-luxury">
                                             -{{ round((($product->price - $product->sale_price) / $product->price) * 100) }}%
                                         </span>
                                     @endif
                                     @if ($product->is_featured)
-                                        <span class="badge bg-warning text-dark fw-bold px-2 py-0.5 rounded-pill" style="font-size: 0.68rem;">
-                                            ⭐ Hot
+                                        <span class="badge-hot-luxury d-inline-flex align-items-center gap-1">
+                                            <i data-lucide="flame" style="width: 12px; height: 12px;"></i>
+                                            <span>Nổi bật</span>
                                         </span>
                                     @endif
                                 </div>
                             </div>
 
-                            <!-- Content -->
-                            <div class="product-store-content p-3 d-flex flex-column flex-grow-1">
-                                <div class="text-tertiary small mb-1" style="font-size: 0.75rem;">
-                                    {{ $product->category?->name ?? 'Túi xách' }}
+                            <!-- Content Area -->
+                            <div class="p-3.5 d-flex flex-column flex-grow-1">
+                                <div class="product-store-category mb-1">
+                                    {{ $product->category?->name ?? 'Túi xách cao cấp' }}
                                 </div>
-                                <h6 class="fw-bold mb-2">
+
+                                <h6 class="mb-2">
                                     <a href="{{ route('shop.show', $product) }}" class="product-store-title text-decoration-none">
                                         {{ $product->name }}
                                     </a>
                                 </h6>
 
-                                @if ($product->color || $product->material)
-                                    <div class="text-secondary small mb-2 d-flex flex-wrap gap-1" style="font-size: 0.75rem;">
-                                        @if ($product->color)
-                                            <span>Màu: <strong>{{ $product->color }}</strong></span>
-                                        @endif
+                                @if ($product->color)
+                                    <div class="mb-3">
+                                        <span class="product-chip">
+                                            <span style="width: 8px; height: 8px; border-radius: 50%; background: #6366f1; display: inline-block;"></span>
+                                            <span>{{ $product->color }}</span>
+                                        </span>
                                     </div>
                                 @endif
 
-                                <div class="mt-auto pt-2 border-top d-flex align-items-baseline justify-content-between">
+                                <!-- Price & Quick Action Toolbar -->
+                                <div class="mt-auto pt-3 border-top d-flex align-items-center justify-content-between gap-2">
                                     <div>
-                                        <div class="fw-bold text-primary" style="font-size: 1.05rem;">
+                                        <div class="price-current-luxury">
                                             {{ $product->has_discount ? $product->formatted_sale_price : $product->formatted_price }}
                                         </div>
                                         @if ($product->has_discount)
-                                            <div class="text-muted text-decoration-line-through small" style="font-size: 0.78rem;">
+                                            <div class="price-original-luxury">
                                                 {{ $product->formatted_price }}
                                             </div>
                                         @endif
                                     </div>
-                                    <a href="{{ route('shop.show', $product) }}" class="btn btn-sm btn-surface p-1.5" title="Xem chi tiết">
-                                        <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
+                                    <a href="{{ route('shop.show', $product) }}" class="btn-card-action flex-shrink-0" title="Xem chi tiết sản phẩm">
+                                        <i data-lucide="eye" style="width: 17px; height: 17px;"></i>
                                     </a>
                                 </div>
                             </div>
@@ -156,12 +168,13 @@
                     </div>
                 @empty
                     <div class="col-12 text-center py-5">
-                        <div class="category-squircle mx-auto mb-3" style="width: 60px; height: 60px;">
-                            <i data-lucide="search-x" style="width: 30px; height: 30px;"></i>
+                        <div class="category-squircle mx-auto mb-3" style="width: 64px; height: 64px;">
+                            <i data-lucide="search-x" style="width: 32px; height: 32px;"></i>
                         </div>
-                        <h5 class="fw-bold text-dark mb-1">Không tìm thấy túi xách phù hợp</h5>
-                        <p class="text-secondary small mb-4">Hãy thử tìm kiếm với từ khóa khác hoặc xóa bộ lọc hiện tại.</p>
-                        <a href="{{ route('shop.index') }}" class="btn-surface">
+                        <h5 class="fw-bold text-dark mb-1">Không tìm thấy mẫu túi xách phù hợp</h5>
+                        <p class="text-secondary small mb-4">Hãy thử tìm kiếm với từ khóa khác hoặc bỏ các bộ lọc đang chọn.</p>
+                        <a href="{{ route('shop.index') }}" class="btn-brand-primary">
+                            <i data-lucide="rotate-ccw" style="width: 16px; height: 16px; margin-right: 0.45rem;"></i>
                             <span>Xem tất cả sản phẩm</span>
                         </a>
                     </div>

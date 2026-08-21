@@ -139,44 +139,54 @@
                             </a>
 
                             <!-- Floating Badges -->
-                            <div class="position-absolute top-0 start-0 p-2.5 d-flex flex-column gap-1">
+                            <div class="position-absolute top-0 start-0 p-2.5 d-flex flex-column gap-1.5" style="z-index: 2;">
                                 @if ($product->has_discount)
-                                    <span class="badge bg-danger text-white fw-bold px-2 py-1 rounded-pill" style="font-size: 0.7rem;">
+                                    <span class="badge-discount-luxury">
                                         -{{ round((($product->price - $product->sale_price) / $product->price) * 100) }}%
                                     </span>
                                 @endif
                                 @if ($product->is_featured)
-                                    <span class="badge bg-warning text-dark fw-bold px-2 py-1 rounded-pill" style="font-size: 0.7rem;">
-                                        ⭐ Hot
+                                    <span class="badge-hot-luxury d-inline-flex align-items-center gap-1">
+                                        <i data-lucide="flame" style="width: 12px; height: 12px;"></i>
+                                        <span>Nổi bật</span>
                                     </span>
                                 @endif
                             </div>
                         </div>
 
                         <!-- Card Body -->
-                        <div class="product-store-content p-3 d-flex flex-column flex-grow-1">
-                            <div class="text-tertiary small mb-1" style="font-size: 0.75rem;">
-                                {{ $product->category?->name ?? 'Túi xách' }}
+                        <div class="p-3.5 d-flex flex-column flex-grow-1">
+                            <div class="product-store-category mb-1">
+                                {{ $product->category?->name ?? 'Túi xách cao cấp' }}
                             </div>
-                            <h6 class="fw-bold mb-2">
+                            <h6 class="mb-2">
                                 <a href="{{ route('shop.show', $product) }}" class="product-store-title text-decoration-none">
                                     {{ $product->name }}
                                 </a>
                             </h6>
 
-                            <div class="mt-auto pt-2 border-top d-flex align-items-baseline justify-content-between">
+                            @if ($product->color)
+                                <div class="mb-3">
+                                    <span class="product-chip">
+                                        <span style="width: 8px; height: 8px; border-radius: 50%; background: #6366f1; display: inline-block;"></span>
+                                        <span>{{ $product->color }}</span>
+                                    </span>
+                                </div>
+                            @endif
+
+                            <div class="mt-auto pt-3 border-top d-flex align-items-center justify-content-between gap-2">
                                 <div>
-                                    <div class="fw-bold text-primary" style="font-size: 1.05rem;">
+                                    <div class="price-current-luxury">
                                         {{ $product->has_discount ? $product->formatted_sale_price : $product->formatted_price }}
                                     </div>
                                     @if ($product->has_discount)
-                                        <div class="text-muted text-decoration-line-through small" style="font-size: 0.78rem;">
+                                        <div class="price-original-luxury">
                                             {{ $product->formatted_price }}
                                         </div>
                                     @endif
                                 </div>
-                                <a href="{{ route('shop.show', $product) }}" class="btn btn-sm btn-surface p-1.5" title="Xem chi tiết">
-                                    <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
+                                <a href="{{ route('shop.show', $product) }}" class="btn-card-action flex-shrink-0" title="Xem chi tiết sản phẩm">
+                                    <i data-lucide="eye" style="width: 17px; height: 17px;"></i>
                                 </a>
                             </div>
                         </div>

@@ -36,4 +36,12 @@ final class AppConstants
     public const MSG_REGISTER_SUCCESS = 'Đăng ký tài khoản thành công! Hãy đăng nhập để tiếp tục.';
     public const MSG_REGISTER_FAILED = 'Đăng ký thất bại. Vui lòng thử lại sau.';
     public const MSG_LOGOUT_SUCCESS = 'Bạn đã đăng xuất thành công.';
+
+    // Thông báo cho User Management
+    public const MSG_USER_CREATED = 'Tài khoản người dùng đã được tạo mới thành công.';
+    public const MSG_USER_UPDATED = 'Thông tin tài khoản đã được cập nhật thành công.';
+    public const MSG_USER_DELETED = 'Tài khoản người dùng đã được xóa thành công.';
+    public const MSG_USER_NOT_FOUND = 'Không tìm thấy tài khoản người dùng yêu cầu.';
+    public const MSG_USER_CANNOT_DELETE_SELF = 'Bạn không thể tự xóa tài khoản quản trị đang đăng nhập của chính mình.';
+    public const MSG_USER_CANNOT_DELETE_LAST_ADMIN = 'Không thể xóa Quản trị viên duy nhất còn lại trong hệ thống.';
 }

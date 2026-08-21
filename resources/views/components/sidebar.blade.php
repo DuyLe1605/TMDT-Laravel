@@ -63,26 +63,64 @@
                 <span>Dòng túi xách</span>
             </div>
         </a>
+
+        <!-- Section: System & Users -->
+        <div class="sidebar-section-title mt-3">HỆ THỐNG & TÀI KHOẢN</div>
+
+        <!-- Users Management Module -->
+        <a href="{{ route('admin.users.index') }}" class="sidebar-nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+            <div class="d-flex align-items-center">
+                <span class="sidebar-icon-box">
+                    <i data-lucide="users" style="width: 18px; height: 18px;"></i>
+                </span>
+                <span>Quản lý Tài khoản</span>
+            </div>
+        </a>
     </div>
 
-    <!-- Sidebar Bottom Profile Footer -->
+    <!-- Sidebar Bottom Profile Footer with Dropdown -->
     <div class="sidebar-footer">
-        <div class="d-flex align-items-center justify-content-between">
-            <div class="d-flex align-items-center">
-                <div class="sidebar-user-avatar">
-                    {{ Auth::check() ? strtoupper(substr(Auth::user()->name, 0, 2)) : 'AD' }}
+        <div class="dropdown dropup w-100">
+            <button class="sidebar-user-btn d-flex align-items-center justify-content-between w-100 p-2 rounded-3 border-0 bg-transparent" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Tùy chọn tài khoản">
+                <div class="d-flex align-items-center gap-2.5 overflow-hidden">
+                    <div class="sidebar-user-avatar flex-shrink-0" style="width: 36px; height: 36px; font-size: 0.85rem;">
+                        {{ Auth::check() ? strtoupper(substr(Auth::user()->name, 0, 2)) : 'AD' }}
+                    </div>
+                    <div class="text-start overflow-hidden">
+                        <div class="sidebar-user-name text-truncate" style="font-size: 0.88rem;">{{ Auth::check() ? Auth::user()->name : 'Admin' }}</div>
+                        <div class="sidebar-user-role text-truncate" style="font-size: 0.72rem;">{{ Auth::check() && Auth::user()->isAdmin() ? 'Super Administrator' : 'Administrator' }}</div>
+                    </div>
                 </div>
-                <div class="overflow-hidden" style="max-width: 120px;">
-                    <div class="sidebar-user-name text-truncate">{{ Auth::check() ? Auth::user()->name : 'Admin' }}</div>
-                    <div class="sidebar-user-role text-truncate">{{ Auth::check() && Auth::user()->isAdmin() ? 'Super Administrator' : 'Administrator' }}</div>
-                </div>
-            </div>
-            <form action="{{ route('logout') }}" method="POST" class="mb-0" id="sidebarLogoutForm">
-                @csrf
-                <button type="submit" class="btn btn-sm btn-surface p-1.5" title="Đăng xuất" aria-label="Logout">
-                    <i data-lucide="log-out" style="width: 16px; height: 16px;" class="text-danger"></i>
-                </button>
-            </form>
+                <i data-lucide="chevrons-up-down" style="width: 16px; height: 16px;" class="text-secondary flex-shrink-0 ms-1"></i>
+            </button>
+
+            <ul class="dropdown-menu dropdown-menu-modern dropdown-menu-dark w-100 shadow-lg mb-2 p-2">
+                <li class="px-2 py-1.5 border-bottom mb-1">
+                    <div class="fw-bold text-dark small text-truncate">{{ Auth::user()->name ?? 'Admin' }}</div>
+                    <div class="text-secondary small font-monospace" style="font-size: 0.75rem;">{{ Auth::user()->email ?? 'admin@tuixach.vn' }}</div>
+                </li>
+                <li>
+                    <a href="{{ route('home') }}" class="dropdown-item-modern rounded-2 py-1.5" target="_blank">
+                        <i data-lucide="external-link" style="width: 15px; height: 15px; margin-right: 0.5rem;"></i>
+                        <span>Xem Storefront</span>
+                    </a>
+                </li>
+                @if (Auth::check())
+                    <li>
+                        <a href="{{ route('admin.users.show', Auth::user()) }}" class="dropdown-item-modern rounded-2 py-1.5">
+                            <i data-lucide="user" style="width: 15px; height: 15px; margin-right: 0.5rem;"></i>
+                            <span>Hồ sơ cá nhân</span>
+                        </a>
+                    </li>
+                @endif
+                <li><hr class="dropdown-divider-modern my-1"></li>
+                <li>
+                    <button type="button" class="dropdown-item-modern item-danger rounded-2 py-1.5 w-100 border-0 bg-transparent text-start" onclick="openLogoutModal()">
+                        <i data-lucide="log-out" style="width: 15px; height: 15px; margin-right: 0.5rem;"></i>
+                        <span>Đăng xuất hệ thống</span>
+                    </button>
+                </li>
+            </ul>
         </div>
     </div>
 </aside>

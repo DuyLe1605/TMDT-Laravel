@@ -38,7 +38,7 @@
                 >
             </div>
             @error('email')
-                <div class="text-danger small mt-1.5 d-flex align-items-center gap-1.5">
+                <div class="text-danger small mt-1.5 d-flex align-items-center gap-1.5 server-invalid-feedback">
                     <i data-lucide="alert-circle" style="width: 15px; height: 15px; flex-shrink: 0;"></i>
                     <span>{{ $message }}</span>
                 </div>
@@ -79,8 +79,8 @@
                 </button>
             </div>
             @error('password')
-                <div class="text-danger small mt-1.5 d-flex align-items-center gap-1">
-                    <i data-lucide="alert-circle" style="width: 14px; height: 14px;"></i>
+                <div class="text-danger small mt-1.5 d-flex align-items-center gap-1.5 server-invalid-feedback">
+                    <i data-lucide="alert-circle" style="width: 15px; height: 15px; flex-shrink: 0;"></i>
                     <span>{{ $message }}</span>
                 </div>
             @enderror
