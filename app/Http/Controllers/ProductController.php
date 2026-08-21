@@ -65,7 +65,7 @@ class ProductController extends Controller
         $this->productService->createProduct($request->validated());
 
         return redirect()
-            ->route('products.index')
+            ->route('admin.products.index')
             ->with(AppConstants::FLASH_SUCCESS, AppConstants::MSG_PRODUCT_CREATED);
     }
 
@@ -105,7 +105,7 @@ class ProductController extends Controller
         $this->productService->updateProduct($product, $request->validated());
 
         return redirect()
-            ->route('products.index')
+            ->route('admin.products.index')
             ->with(AppConstants::FLASH_SUCCESS, AppConstants::MSG_PRODUCT_UPDATED);
     }
 
@@ -120,7 +120,7 @@ class ProductController extends Controller
         $this->productService->deleteProduct($product);
 
         return redirect()
-            ->route('products.index')
+            ->route('admin.products.index')
             ->with(AppConstants::FLASH_SUCCESS, AppConstants::MSG_PRODUCT_DELETED);
     }
 }

@@ -29,4 +29,11 @@ final class AppConstants
     public const MSG_PRODUCT_UPDATED = 'Thông tin sản phẩm túi xách đã được cập nhật thành công.';
     public const MSG_PRODUCT_DELETED = 'Sản phẩm túi xách đã được xóa thành công.';
     public const MSG_PRODUCT_NOT_FOUND = 'Không tìm thấy sản phẩm yêu cầu.';
+
+    // Thông báo cho Auth
+    public const MSG_LOGIN_SUCCESS = 'Đăng nhập thành công! Chào mừng bạn quay lại.';
+    public const MSG_LOGIN_FAILED = 'Email hoặc mật khẩu không chính xác. Vui lòng thử lại.';
+    public const MSG_REGISTER_SUCCESS = 'Đăng ký tài khoản thành công! Hãy đăng nhập để tiếp tục.';
+    public const MSG_REGISTER_FAILED = 'Đăng ký thất bại. Vui lòng thử lại sau.';
+    public const MSG_LOGOUT_SUCCESS = 'Bạn đã đăng xuất thành công.';
 }

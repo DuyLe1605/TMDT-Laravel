@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark navbar-obsidian">
     <div class="container">
         <!-- Brand Logo & Identity -->
-        <a class="navbar-brand d-flex align-items-center gap-2" href="{{ route('categories.index') }}">
+        <a class="navbar-brand d-flex align-items-center gap-2" href="{{ route('admin.dashboard') }}">
             <div class="brand-logo-badge">
                 <i data-lucide="layers" style="width: 20px; height: 20px;"></i>
             </div>
@@ -20,7 +20,7 @@
         <div class="collapse navbar-collapse" id="navbarMain">
             <ul class="navbar-nav me-auto ps-lg-4 gap-1 my-2 my-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link nav-link-obsidian {{ request()->routeIs('categories.*') ? 'active' : '' }}" href="{{ route('categories.index') }}">
+                    <a class="nav-link nav-link-obsidian {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}" href="{{ route('admin.categories.index') }}">
                         <i data-lucide="folder-tree" style="width: 16px; height: 16px;"></i>
                         <span>Quản lý Danh mục</span>
                     </a>

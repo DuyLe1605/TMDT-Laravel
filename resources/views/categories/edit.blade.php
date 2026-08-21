@@ -7,9 +7,9 @@
     <div class="col-md-9 col-lg-7 col-xl-6">
         <!-- Breadcrumbs -->
         <div class="breadcrumb-modern">
-            <a href="{{ route('categories.index') }}">Danh mục</a>
+            <a href="{{ route('admin.categories.index') }}">Danh mục</a>
             <i data-lucide="chevron-right" style="width: 14px; height: 14px;"></i>
-            <a href="{{ route('categories.show', $category) }}">#{{ str_pad($category->id, 3, '0', STR_PAD_LEFT) }}</a>
+            <a href="{{ route('admin.categories.show', $category) }}">#{{ str_pad($category->id, 3, '0', STR_PAD_LEFT) }}</a>
             <i data-lucide="chevron-right" style="width: 14px; height: 14px;"></i>
             <span class="text-primary fw-medium">Chỉnh sửa</span>
         </div>
@@ -29,7 +29,7 @@
                         <div class="text-secondary small">Cập nhật thông tin phân loại sản phẩm</div>
                     </div>
                 </div>
-                <a href="{{ route('categories.index') }}" class="btn-surface" style="padding: 0.55rem 1.1rem; font-size: 0.88rem;">
+                <a href="{{ route('admin.categories.index') }}" class="btn-surface" style="padding: 0.55rem 1.1rem; font-size: 0.88rem;">
                     <i data-lucide="arrow-left" style="width: 15px; height: 15px; margin-right: 0.45rem;"></i>
                     <span>Quay lại</span>
                 </a>
@@ -37,7 +37,7 @@
             
             <!-- Card Form Body -->
             <div class="card-modern-body">
-                <form action="{{ route('categories.update', $category) }}" method="POST" id="editCategoryForm">
+                <form action="{{ route('admin.categories.update', $category) }}" method="POST" id="editCategoryForm">
                     @csrf
                     @method('PUT')
                     
@@ -79,7 +79,7 @@
                     </div>
 
                     <div class="d-flex justify-content-end align-items-center gap-3 pt-3 border-top">
-                        <a href="{{ route('categories.index') }}" class="btn-surface">
+                        <a href="{{ route('admin.categories.index') }}" class="btn-surface">
                             <span>Hủy bỏ</span>
                         </a>
                         <button type="submit" class="btn-brand-primary">

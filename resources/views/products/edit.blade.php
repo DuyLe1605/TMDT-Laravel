@@ -7,9 +7,9 @@
     <div class="col-lg-10 col-xl-9">
         <!-- Breadcrumbs -->
         <div class="breadcrumb-modern">
-            <a href="{{ route('products.index') }}">Sản phẩm</a>
+            <a href="{{ route('admin.products.index') }}">Sản phẩm</a>
             <i data-lucide="chevron-right" style="width: 14px; height: 14px;"></i>
-            <a href="{{ route('products.show', $product) }}">#{{ str_pad($product->id, 3, '0', STR_PAD_LEFT) }}</a>
+            <a href="{{ route('admin.products.show', $product) }}">#{{ str_pad($product->id, 3, '0', STR_PAD_LEFT) }}</a>
             <i data-lucide="chevron-right" style="width: 14px; height: 14px;"></i>
             <span class="text-primary fw-medium">Chỉnh sửa</span>
         </div>
@@ -29,7 +29,7 @@
                         <div class="text-secondary small">Cập nhật giá bán, số lượng tồn kho và thông số sản phẩm</div>
                     </div>
                 </div>
-                <a href="{{ route('products.index') }}" class="btn-surface" style="padding: 0.55rem 1.1rem; font-size: 0.88rem;">
+                <a href="{{ route('admin.products.index') }}" class="btn-surface" style="padding: 0.55rem 1.1rem; font-size: 0.88rem;">
                     <i data-lucide="arrow-left" style="width: 15px; height: 15px; margin-right: 0.45rem;"></i>
                     <span>Quay lại</span>
                 </a>
@@ -37,7 +37,7 @@
             
             <!-- Card Form Body -->
             <div class="card-modern-body">
-                <form action="{{ route('products.update', $product) }}" method="POST" id="editProductForm">
+                <form action="{{ route('admin.products.update', $product) }}" method="POST" id="editProductForm">
                     @csrf
                     @method('PUT')
                     
@@ -229,7 +229,7 @@
 
                     <!-- Submit Buttons -->
                     <div class="d-flex justify-content-end align-items-center gap-3 pt-4 mt-4 border-top">
-                        <a href="{{ route('products.index') }}" class="btn-surface">
+                        <a href="{{ route('admin.products.index') }}" class="btn-surface">
                             <span>Hủy bỏ</span>
                         </a>
                         <button type="submit" class="btn-brand-primary">

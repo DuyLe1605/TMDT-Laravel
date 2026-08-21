@@ -44,7 +44,7 @@ class CategoryController extends Controller
         $this->categoryService->createCategory($request->validated());
 
         return redirect()
-            ->route('categories.index')
+            ->route('admin.categories.index')
             ->with(AppConstants::FLASH_SUCCESS, AppConstants::MSG_CATEGORY_CREATED);
     }
 
@@ -72,7 +72,7 @@ class CategoryController extends Controller
         $this->categoryService->updateCategory($category, $request->validated());
 
         return redirect()
-            ->route('categories.index')
+            ->route('admin.categories.index')
             ->with(AppConstants::FLASH_SUCCESS, AppConstants::MSG_CATEGORY_UPDATED);
     }
 
@@ -84,7 +84,7 @@ class CategoryController extends Controller
         $this->categoryService->deleteCategory($category);
 
         return redirect()
-            ->route('categories.index')
+            ->route('admin.categories.index')
             ->with(AppConstants::FLASH_SUCCESS, AppConstants::MSG_CATEGORY_DELETED);
     }
 }

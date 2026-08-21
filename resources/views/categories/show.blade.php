@@ -7,7 +7,7 @@
     <div class="col-md-9 col-lg-8 col-xl-7">
         <!-- Breadcrumbs -->
         <div class="breadcrumb-modern">
-            <a href="{{ route('categories.index') }}">Danh mục</a>
+            <a href="{{ route('admin.categories.index') }}">Danh mục</a>
             <i data-lucide="chevron-right" style="width: 14px; height: 14px;"></i>
             <span class="text-primary fw-medium">Chi tiết #{{ str_pad($category->id, 3, '0', STR_PAD_LEFT) }}</span>
         </div>
@@ -27,7 +27,7 @@
                         <div class="text-secondary small">Thông số kỹ thuật & thuộc tính ngành hàng</div>
                     </div>
                 </div>
-                <a href="{{ route('categories.index') }}" class="btn-surface" style="padding: 0.55rem 1.1rem; font-size: 0.88rem;">
+                <a href="{{ route('admin.categories.index') }}" class="btn-surface" style="padding: 0.55rem 1.1rem; font-size: 0.88rem;">
                     <i data-lucide="arrow-left" style="width: 15px; height: 15px; margin-right: 0.45rem;"></i>
                     <span>Quay lại</span>
                 </a>
@@ -135,7 +135,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             
-            <form id="editCategoryForm" action="{{ route('categories.update', $category) }}" method="POST">
+            <form id="editCategoryForm" action="{{ route('admin.categories.update', $category) }}" method="POST">
                 @csrf
                 @method('PUT')
                 <div class="modal-body-modern">
@@ -204,7 +204,7 @@
     </div>
 </div>
 
-<form id="delete-form-{{ $category->id }}" action="{{ route('categories.destroy', $category) }}" method="POST" class="d-none">
+<form id="delete-form-{{ $category->id }}" action="{{ route('admin.categories.destroy', $category) }}" method="POST" class="d-none">
     @csrf
     @method('DELETE')
 </form>

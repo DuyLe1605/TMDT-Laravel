@@ -1,13 +1,13 @@
 <aside class="admin-sidebar" id="adminSidebar">
     <!-- Sidebar Header & Brand -->
     <div class="sidebar-header">
-        <a href="{{ route('products.index') }}" class="d-flex align-items-center text-decoration-none">
+        <a href="{{ route('admin.dashboard') }}" class="d-flex align-items-center text-decoration-none">
             <div class="brand-logo-badge">
                 <i data-lucide="layers" style="width: 20px; height: 20px;"></i>
             </div>
             <div class="d-flex align-items-center">
-                <span class="brand-title">TMDT</span>
-                <span class="brand-tag">PORTAL</span>
+                <span class="brand-title">AURELIA</span>
+                <span class="brand-tag">ADMIN</span>
             </div>
         </a>
 
@@ -21,7 +21,7 @@
     <div class="sidebar-content">
         <!-- Section: Overview -->
         <div class="sidebar-section-title">TỔNG QUAN</div>
-        <a href="{{ route('products.index') }}" class="sidebar-nav-link">
+        <a href="{{ route('admin.dashboard') }}" class="sidebar-nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
             <div class="d-flex align-items-center">
                 <span class="sidebar-icon-box">
                     <i data-lucide="layout-dashboard" style="width: 18px; height: 18px;"></i>
@@ -30,11 +30,21 @@
             </div>
         </a>
 
+        <!-- Public Storefront Quick Link -->
+        <a href="{{ route('home') }}" class="sidebar-nav-link" target="_blank">
+            <div class="d-flex align-items-center">
+                <span class="sidebar-icon-box">
+                    <i data-lucide="external-link" style="width: 18px; height: 18px;"></i>
+                </span>
+                <span>Xem Cửa hàng (Public)</span>
+            </div>
+        </a>
+
         <!-- Section: E-Commerce Operations -->
         <div class="sidebar-section-title mt-3">QUẢN LÝ E-COMMERCE</div>
         
         <!-- Active Products Module -->
-        <a href="{{ route('products.index') }}" class="sidebar-nav-link {{ request()->routeIs('products.*') ? 'active' : '' }}">
+        <a href="{{ route('admin.products.index') }}" class="sidebar-nav-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
             <div class="d-flex align-items-center">
                 <span class="sidebar-icon-box">
                     <i data-lucide="package" style="width: 18px; height: 18px;"></i>
@@ -45,52 +55,12 @@
         </a>
 
         <!-- Active Categories Module -->
-        <a href="{{ route('categories.index') }}" class="sidebar-nav-link {{ request()->routeIs('categories.*') ? 'active' : '' }}">
+        <a href="{{ route('admin.categories.index') }}" class="sidebar-nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
             <div class="d-flex align-items-center">
                 <span class="sidebar-icon-box">
                     <i data-lucide="folder-tree" style="width: 18px; height: 18px;"></i>
                 </span>
                 <span>Dòng túi xách</span>
-            </div>
-        </a>
-
-        <a href="javascript:void(0)" class="sidebar-nav-link disabled" title="Tính năng đang phát triển">
-            <div class="d-flex align-items-center">
-                <span class="sidebar-icon-box">
-                    <i data-lucide="shopping-cart" style="width: 18px; height: 18px;"></i>
-                </span>
-                <span>Đơn hàng</span>
-            </div>
-            <span class="badge bg-secondary bg-opacity-25 text-secondary px-2 py-0.5 rounded-pill" style="font-size: 0.65rem;">Sắp có</span>
-        </a>
-
-        <a href="javascript:void(0)" class="sidebar-nav-link disabled" title="Tính năng đang phát triển">
-            <div class="d-flex align-items-center">
-                <span class="sidebar-icon-box">
-                    <i data-lucide="users" style="width: 18px; height: 18px;"></i>
-                </span>
-                <span>Khách hàng</span>
-            </div>
-            <span class="badge bg-secondary bg-opacity-25 text-secondary px-2 py-0.5 rounded-pill" style="font-size: 0.65rem;">Sắp có</span>
-        </a>
-
-        <!-- Section: System & Settings -->
-        <div class="sidebar-section-title mt-3">HỆ THỐNG</div>
-        <a href="javascript:void(0)" class="sidebar-nav-link disabled" title="Tính năng đang phát triển">
-            <div class="d-flex align-items-center">
-                <span class="sidebar-icon-box">
-                    <i data-lucide="bar-chart-3" style="width: 18px; height: 18px;"></i>
-                </span>
-                <span>Báo cáo doanh thu</span>
-            </div>
-        </a>
-
-        <a href="javascript:void(0)" class="sidebar-nav-link disabled" title="Tính năng đang phát triển">
-            <div class="d-flex align-items-center">
-                <span class="sidebar-icon-box">
-                    <i data-lucide="settings" style="width: 18px; height: 18px;"></i>
-                </span>
-                <span>Cài đặt chung</span>
             </div>
         </a>
     </div>
@@ -100,14 +70,19 @@
         <div class="d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center">
                 <div class="sidebar-user-avatar">
-                    AD
+                    {{ Auth::check() ? strtoupper(substr(Auth::user()->name, 0, 2)) : 'AD' }}
                 </div>
-                <div>
-                    <div class="sidebar-user-name">Admin User</div>
-                    <div class="sidebar-user-role">Super Administrator</div>
+                <div class="overflow-hidden" style="max-width: 120px;">
+                    <div class="sidebar-user-name text-truncate">{{ Auth::check() ? Auth::user()->name : 'Admin' }}</div>
+                    <div class="sidebar-user-role text-truncate">{{ Auth::check() && Auth::user()->isAdmin() ? 'Super Administrator' : 'Administrator' }}</div>
                 </div>
             </div>
-            <div class="status-pulse-dot" title="Trực tuyến"></div>
+            <form action="{{ route('logout') }}" method="POST" class="mb-0" id="sidebarLogoutForm">
+                @csrf
+                <button type="submit" class="btn btn-sm btn-surface p-1.5" title="Đăng xuất" aria-label="Logout">
+                    <i data-lucide="log-out" style="width: 16px; height: 16px;" class="text-danger"></i>
+                </button>
+            </form>
         </div>
     </div>
 </aside>

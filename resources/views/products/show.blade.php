@@ -7,7 +7,7 @@
     <div class="col-lg-10 col-xl-9">
         <!-- Breadcrumbs -->
         <div class="breadcrumb-modern">
-            <a href="{{ route('products.index') }}">Sản phẩm</a>
+            <a href="{{ route('admin.products.index') }}">Sản phẩm</a>
             <i data-lucide="chevron-right" style="width: 14px; height: 14px;"></i>
             <span class="text-primary fw-medium">Chi tiết #{{ str_pad($product->id, 3, '0', STR_PAD_LEFT) }}</span>
         </div>
@@ -27,7 +27,7 @@
                         <div class="text-secondary small">Thuộc tính ngành hàng, định giá và tình trạng kho</div>
                     </div>
                 </div>
-                <a href="{{ route('products.index') }}" class="btn-surface" style="padding: 0.55rem 1.1rem; font-size: 0.88rem;">
+                <a href="{{ route('admin.products.index') }}" class="btn-surface" style="padding: 0.55rem 1.1rem; font-size: 0.88rem;">
                     <i data-lucide="arrow-left" style="width: 15px; height: 15px; margin-right: 0.45rem;"></i>
                     <span>Quay lại</span>
                 </a>
@@ -160,7 +160,7 @@
                         <span>Xóa sản phẩm</span>
                     </button>
 
-                    <a href="{{ route('products.edit', $product) }}" class="btn-brand-primary">
+                    <a href="{{ route('admin.products.edit', $product) }}" class="btn-brand-primary">
                         <i data-lucide="pencil" style="width: 16px; height: 16px; margin-right: 0.45rem;"></i>
                         <span>Chỉnh sửa sản phẩm</span>
                     </a>
@@ -196,7 +196,7 @@
     </div>
 </div>
 
-<form id="delete-product-form-{{ $product->id }}" action="{{ route('products.destroy', $product) }}" method="POST" class="d-none">
+<form id="delete-product-form-{{ $product->id }}" action="{{ route('admin.products.destroy', $product) }}" method="POST" class="d-none">
     @csrf
     @method('DELETE')
 </form>

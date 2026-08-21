@@ -1,7 +1,10 @@
 /**
  * TMDT Bespoke Form Validator & Floating Toast System
- * Inspired by Zod schema validation: Disables native browser validation,
- * provides reactive inline feedback and animated floating toast notifications.
+ * Handles Client-Side Validation for Auth, Storefront, and Admin forms:
+ * - Disables native browser tooltip popups (novalidate)
+ * - Validates Required, Email regex, Password length, Password confirmation match, Numbers/Min/Max
+ * - Injects clean, beautiful inline error messages below each field
+ * - Live real-time validation on typing/blur
  */
 
 (function () {
@@ -52,12 +55,10 @@
 
         container.appendChild(toastEl);
 
-        // Re-run lucide icons on the newly created toast
         if (typeof lucide !== 'undefined') {
             lucide.createIcons();
         }
 
-        // Auto dismiss after 5 seconds
         setTimeout(() => {
             dismissToast(toastId);
         }, 5000);
@@ -78,7 +79,7 @@
      */
     function clearFieldError(input) {
         input.classList.remove('is-invalid');
-        const parent = input.closest('.mb-3, .mb-4, .col-md-4, .col-md-6, .col-md-8, .col-12, div');
+        const parent = input.closest('.form-group-modern, .mb-3, .mb-4, .col-md-4, .col-md-6, .col-md-8, .col-12, div');
         if (parent) {
             const feedbacks = parent.querySelectorAll('.dynamic-invalid-feedback');
             feedbacks.forEach(el => el.remove());
@@ -86,87 +87,135 @@
     }
 
     /**
-     * Set inline error on a single form control
+     * Set inline error on a single form control below the input/input-group
      */
     function setFieldError(input, message) {
         input.classList.add('is-invalid');
-        const parent = input.closest('.mb-3, .mb-4, .col-md-4, .col-md-6, .col-md-8, .col-12, div') || input.parentElement;
+        const parent = input.closest('.form-group-modern, .mb-3, .mb-4, .col-md-4, .col-md-6, .col-md-8, .col-12, div') || input.parentElement;
         if (parent) {
-            // Remove previous dynamic feedback if exists
             const existing = parent.querySelectorAll('.dynamic-invalid-feedback');
             existing.forEach(el => el.remove());
 
             const feedback = document.createElement('div');
-            feedback.className = 'invalid-feedback dynamic-invalid-feedback d-block mt-1';
-            feedback.innerText = message;
-            input.parentElement.appendChild(feedback);
+            feedback.className = 'text-danger small mt-1.5 d-flex align-items-center gap-1.5 dynamic-invalid-feedback';
+            feedback.innerHTML = `
+                <i data-lucide="alert-circle" style="width: 15px; height: 15px; flex-shrink: 0;"></i>
+                <span>${message}</span>
+            `;
+
+            // Insert after input-group-modern if present, otherwise after input
+            const targetContainer = input.closest('.input-group-modern') || input;
+            targetContainer.insertAdjacentElement('afterend', feedback);
+
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
         }
     }
 
     /**
-     * Validate a single form input element
+     * Validate a single form input element with comprehensive client-side rules
      */
     function validateField(input) {
+        // Skip hidden, tokens, submit buttons, checkboxes with no requirements
+        if (input.type === 'hidden' || input.type === 'submit' || input.type === 'button') return null;
+
         const value = input.value !== undefined ? input.value.trim() : '';
-        const isRequired = input.hasAttribute('required') || input.dataset.ruleRequired === 'true';
-        const fieldLabel = (input.closest('div')?.querySelector('label')?.innerText || input.placeholder || 'Trường này')
-            .replace('Bắt buộc', '')
-            .replace('Tùy chọn', '')
-            .trim();
+        const name = input.name || input.id || '';
+        const isRequired = input.hasAttribute('required') || input.dataset.ruleRequired === 'true' || ['email', 'password', 'name', 'password_confirmation'].includes(name);
+
+        const labelEl = input.closest('.form-group-modern, .mb-3, .mb-4, div')?.querySelector('label');
+        let fieldLabel = labelEl ? labelEl.innerText.replace('*', '').replace('Bắt buộc', '').replace('Tùy chọn', '').trim() : (input.placeholder || 'Trường này');
 
         // 1. Required Check
         if (isRequired && !value) {
-            setFieldError(input, `${fieldLabel} không được để trống.`);
-            return `${fieldLabel} không được để trống.`;
+            const msg = `Vui lòng nhập ${fieldLabel.toLowerCase()}.`;
+            setFieldError(input, msg);
+            return msg;
         }
 
-        // If not required and empty, pass
-        if (!isRequired && !value) {
+        // If field is optional and empty, pass
+        if (!value) {
             clearFieldError(input);
             return null;
         }
 
-        // 2. Numeric / Min / Max Check
+        // 2. Email Format Check
+        if (input.type === 'email' || name === 'email') {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(value)) {
+                const msg = 'Địa chỉ email không đúng định dạng (ví dụ: name@example.com).';
+                setFieldError(input, msg);
+                return msg;
+            }
+        }
+
+        // 3. Password Length Check (min 8 chars)
+        if (input.type === 'password' && name === 'password') {
+            if (value.length < 8) {
+                const msg = 'Mật khẩu phải có ít nhất 8 ký tự.';
+                setFieldError(input, msg);
+                return msg;
+            }
+        }
+
+        // 4. Password Confirmation Match Check
+        if (name === 'password_confirmation') {
+            const form = input.closest('form');
+            const passInput = form?.querySelector('input[name="password"]');
+            if (passInput && value !== passInput.value.trim()) {
+                const msg = 'Xác nhận mật khẩu không khớp với mật khẩu đã nhập.';
+                setFieldError(input, msg);
+                return msg;
+            }
+        }
+
+        // 5. Numeric / Min / Max Check
         if (input.type === 'number' || input.dataset.type === 'numeric') {
             const num = parseFloat(value);
             if (isNaN(num)) {
-                setFieldError(input, `${fieldLabel} phải là số hợp lệ.`);
-                return `${fieldLabel} phải là số hợp lệ.`;
+                const msg = `${fieldLabel} phải là số hợp lệ.`;
+                setFieldError(input, msg);
+                return msg;
             }
 
             const min = input.getAttribute('min');
             if (min !== null && num < parseFloat(min)) {
-                setFieldError(input, `${fieldLabel} không được nhỏ hơn ${min}.`);
-                return `${fieldLabel} không được nhỏ hơn ${min}.`;
+                const msg = `${fieldLabel} không được nhỏ hơn ${min}.`;
+                setFieldError(input, msg);
+                return msg;
             }
 
             const max = input.getAttribute('max');
             if (max !== null && num > parseFloat(max)) {
-                setFieldError(input, `${fieldLabel} không được vượt quá ${max}.`);
-                return `${fieldLabel} không được vượt quá ${max}.`;
+                const msg = `${fieldLabel} không được vượt quá ${max}.`;
+                setFieldError(input, msg);
+                return msg;
             }
         }
 
-        // 3. Sale price <= regular price check
+        // 6. Sale price <= regular price check
         if (input.id === 'sale_price' && value) {
             const priceInput = document.getElementById('price');
             if (priceInput && priceInput.value) {
                 const regularPrice = parseFloat(priceInput.value);
                 const salePrice = parseFloat(value);
                 if (salePrice > regularPrice) {
-                    setFieldError(input, 'Giá khuyến mãi phải nhỏ hơn hoặc bằng giá gốc.');
-                    return 'Giá khuyến mãi không được lớn hơn giá bán gốc.';
+                    const msg = 'Giá khuyến mãi phải nhỏ hơn hoặc bằng giá gốc.';
+                    setFieldError(input, msg);
+                    return msg;
                 }
             }
         }
 
-        // 4. URL Check
+        // 7. URL Check
         if (input.type === 'url' && value) {
             try {
                 new URL(value);
             } catch (_) {
-                setFieldError(input, 'Đường dẫn liên kết (URL) không đúng định dạng.');
-                return 'Đường dẫn ảnh/liên kết không đúng định dạng URL.';
+                const msg = 'Đường dẫn liên kết (URL) không đúng định dạng.';
+                setFieldError(input, msg);
+                return msg;
             }
         }
 
@@ -178,12 +227,12 @@
      * Attach validator listeners to all forms
      */
     function initFormValidators() {
-        // Disable browser native validation on all forms
         const forms = document.querySelectorAll('form');
         forms.forEach(form => {
+            // Disable default browser tooltips
             form.setAttribute('novalidate', 'true');
 
-            // Listen to real-time input / change to clear errors immediately
+            // Real-time input validation: clear error or re-validate as user types
             const inputs = form.querySelectorAll('input, select, textarea');
             inputs.forEach(input => {
                 input.addEventListener('input', () => {
@@ -191,16 +240,23 @@
                         validateField(input);
                     }
                 });
+                input.addEventListener('blur', () => {
+                    if (input.value && input.value.trim().length > 0) {
+                        validateField(input);
+                    }
+                });
                 input.addEventListener('change', () => validateField(input));
             });
 
-            // Intercept form submit
+            // Intercept form submit and validate all fields client-side first
             form.addEventListener('submit', function (e) {
+                // Ignore search-only GET forms with empty inputs
+                if (form.method.toUpperCase() === 'GET' && form.id === 'shopFilterForm') return;
+
                 const formInputs = form.querySelectorAll('input, select, textarea');
                 const errors = [];
 
                 formInputs.forEach(input => {
-                    // Ignore hidden fields or CSRF token
                     if (input.type === 'hidden' || input.name === '_token' || input.name === '_method') return;
 
                     const err = validateField(input);
@@ -219,8 +275,10 @@
                         firstInvalid.focus();
                     }
 
-                    // Trigger animated toast with full error summary
-                    window.showToast('error', 'Kiểm tra lại dữ liệu nhập', errors);
+                    // Optional toast alert
+                    if (typeof window.showToast === 'function' && errors.length > 1) {
+                        window.showToast('error', 'Vui lòng kiểm tra lại thông tin', errors);
+                    }
                 }
             });
         });

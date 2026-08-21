@@ -6,7 +6,7 @@
 <!-- Breadcrumbs & Page Header -->
 <div class="mb-4">
     <div class="breadcrumb-modern">
-        <a href="{{ route('categories.index') }}">Tổng quan</a>
+        <a href="{{ route('admin.categories.index') }}">Tổng quan</a>
         <i data-lucide="chevron-right" style="width: 14px; height: 14px;"></i>
         <span class="text-primary fw-medium">Danh mục Túi Xách Nữ</span>
     </div>
@@ -142,7 +142,7 @@
                                     <i data-lucide="shopping-bag" style="width: 18px; height: 18px;"></i>
                                 </div>
                                 <div>
-                                    <a href="{{ route('categories.show', $category) }}" class="category-name-text d-block text-decoration-none">
+                                    <a href="{{ route('admin.categories.show', $category) }}" class="category-name-text d-block text-decoration-none">
                                         {{ $category->name }}
                                     </a>
                                     <span class="text-tertiary" style="font-size: 0.8rem;">
@@ -179,7 +179,7 @@
                                 <ul class="dropdown-menu dropdown-menu-modern dropdown-menu-end shadow">
                                     <li>
                                         <!-- Direct Link to Dedicated Show Page -->
-                                        <a href="{{ route('categories.show', $category) }}" class="dropdown-item-modern">
+                                        <a href="{{ route('admin.categories.show', $category) }}" class="dropdown-item-modern">
                                             <i data-lucide="eye" style="width: 16px; height: 16px; margin-right: 0.5rem;"></i>
                                             <span>Xem chi tiết</span>
                                         </a>
@@ -208,7 +208,7 @@
                                 </ul>
                             </div>
 
-                            <form id="delete-form-{{ $category->id }}" action="{{ route('categories.destroy', $category) }}" method="POST" class="d-none">
+                            <form id="delete-form-{{ $category->id }}" action="{{ route('admin.categories.destroy', $category) }}" method="POST" class="d-none">
                                 @csrf
                                 @method('DELETE')
                             </form>
@@ -262,7 +262,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             
-            <form action="{{ route('categories.store') }}" method="POST">
+            <form action="{{ route('admin.categories.store') }}" method="POST">
                 @csrf
                 <div class="modal-body-modern">
                     <div class="mb-4">

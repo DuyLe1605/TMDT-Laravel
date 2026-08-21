@@ -6,7 +6,7 @@
 <!-- Breadcrumbs & Page Header -->
 <div class="mb-4">
     <div class="breadcrumb-modern">
-        <a href="{{ route('products.index') }}">Tổng quan</a>
+        <a href="{{ route('admin.products.index') }}">Tổng quan</a>
         <i data-lucide="chevron-right" style="width: 14px; height: 14px;"></i>
         <span class="text-primary fw-medium">Sản phẩm Túi Xách Nữ</span>
     </div>
@@ -19,7 +19,7 @@
             </p>
         </div>
         <div class="d-flex align-items-center gap-2">
-            <a href="{{ route('products.create') }}" class="btn-brand-primary">
+            <a href="{{ route('admin.products.create') }}" class="btn-brand-primary">
                 <i data-lucide="plus" style="width: 18px; height: 18px; margin-right: 0.45rem;"></i>
                 <span>Thêm sản phẩm mới</span>
             </a>
@@ -83,7 +83,7 @@
         
         <div class="d-flex align-items-center gap-2.5 flex-nowrap">
             <!-- Filter by Category -->
-            <form method="GET" action="{{ route('products.index') }}" class="d-flex align-items-center gap-2.5 flex-nowrap mb-0">
+            <form method="GET" action="{{ route('admin.products.index') }}" class="d-flex align-items-center gap-2.5 flex-nowrap mb-0">
                 <div class="select-box-modern" style="width: 170px;">
                     <i data-lucide="folder-tree" class="select-icon" style="width: 15px; height: 15px;"></i>
                     <select name="category_id" class="form-select form-select-modern" onchange="this.form.submit()">
@@ -161,7 +161,7 @@
                                     </div>
                                 @endif
                                 <div>
-                                    <a href="{{ route('products.show', $product) }}" class="category-name-text d-block text-decoration-none">
+                                    <a href="{{ route('admin.products.show', $product) }}" class="category-name-text d-block text-decoration-none">
                                         {{ $product->name }}
                                     </a>
                                     <div class="d-flex align-items-center gap-2 text-tertiary mt-0.5" style="font-size: 0.8rem;">
@@ -235,13 +235,13 @@
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-modern dropdown-menu-end shadow">
                                     <li>
-                                        <a href="{{ route('products.show', $product) }}" class="dropdown-item-modern">
+                                        <a href="{{ route('admin.products.show', $product) }}" class="dropdown-item-modern">
                                             <i data-lucide="eye" style="width: 16px; height: 16px; margin-right: 0.5rem;"></i>
                                             <span>Xem chi tiết</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="{{ route('products.edit', $product) }}" class="dropdown-item-modern">
+                                        <a href="{{ route('admin.products.edit', $product) }}" class="dropdown-item-modern">
                                             <i data-lucide="pencil" style="width: 16px; height: 16px; margin-right: 0.5rem;"></i>
                                             <span>Chỉnh sửa</span>
                                         </a>
@@ -260,7 +260,7 @@
                                 </ul>
                             </div>
 
-                            <form id="delete-product-form-{{ $product->id }}" action="{{ route('products.destroy', $product) }}" method="POST" class="d-none">
+                            <form id="delete-product-form-{{ $product->id }}" action="{{ route('admin.products.destroy', $product) }}" method="POST" class="d-none">
                                 @csrf
                                 @method('DELETE')
                             </form>
@@ -275,7 +275,7 @@
                                 </div>
                                 <h5 class="fw-bold text-dark mb-1">Chưa có sản phẩm túi xách nào</h5>
                                 <p class="text-secondary small mb-4">Bắt đầu bằng cách thêm mẫu túi xách nữ đầu tiên vào kho hàng.</p>
-                                <a href="{{ route('products.create') }}" class="btn-brand-primary">
+                                <a href="{{ route('admin.products.create') }}" class="btn-brand-primary">
                                     <i data-lucide="plus" style="width: 16px; height: 16px; margin-right: 0.45rem;"></i>
                                     <span>Thêm sản phẩm ngay</span>
                                 </a>
