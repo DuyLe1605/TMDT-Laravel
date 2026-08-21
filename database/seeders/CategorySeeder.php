@@ -13,16 +13,16 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         $categories = [
-            ['name' => 'Điện thoại & Phụ kiện'],
-            ['name' => 'Máy tính & Laptop'],
-            ['name' => 'Thời trang Nam'],
-            ['name' => 'Thời trang Nữ'],
-            ['name' => 'Thiết bị điện tử'],
-            ['name' => 'Nhà cửa & Đời sống'],
+            ['name' => 'Túi Đeo Chéo'],
+            ['name' => 'Túi Xách Tay Công Sở'],
+            ['name' => 'Túi Tote Đa Năng'],
+            ['name' => 'Túi Kẹp Nách Thời Thượng'],
+            ['name' => 'Ví Cầm Tay & Clutch Dạ Tiệc'],
+            ['name' => 'Balo Mini Nữ Thời Trang'],
         ];
 
-        foreach ($categories as $cat) {
-            Category::firstOrCreate(['name' => $cat['name']]);
+        foreach ($categories as $category) {
+            Category::firstOrCreate(['name' => $category['name']], $category);
         }
     }
 }

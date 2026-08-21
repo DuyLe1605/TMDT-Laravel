@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Admin Hub') - TMDT E-Commerce</title>
+    <title>@yield('title', 'Admin Hub') - TMDT Túi Xách Nữ</title>
     
     <!-- Anti-flicker Theme Init Script -->
     <script>
@@ -47,8 +47,8 @@
 
                     <!-- Quick System Breadcrumb / Title -->
                     <div class="d-flex align-items-center gap-2 text-secondary small d-none d-sm-flex">
-                        <i data-lucide="shield-check" class="text-success" style="width: 16px; height: 16px;"></i>
-                        <span class="fw-semibold">TMDT Management Portal</span>
+                        <i data-lucide="sparkles" class="text-primary" style="width: 16px; height: 16px;"></i>
+                        <span class="fw-semibold">Túi Xách Nữ &bull; TMDT Admin Portal</span>
                     </div>
                 </div>
 
@@ -84,6 +84,9 @@
     <!-- Bootstrap 5 Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     
+    <!-- Zod-like Client-Side Form Validator & Floating Toast System -->
+    <script src="{{ asset('js/validator.js') }}"></script>
+
     <!-- Global Scripts: Theme, Sidebar & Icons -->
     <script>
         function updateThemeIcon(theme) {

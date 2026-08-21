@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Danh sách danh mục')
+@section('title', 'Quản lý Danh mục Túi Xách Nữ')
 
 @section('content')
 <!-- Breadcrumbs & Page Header -->
@@ -8,14 +8,14 @@
     <div class="breadcrumb-modern">
         <a href="{{ route('categories.index') }}">Tổng quan</a>
         <i data-lucide="chevron-right" style="width: 14px; height: 14px;"></i>
-        <span class="text-primary fw-medium">Danh mục sản phẩm</span>
+        <span class="text-primary fw-medium">Danh mục Túi Xách Nữ</span>
     </div>
     
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mt-2">
         <div>
-            <h2 class="fw-bold mb-1 text-dark" style="letter-spacing: -0.03em;">Quản lý Danh mục</h2>
+            <h2 class="fw-bold mb-1 text-dark" style="letter-spacing: -0.03em;">Quản lý Danh mục Túi Xách Nữ</h2>
             <p class="text-secondary mb-0" style="font-size: 0.94rem;">
-                Tổ chức, phân nhóm và tối ưu hóa hệ thống ngành hàng trên sàn thương mại điện tử
+                Phân nhóm ngành hàng túi xách thời trang (Túi đeo chéo, Túi xách tay, Túi Tote, Kẹp nách, Clutch dạ tiệc)
             </p>
         </div>
         <div class="d-flex align-items-center gap-2">
@@ -33,11 +33,11 @@
         <div class="metric-card metric-card-primary">
             <div class="d-flex align-items-center justify-content-between">
                 <div>
-                    <div class="metric-label mb-2">Tổng số danh mục</div>
+                    <div class="metric-label mb-2">Tổng số dòng túi xách</div>
                     <div class="metric-number">{{ method_exists($categories, 'total') ? $categories->total() : $categories->count() }}</div>
                 </div>
                 <div class="metric-icon-box metric-icon-indigo">
-                    <i data-lucide="folder-tree" style="width: 22px; height: 22px;"></i>
+                    <i data-lucide="shopping-bag" style="width: 22px; height: 22px;"></i>
                 </div>
             </div>
         </div>
@@ -46,7 +46,7 @@
         <div class="metric-card metric-card-success">
             <div class="d-flex align-items-center justify-content-between">
                 <div>
-                    <div class="metric-label mb-2">Trạng thái đồng bộ</div>
+                    <div class="metric-label mb-2">Trạng thái đồng bộ CSDL</div>
                     <div class="metric-number text-success">100%</div>
                 </div>
                 <div class="metric-icon-box metric-icon-emerald">
@@ -59,11 +59,11 @@
         <div class="metric-card metric-card-info">
             <div class="d-flex align-items-center justify-content-between">
                 <div>
-                    <div class="metric-label mb-2">Cấu trúc dữ liệu</div>
-                    <div class="metric-number" style="font-size: 1.35rem; font-weight: 700;">Standard CRUD</div>
+                    <div class="metric-label mb-2">Ngành hàng chuyên biệt</div>
+                    <div class="metric-number" style="font-size: 1.3rem; font-weight: 700;">Túi Xách Nữ</div>
                 </div>
                 <div class="metric-icon-box metric-icon-sky">
-                    <i data-lucide="database" style="width: 22px; height: 22px;"></i>
+                    <i data-lucide="sparkles" style="width: 22px; height: 22px;"></i>
                 </div>
             </div>
         </div>
@@ -72,7 +72,7 @@
 
 <!-- Data Table Card Container -->
 <div class="card-modern">
-    <!-- Card Header with Real-time Quick Filter -->
+    <!-- Card Header with Sleek Integrated Toolbar Strictly Same Row -->
     <div class="card-modern-header d-flex flex-wrap justify-content-between align-items-center gap-3">
         <div class="d-flex align-items-center">
             <span class="fw-bold text-dark" style="font-size: 1.1rem;">Tất cả danh mục</span>
@@ -80,15 +80,32 @@
                 {{ method_exists($categories, 'total') ? $categories->total() : $categories->count() }} bản ghi
             </span>
         </div>
-        <div class="search-box-modern">
-            <i data-lucide="search" class="search-icon" style="width: 16px; height: 16px;"></i>
-            <input 
-                type="text" 
-                id="categorySearchInput" 
-                class="form-control form-control-modern" 
-                placeholder="Tìm nhanh theo tên danh mục..."
-                onkeyup="filterCategoryRows()"
-            >
+        
+        <!-- Controls strictly on the same row (flex-nowrap) -->
+        <div class="d-flex align-items-center gap-2.5 flex-nowrap">
+            <!-- Modern Integrated Sort Dropdown -->
+            <div class="select-box-modern">
+                <i data-lucide="arrow-up-down" class="select-icon" style="width: 15px; height: 15px;"></i>
+                <select id="categorySortSelect" class="form-select form-select-modern" onchange="applySortCategories()">
+                    <option value="created_desc">Mới nhất trước</option>
+                    <option value="created_asc">Cũ nhất trước</option>
+                    <option value="name_asc">Tên A &rarr; Z</option>
+                    <option value="name_desc">Tên Z &rarr; A</option>
+                    <option value="id_asc">Mã ID tăng dần</option>
+                </select>
+            </div>
+
+            <!-- Accent-insensitive Search Box -->
+            <div class="search-box-modern">
+                <i data-lucide="search" class="search-icon" style="width: 16px; height: 16px;"></i>
+                <input 
+                    type="text" 
+                    id="categorySearchInput" 
+                    class="form-control form-control-modern" 
+                    placeholder="Tìm theo tên dòng túi..."
+                    onkeyup="filterCategoryRows()"
+                >
+            </div>
         </div>
     </div>
 
@@ -98,34 +115,38 @@
             <thead>
                 <tr>
                     <th style="width: 110px;" class="text-center">Mã ID</th>
-                    <th>Tên danh mục & Phân loại</th>
+                    <th>Tên danh mục & Phân loại Túi Xách</th>
                     <th style="width: 220px;">Ngày tạo</th>
                     <th style="width: 220px;">Cập nhật cuối</th>
                     <th style="width: 100px;" class="text-center">Thao tác</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="categoryTableBody">
                 @forelse ($categories as $category)
                     @php
                         $slug = \Illuminate\Support\Str::slug($category->name);
                         $createdAt = $category->created_at ? $category->created_at->format('d/m/Y H:i') : '---';
+                        $createdTimestamp = $category->created_at ? $category->created_at->timestamp : 0;
                         $updatedAt = $category->updated_at ? $category->updated_at->format('d/m/Y H:i') : '---';
                     @endphp
-                    <tr class="category-data-row">
+                    <tr class="category-data-row" 
+                        data-id="{{ $category->id }}" 
+                        data-name="{{ $category->name }}" 
+                        data-created="{{ $createdTimestamp }}">
                         <td class="text-center">
                             <span class="badge-mono-id">#{{ str_pad($category->id, 3, '0', STR_PAD_LEFT) }}</span>
                         </td>
                         <td>
                             <div class="d-flex align-items-center gap-3">
                                 <div class="category-squircle">
-                                    <i data-lucide="tag" style="width: 18px; height: 18px;"></i>
+                                    <i data-lucide="shopping-bag" style="width: 18px; height: 18px;"></i>
                                 </div>
                                 <div>
                                     <a href="{{ route('categories.show', $category) }}" class="category-name-text d-block text-decoration-none">
                                         {{ $category->name }}
                                     </a>
                                     <span class="text-tertiary" style="font-size: 0.8rem;">
-                                        /danh-muc/{{ $slug }} &bull; Đang hoạt động
+                                        /danh-muc/{{ $slug }} &bull; Ngành hàng Túi xách nữ
                                     </span>
                                 </div>
                             </div>
@@ -200,8 +221,8 @@
                                 <div class="category-squircle mx-auto mb-3" style="width: 56px; height: 56px;">
                                     <i data-lucide="inbox" style="width: 28px; height: 28px;"></i>
                                 </div>
-                                <h5 class="fw-bold text-dark mb-1">Chưa có danh mục nào</h5>
-                                <p class="text-secondary small mb-4">Bắt đầu bằng cách tạo danh mục sản phẩm đầu tiên cho sàn TMDT.</p>
+                                <h5 class="fw-bold text-dark mb-1">Chưa có phân loại túi xách nào</h5>
+                                <p class="text-secondary small mb-4">Bắt đầu bằng cách tạo danh mục túi xách nữ đầu tiên.</p>
                                 <button type="button" class="btn-brand-primary" onclick="openCreateModal()">
                                     <i data-lucide="plus" style="width: 16px; height: 16px; margin-right: 0.4rem;"></i>
                                     <span>Tạo danh mục ngay</span>
@@ -234,8 +255,8 @@
                         <i data-lucide="folder-plus" style="width: 22px; height: 22px;"></i>
                     </div>
                     <div>
-                        <h5 class="fw-bold text-dark mb-1">Thêm Danh Mục Mới</h5>
-                        <div class="text-secondary small">Tạo phân nhóm ngành hàng mới cho hệ thống</div>
+                        <h5 class="fw-bold text-dark mb-1">Thêm Danh Mục Túi Xách</h5>
+                        <div class="text-secondary small">Khởi tạo phân nhóm túi xách nữ mới cho sàn TMDT</div>
                     </div>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -246,7 +267,7 @@
                 <div class="modal-body-modern">
                     <div class="mb-4">
                         <label for="create_name" class="form-label-modern mb-2">
-                            <span>Tên danh mục</span>
+                            <span>Tên dòng túi xách</span>
                             <span class="badge bg-danger-subtle text-danger px-2.5 py-1 rounded-pill" style="font-size: 0.72rem;">Bắt buộc</span>
                         </label>
                         <input 
@@ -254,7 +275,7 @@
                             class="form-control form-control-modern" 
                             id="create_name" 
                             name="name" 
-                            placeholder="Ví dụ: Đồ gia dụng, Điện thoại cao cấp..." 
+                            placeholder="Ví dụ: Túi Đeo Chéo, Túi Tote, Túi Kẹp Nách..." 
                             required 
                             autofocus
                             oninput="updateModalSlugPreview('create_name', 'create_slug_preview')"
@@ -282,7 +303,7 @@
 </div>
 
 <!-- =======================================================================
-     DIALOG 2: EDIT CATEGORY MODAL (Fixed Icon & Badge Spacing)
+     DIALOG 2: EDIT CATEGORY MODAL
      ======================================================================= -->
 <div class="modal fade" id="editCategoryModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 520px;">
@@ -297,7 +318,7 @@
                             <h5 class="fw-bold text-dark mb-0">Chỉnh Sửa Danh Mục</h5>
                             <span class="badge-mono-id" style="margin-left: 0.85rem !important;" id="editCategoryBadge">#000</span>
                         </div>
-                        <div class="text-secondary small">Cập nhật thông tin phân loại sản phẩm</div>
+                        <div class="text-secondary small">Cập nhật thông tin phân loại túi xách</div>
                     </div>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -309,7 +330,7 @@
                 <div class="modal-body-modern">
                     <div class="mb-4">
                         <label for="edit_name" class="form-label-modern mb-2">
-                            <span>Tên danh mục</span>
+                            <span>Tên dòng túi xách</span>
                             <span class="badge bg-danger-subtle text-danger px-2.5 py-1 rounded-pill" style="font-size: 0.72rem;">Bắt buộc</span>
                         </label>
                         <input 
@@ -355,7 +376,7 @@
                 </div>
                 <h5 class="fw-bold text-dark mb-2">Xác nhận xóa danh mục</h5>
                 <p class="text-secondary small mb-4">
-                    Bạn có chắc chắn muốn xóa danh mục <strong id="deleteCategoryName" class="text-dark"></strong> (#<span id="deleteCategoryId"></span>)? Thao tác này không thể hoàn tác.
+                    Bạn có chắc chắn muốn xóa danh mục <strong id="deleteCategoryName" class="text-dark"></strong> (#<span id="deleteCategoryId"></span>)? Toàn bộ sản phẩm thuộc dòng này sẽ bị ảnh hưởng.
                 </p>
                 <div class="d-flex justify-content-center gap-3">
                     <button type="button" class="btn-surface px-4 py-2" data-bs-dismiss="modal">
@@ -379,16 +400,21 @@
     let editModalInstance = null;
     let deleteModalInstance = null;
 
+    // Helper: Remove Vietnamese Tones for Accent-Insensitive Search
+    function removeVietnameseTones(str) {
+        if (!str) return '';
+        return str.normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[đĐ]/g, 'd')
+            .replace(/[^a-z0-9\s-]/gi, '')
+            .toLowerCase()
+            .trim();
+    }
+
     // Helper: Convert string to slug
     function generateSlug(text) {
         if (!text || !text.trim()) return 'chua-co-ten';
-        return text.toLowerCase()
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .replace(/[đĐ]/g, 'd')
-            .replace(/[^a-z0-9\s-]/g, '')
-            .trim()
-            .replace(/\s+/g, '-');
+        return removeVietnameseTones(text).replace(/\s+/g, '-');
     }
 
     function updateModalSlugPreview(inputId, previewId) {
@@ -451,18 +477,53 @@
         }
     }
 
-    // Real-time table filter
+    // Search: Accent-Insensitive Filter
     function filterCategoryRows() {
-        const query = document.getElementById('categorySearchInput').value.toLowerCase().trim();
+        const query = removeVietnameseTones(document.getElementById('categorySearchInput').value);
         const rows = document.querySelectorAll('.category-data-row');
         
         rows.forEach(row => {
-            const nameEl = row.querySelector('.category-name-text');
-            if (nameEl) {
-                const text = nameEl.textContent.toLowerCase();
-                row.style.display = text.includes(query) ? '' : 'none';
+            const rawName = row.getAttribute('data-name') || '';
+            const normalizedName = removeVietnameseTones(rawName);
+            const id = row.getAttribute('data-id') || '';
+            
+            const match = normalizedName.includes(query) || id.includes(query);
+            row.style.display = match ? '' : 'none';
+        });
+    }
+
+    // Sort: Client-side dynamic sort
+    function applySortCategories() {
+        const sortType = document.getElementById('categorySortSelect').value;
+        const tbody = document.getElementById('categoryTableBody');
+        const rows = Array.from(tbody.querySelectorAll('.category-data-row'));
+
+        rows.sort((a, b) => {
+            const idA = parseInt(a.getAttribute('data-id'), 10) || 0;
+            const idB = parseInt(b.getAttribute('data-id'), 10) || 0;
+            const nameA = (a.getAttribute('data-name') || '').toLowerCase();
+            const nameB = (b.getAttribute('data-name') || '').toLowerCase();
+            const createdA = parseInt(a.getAttribute('data-created'), 10) || 0;
+            const createdB = parseInt(b.getAttribute('data-created'), 10) || 0;
+
+            switch (sortType) {
+                case 'created_desc':
+                    return createdB - createdA || idB - idA;
+                case 'created_asc':
+                    return createdA - createdB || idA - idB;
+                case 'name_asc':
+                    return nameA.localeCompare(nameB, 'vi');
+                case 'name_desc':
+                    return nameB.localeCompare(nameA, 'vi');
+                case 'id_asc':
+                    return idA - idB;
+                default:
+                    return createdB - createdA;
             }
         });
+
+        // Re-append sorted rows
+        rows.forEach(row => tbody.appendChild(row));
     }
 </script>
 @endsection

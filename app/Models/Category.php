@@ -4,8 +4,10 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Database\Factories\CategoryFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Class Category
@@ -14,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $name
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property Collection<int, Product> $products
  * 
  * @method static CategoryFactory factory($count = null, $state = [])
  */
@@ -49,5 +52,13 @@ class Category extends Model
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
         ];
+    }
+
+    /**
+     * Get all products for this category.
+     */
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class);
     }
 }
