@@ -12,11 +12,28 @@
 
     /**
      * Dynamic Floating Toast Generator
-     * @param {'success'|'error'|'warning'|'info'} type 
-     * @param {string} title 
-     * @param {string|string[]} content 
+     * Supports:
+     * - showToast("Message text", "success")
+     * - showToast("success", "Title", "Content")
      */
-    window.showToast = function (type = 'error', title = 'Thông báo', content = '') {
+    window.showToast = function (arg1 = 'Thông báo', arg2 = 'info', arg3 = '') {
+        let type = 'info';
+        let title = 'Thông báo';
+        let content = '';
+
+        const validTypes = ['success', 'error', 'warning', 'info'];
+
+        if (validTypes.includes(arg1)) {
+            type = arg1;
+            title = arg2 || 'Thông báo';
+            content = arg3 || '';
+        } else {
+            // First argument is the message content or title
+            content = arg1;
+            type = validTypes.includes(arg2) ? arg2 : 'success';
+            title = type === 'success' ? 'Thành công' : (type === 'error' ? 'Có lỗi xảy ra' : (type === 'warning' ? 'Cảnh báo' : 'Thông báo'));
+        }
+
         let container = document.querySelector('.toast-container-custom');
         if (!container) {
             container = document.createElement('div');
@@ -27,18 +44,19 @@
         const toastId = 'toast-' + Math.random().toString(36).substr(2, 9);
         const toastEl = document.createElement('div');
         toastEl.id = toastId;
-        toastEl.className = `toast-modern toast-modern-${type === 'error' ? 'error' : (type === 'success' ? 'success' : 'error')} shadow-lg`;
+        toastEl.className = `toast-modern toast-modern-${type} shadow-lg`;
         toastEl.setAttribute('role', 'alert');
 
         let iconName = 'alert-triangle';
-        if (type === 'success') iconName = 'check';
+        if (type === 'success') iconName = 'check-circle-2';
         if (type === 'error') iconName = 'alert-circle';
+        if (type === 'warning') iconName = 'alert-triangle';
         if (type === 'info') iconName = 'info';
 
         let bodyHtml = '';
         if (Array.isArray(content)) {
             bodyHtml = `<ul class="mb-0 ps-3 mt-1 small">${content.map(item => `<li>${item}</li>`).join('')}</ul>`;
-        } else {
+        } else if (content) {
             bodyHtml = `<div class="toast-desc">${content}</div>`;
         }
 
@@ -61,7 +79,7 @@
 
         setTimeout(() => {
             dismissToast(toastId);
-        }, 5000);
+        }, 4000);
     };
 
     window.dismissToast = function (id) {

@@ -97,4 +97,36 @@ class Product extends Model
     {
         return $this->sale_price !== null && (float) $this->sale_price < (float) $this->price;
     }
+
+    /**
+     * Effective price accessor (sale price if discount active, else standard price).
+     */
+    public function getEffectivePriceAttribute(): float
+    {
+        return $this->has_discount ? (float) $this->sale_price : (float) $this->price;
+    }
+
+    /**
+     * Formatted effective price string.
+     */
+    public function getFormattedEffectivePriceAttribute(): string
+    {
+        return number_format($this->effective_price, 0, ',', '.') . ' ₫';
+    }
+
+    /**
+     * Cart items relationship.
+     */
+    public function cartItems()
+    {
+        return $this->hasMany(CartItem::class);
+    }
+
+    /**
+     * Order items relationship.
+     */
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
 }

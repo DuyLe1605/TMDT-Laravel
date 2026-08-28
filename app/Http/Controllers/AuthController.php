@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Constants\AppConstants;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
-use App\Models\User;
+use App\Services\CartService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +14,10 @@ use Illuminate\View\View;
 
 class AuthController extends Controller
 {
+    public function __construct(
+        protected ?CartService $cartService = null
+    ) {}
+
     /**
      * Hiển thị form đăng nhập.
      */
@@ -28,9 +32,14 @@ class AuthController extends Controller
     public function login(LoginRequest $request): RedirectResponse
     {
         $credentials = $request->only('email', 'password');
+        $previousSessionId = $request->session()->getId();
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
+
+            if ($this->cartService) {
+                $this->cartService->mergeGuestCart(Auth::id(), $previousSessionId);
+            }
 
             Log::info('User logged in: ' . Auth::user()->email);
 

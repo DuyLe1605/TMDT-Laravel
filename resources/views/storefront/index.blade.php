@@ -185,9 +185,27 @@
                                         </div>
                                     @endif
                                 </div>
-                                <a href="{{ route('shop.show', $product) }}" class="btn-card-action flex-shrink-0" title="Xem chi tiết sản phẩm">
-                                    <i data-lucide="eye" style="width: 17px; height: 17px;"></i>
-                                </a>
+                                <div class="d-flex align-items-center gap-1.5 flex-shrink-0">
+                                    <button 
+                                        type="button" 
+                                        class="btn-card-action" 
+                                        title="Thêm vào giỏ hàng" 
+                                        onclick="openQuickAddModal({
+                                            id: {{ $product->id }},
+                                            name: '{{ addslashes($product->name) }}',
+                                            effective_price: {{ (float) ($product->sale_price ?? $product->price) }},
+                                            original_price: {{ $product->has_discount ? (float) $product->price : 'null' }},
+                                            image: '{{ $product->image ?? '' }}',
+                                            category_name: '{{ addslashes($product->category?->name ?? 'Túi xách') }}',
+                                            stock: {{ $product->stock }}
+                                        })"
+                                    >
+                                        <i data-lucide="shopping-bag" style="width: 16px; height: 16px;"></i>
+                                    </button>
+                                    <a href="{{ route('shop.show', $product) }}" class="btn-card-action flex-shrink-0" title="Xem chi tiết sản phẩm">
+                                        <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>

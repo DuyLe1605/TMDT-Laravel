@@ -78,8 +78,16 @@
                 </a>
             </nav>
 
-            <!-- Header Right Actions (Search / Theme / Auth) -->
+            <!-- Header Right Actions (Search / Cart / Theme / Auth) -->
             <div class="d-flex align-items-center gap-2.5">
+                <!-- Shopping Cart Button with Dynamic Live Badge -->
+                <a href="{{ route('cart.index') }}" class="btn-surface position-relative p-2 d-inline-flex align-items-center justify-content-center text-decoration-none" title="Giỏ hàng của bạn" aria-label="Giỏ hàng">
+                    <i data-lucide="shopping-cart" style="width: 19px; height: 19px;"></i>
+                    <span class="cart-badge-count position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.68rem; padding: 0.25em 0.5em; display: none;">
+                        0
+                    </span>
+                </a>
+
                 <!-- Theme Toggle Button -->
                 <button type="button" class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Chuyển đổi Sáng / Tối" aria-label="Toggle Dark Mode">
                     <i data-lucide="sun" id="themeIconSun" style="width: 17px; height: 17px; display: none;"></i>
@@ -125,6 +133,19 @@
                                 </li>
                                 <li><hr class="dropdown-divider-modern"></li>
                             @endif
+                            <li>
+                                <a href="{{ route('account.orders') }}" class="dropdown-item-modern">
+                                    <i data-lucide="package" style="width: 16px; height: 16px; margin-right: 0.5rem;"></i>
+                                    <span>Đơn hàng của tôi</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('account.addresses') }}" class="dropdown-item-modern">
+                                    <i data-lucide="map-pin" style="width: 16px; height: 16px; margin-right: 0.5rem;"></i>
+                                    <span>Sổ địa chỉ nhận hàng</span>
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider-modern"></li>
                             <li>
                                 <form action="{{ route('logout') }}" method="POST">
                                     @csrf
@@ -227,6 +248,9 @@
     <!-- Client-Side Form Validator -->
     <script src="{{ asset('js/validator.js') }}"></script>
     
+    <!-- Vietnam Administrative Locations Cascading Selector Helper -->
+    <script src="{{ asset('js/vn-locations.js') }}"></script>
+    
     <script>
         function updateThemeIcon(theme) {
             const sunIcon = document.getElementById('themeIconSun');
@@ -251,12 +275,34 @@
             if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
+        // Fetch current cart count dynamically
+        async function refreshCartBadge() {
+            try {
+                const res = await fetch('{{ route("cart.count") }}', {
+                    headers: { 'Accept': 'application/json' }
+                });
+                const data = await res.json();
+                if (data && typeof data.count !== 'undefined') {
+                    const badges = document.querySelectorAll('.cart-badge-count');
+                    badges.forEach(b => {
+                        b.textContent = data.count;
+                        b.style.display = data.count > 0 ? 'inline-flex' : 'none';
+                    });
+                }
+            } catch (e) {}
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
             const initialTheme = document.documentElement.getAttribute('data-theme') || 'light';
             updateThemeIcon(initialTheme);
             if (typeof lucide !== 'undefined') lucide.createIcons();
+            refreshCartBadge();
         });
     </script>
+    
+    <!-- Global Quick Add to Cart Modal -->
+    <x-quick-add-modal />
+
     @yield('scripts')
 </body>
 </html>

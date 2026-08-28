@@ -1094,8 +1094,10 @@ body {
     height: 100%;
 }
 
-.toast-modern-success::before { background: var(--success-500); }
-.toast-modern-error::before { background: var(--danger-500); }
+.toast-modern-success::before { background: #10b981; }
+.toast-modern-error::before { background: #f43f5e; }
+.toast-modern-warning::before { background: #f59e0b; }
+.toast-modern-info::before { background: #0ea5e9; }
 
 .toast-icon-wrapper {
     width: 34px;
@@ -1109,13 +1111,47 @@ body {
 }
 
 .toast-modern-success .toast-icon-wrapper {
-    background: var(--success-50);
-    color: var(--success-600);
+    background: #d1fae5;
+    color: #059669;
 }
 
 .toast-modern-error .toast-icon-wrapper {
-    background: var(--danger-50);
-    color: var(--danger-600);
+    background: #ffe4e6;
+    color: #e11d48;
+}
+
+.toast-modern-warning .toast-icon-wrapper {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.toast-modern-info .toast-icon-wrapper {
+    background: #e0f2fe;
+    color: #0284c7;
+}
+
+[data-theme="dark"] .toast-modern-success .toast-icon-wrapper {
+    background: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+[data-theme="dark"] .toast-modern-error .toast-icon-wrapper {
+    background: rgba(244, 63, 94, 0.2);
+    color: #fb7185;
+    border: 1px solid rgba(244, 63, 94, 0.35);
+}
+
+[data-theme="dark"] .toast-modern-warning .toast-icon-wrapper {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+    border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+[data-theme="dark"] .toast-modern-info .toast-icon-wrapper {
+    background: rgba(14, 165, 233, 0.2);
+    color: #38bdf8;
+    border: 1px solid rgba(14, 165, 233, 0.35);
 }
 
 .toast-title {
@@ -1775,20 +1811,29 @@ input::-ms-clear {
     color: var(--brand-600);
 }
 
+[data-theme="dark"] .product-store-category {
+    color: #a5b4fc !important;
+}
+
 .product-store-title {
     color: var(--text-primary);
-    font-size: 0.98rem;
+    font-size: 0.95rem;
     font-weight: 700;
-    line-height: 1.45;
+    line-height: 1.4;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    min-height: 2.7rem;
     transition: color 0.15s ease;
 }
 
 .product-store-title:hover {
     color: var(--brand-600);
+}
+
+[data-theme="dark"] .product-store-title:hover {
+    color: #a5b4fc;
 }
 
 .product-chip {
@@ -1799,16 +1844,16 @@ input::-ms-clear {
     color: var(--text-secondary);
     background: var(--bg-surface-subtle);
     border: 1px solid var(--border-default);
-    padding: 0.2rem 0.55rem;
+    padding: 0.25rem 0.65rem;
     border-radius: var(--radius-full);
 }
 
 .price-current-luxury {
-    font-size: 1.2rem;
+    font-size: 1.15rem;
     font-weight: 800;
     letter-spacing: -0.02em;
     color: var(--brand-600);
-    line-height: 1.2;
+    line-height: 1.15;
 }
 
 [data-theme="dark"] .price-current-luxury {
@@ -1816,16 +1861,18 @@ input::-ms-clear {
 }
 
 .price-original-luxury {
-    font-size: 0.82rem;
+    font-size: 0.78rem;
     text-decoration: line-through;
     color: var(--text-tertiary);
+    line-height: 1;
+    margin-top: 3px;
 }
 
 .btn-card-action {
-    width: 38px;
-    height: 38px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     background: var(--bg-surface-subtle);
@@ -1833,13 +1880,23 @@ input::-ms-clear {
     border: 1px solid var(--border-default);
     transition: all 0.2s ease;
     text-decoration: none;
+    padding: 0 !important;
 }
 
-.btn-card-action:hover {
-    background: var(--brand-600);
-    color: #ffffff;
-    border-color: var(--brand-600);
-    transform: scale(1.08);
+.btn-card-action svg,
+.btn-card-action i {
+    margin: 0 !important;
+    margin-right: 0 !important;
+    flex-shrink: 0;
+}
+
+.btn-card-action:hover,
+.btn-card-action.active {
+    background: var(--brand-gradient);
+    color: #ffffff !important;
+    border-color: transparent;
+    box-shadow: 0 4px 12px var(--brand-glow);
+    transform: scale(1.06);
 }
 
 .storefront-footer {
@@ -1949,3 +2006,106 @@ input::-ms-clear {
         padding: 1.15rem 1.5rem;
     }
 }
+
+/* ==========================================================================
+   CART & CHECKOUT ENHANCEMENTS
+   ========================================================================== */
+
+/* Custom Checkbox */
+.custom-checkbox {
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+    border-radius: 0.35rem !important;
+    border: 1.5px solid var(--border-strong) !important;
+    cursor: pointer;
+    background-color: var(--bg-surface);
+}
+
+.custom-checkbox:checked {
+    background-color: var(--brand-600) !important;
+    border-color: var(--brand-600) !important;
+}
+
+.custom-checkbox:focus {
+    box-shadow: 0 0 0 3px rgba(194, 91, 58, 0.2) !important;
+}
+
+/* Quantity Stepper */
+.qty-stepper {
+    background: var(--bg-surface);
+    border-color: var(--border-default) !important;
+    overflow: hidden;
+}
+
+.btn-stepper {
+    padding: 0.4rem 0.65rem;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+}
+
+.btn-stepper:hover {
+    background: var(--bg-surface-subtle);
+    color: var(--text-primary);
+}
+
+.qty-input {
+    padding: 0.25rem 0.5rem;
+    color: var(--text-primary);
+    -moz-appearance: textfield;
+}
+
+.qty-input::-webkit-outer-spin-button,
+.qty-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Address & Shipping / Payment Method Cards */
+.address-item-card,
+.shipping-method-card,
+.payment-method-card {
+    background: var(--bg-surface);
+    border-color: var(--border-default) !important;
+    transition: all 0.2s ease;
+}
+
+.address-item-card:hover,
+.shipping-method-card:hover,
+.payment-method-card:hover {
+    border-color: var(--brand-400) !important;
+    background: var(--bg-surface-subtle);
+}
+
+.shipping-method-card.active,
+.payment-method-card.active {
+    border-color: var(--brand-600) !important;
+    background: rgba(194, 91, 58, 0.04);
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.pointer-events-none {
+    pointer-events: none;
+}
+
+.transition-all {
+    transition: all 0.2s ease-in-out;
+}
+
+/* Cart badge pulse */
+.cart-badge-count {
+    animation: cartBounce 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes cartBounce {
+    0% { transform: translate(-50%, -50%) scale(0.5); }
+    100% { transform: translate(-50%, -50%) scale(1); }
+}
+
