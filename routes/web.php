@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 // Import controllers
 use App\Http\Controllers\AdminController;
@@ -25,6 +27,27 @@ Route::middleware('guest')->group(function () {
     Route::get('register', [AuthController::class, 'showRegisterForm'])->name('register');
     Route::post('register', [AuthController::class, 'register']);
 });
+
+// =============================================================================
+// EMAIL VERIFICATION ROUTES — Xác thực email
+// =============================================================================
+
+// Hiển thị thông báo xác thực email
+Route::get('/email/verify', function () {
+    return view('auth.verify-email');
+})->middleware('auth')->name('verification.notice');
+
+// Xử lý link xác nhận (từ email)
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill();
+    return redirect()->route('home')->with('success', 'Email đã được xác thực thành công!');
+})->middleware(['auth', 'signed'])->name('verification.verify');
+
+// Gửi lại email xác nhận
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+    return back()->with('message', 'Link xác thực đã được gửi lại!');
+})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
 // =============================================================================
 // PROTECTED ROUTES — Phải đăng nhập

@@ -72,7 +72,7 @@
             <x-alert />
 
             <!-- Main Dynamic Page Content Container -->
-            <main class="container-fluid px-4 px-xl-5 py-4 pb-5 flex-grow-1">
+            <main class="container-fluid px-4 px-xl-5 py-4 flex-grow-1" style="padding-bottom: 2.5rem;">
                 @yield('content')
             </main>
 

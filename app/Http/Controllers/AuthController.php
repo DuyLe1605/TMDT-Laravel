@@ -34,6 +34,12 @@ class AuthController extends Controller
 
             Log::info('User logged in: ' . Auth::user()->email);
 
+            // Kiểm tra email đã xác thực chưa
+            if (!Auth::user()->hasVerifiedEmail()) {
+                return redirect()->route('verification.notice')
+                    ->with(AppConstants::FLASH_WARNING, 'Vui lòng xác thực email trước khi tiếp tục.');
+            }
+
             // Admin → redirect về admin dashboard lần đầu
             if (Auth::user()->isAdmin()) {
                 return redirect()->intended(route('admin.dashboard'))
@@ -69,17 +75,23 @@ class AuthController extends Controller
         try {
             Log::info('Registering user with email: ' . $request->email);
 
-            User::create([
+            $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => $request->password, // Auto-hashed via casts
                 'role' => 'customer',
             ]);
 
+            // Gửi email xác thực
+            $user->sendEmailVerificationNotification();
+
             Log::info('User registered successfully: ' . $request->email);
 
-            return redirect()->route('login')
-                ->with(AppConstants::FLASH_SUCCESS, AppConstants::MSG_REGISTER_SUCCESS);
+            // Đăng nhập user ngay sau khi đăng ký
+            Auth::login($user);
+
+            return redirect()->route('verification.notice')
+                ->with(AppConstants::FLASH_SUCCESS, 'Vui lòng kiểm tra email để xác thực tài khoản.');
         } catch (\Exception $e) {
             Log::error('Registration failed: ' . $e->getMessage());
 
