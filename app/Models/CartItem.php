@@ -14,12 +14,14 @@ class CartItem extends Model
         'user_id',
         'session_id',
         'product_id',
+        'product_variant_id',
         'quantity',
     ];
 
     protected $casts = [
         'user_id' => 'integer',
         'product_id' => 'integer',
+        'product_variant_id' => 'integer',
         'quantity' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
@@ -42,17 +44,39 @@ class CartItem extends Model
     }
 
     /**
-     * Get unit effective price (sale price if active discount, otherwise standard price).
+     * Get the variant for the cart item (if selected).
+     */
+    public function variant(): BelongsTo
+    {
+        return $this->belongsTo(ProductVariant::class, 'product_variant_id');
+    }
+
+    /**
+     * Get unit effective price (variant price if set, otherwise product price).
      */
     public function getUnitPriceAttribute(): float
     {
+        if ($this->variant) {
+            return (float) $this->variant->effective_price;
+        }
+
         if (!$this->product) {
             return 0.0;
         }
 
-        return $this->product->has_discount && $this->product->sale_price !== null
-            ? (float) $this->product->sale_price
-            : (float) $this->product->price;
+        return (float) $this->product->effective_price;
+    }
+
+    /**
+     * Get current available stock.
+     */
+    public function getAvailableStockAttribute(): int
+    {
+        if ($this->variant) {
+            return (int) $this->variant->stock;
+        }
+
+        return $this->product ? (int) $this->product->stock : 0;
     }
 
     /**

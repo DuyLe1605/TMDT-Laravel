@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 class Product extends Model
@@ -18,16 +19,20 @@ class Product extends Model
      */
     protected $fillable = [
         'category_id',
+        'brand_id',
         'name',
         'slug',
+        'sku',
         'price',
         'sale_price',
+        'has_variants',
         'stock',
         'material',
         'dimensions',
         'color',
         'description',
         'image',
+        'search_index',
         'is_featured',
         'is_active',
     ];
@@ -39,8 +44,10 @@ class Product extends Model
      */
     protected $casts = [
         'category_id' => 'integer',
+        'brand_id' => 'integer',
         'price' => 'decimal:2',
         'sale_price' => 'decimal:2',
+        'has_variants' => 'boolean',
         'stock' => 'integer',
         'is_featured' => 'boolean',
         'is_active' => 'boolean',
@@ -49,7 +56,7 @@ class Product extends Model
     ];
 
     /**
-     * Boot the model to auto-generate slug if not provided.
+     * Boot the model to auto-generate slug, sku and search_index.
      */
     protected static function boot(): void
     {
@@ -59,6 +66,24 @@ class Product extends Model
             if (empty($product->slug) || $product->isDirty('name')) {
                 $product->slug = Str::slug($product->name);
             }
+
+            if (empty($product->sku)) {
+                $product->sku = 'BAG-' . strtoupper(Str::random(6));
+            }
+
+            // Tự động sinh chuỗi tìm kiếm không dấu tổng hợp
+            $brandName = $product->brand?->name ?? ($product->brand_id ? Brand::find($product->brand_id)?->name : '');
+            $categoryName = $product->category?->name ?? ($product->category_id ? Category::find($product->category_id)?->name : '');
+            
+            $product->search_index = \App\Helpers\VietnameseHelper::buildSearchIndex(
+                $product->name,
+                $brandName,
+                $categoryName,
+                $product->material,
+                $product->color,
+                $product->sku,
+                $product->description
+            );
         });
     }
 
@@ -68,6 +93,38 @@ class Product extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * Get the brand that owns the product.
+     */
+    public function brand(): BelongsTo
+    {
+        return $this->belongsTo(Brand::class);
+    }
+
+    /**
+     * Get product attributes (e.g. Chất liệu, Màu sắc).
+     */
+    public function attributes(): HasMany
+    {
+        return $this->hasMany(ProductAttribute::class)->orderBy('position');
+    }
+
+    /**
+     * Get all product variants / SKUs.
+     */
+    public function variants(): HasMany
+    {
+        return $this->hasMany(ProductVariant::class);
+    }
+
+    /**
+     * Get only active product variants.
+     */
+    public function activeVariants(): HasMany
+    {
+        return $this->hasMany(ProductVariant::class)->where('is_active', true);
     }
 
     /**
@@ -115,9 +172,40 @@ class Product extends Model
     }
 
     /**
+     * Dynamic Price range string if has variants.
+     */
+    public function getFormattedPriceRangeAttribute(): string
+    {
+        if (!$this->has_variants || $this->activeVariants->isEmpty()) {
+            return $this->formatted_effective_price;
+        }
+
+        $min = $this->activeVariants->min(fn($v) => $v->effective_price);
+        $max = $this->activeVariants->max(fn($v) => $v->effective_price);
+
+        if ($min == $max) {
+            return number_format($min, 0, ',', '.') . ' ₫';
+        }
+
+        return number_format($min, 0, ',', '.') . ' ₫ - ' . number_format($max, 0, ',', '.') . ' ₫';
+    }
+
+    /**
+     * Dynamic total stock (taking from variants if has_variants).
+     */
+    public function getTotalStockAttribute(): int
+    {
+        if ($this->has_variants && $this->relationLoaded('variants')) {
+            return (int) $this->variants->sum('stock');
+        }
+
+        return (int) $this->stock;
+    }
+
+    /**
      * Cart items relationship.
      */
-    public function cartItems()
+    public function cartItems(): HasMany
     {
         return $this->hasMany(CartItem::class);
     }
@@ -125,7 +213,7 @@ class Product extends Model
     /**
      * Order items relationship.
      */
-    public function orderItems()
+    public function orderItems(): HasMany
     {
         return $this->hasMany(OrderItem::class);
     }
