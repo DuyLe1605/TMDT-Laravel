@@ -375,6 +375,43 @@
                         <i data-lucide="receipt-check" class="text-primary" style="width: 18px; height: 18px;"></i>
                     </h5>
 
+                    <!-- Selected Items Preview List -->
+                    <div class="mb-3 pb-3 border-bottom">
+                        <div class="fw-bold text-dark small mb-2 d-flex justify-content-between">
+                            <span>Sản phẩm thanh toán</span>
+                            <span class="text-secondary">{{ $selectedItems->count() }} mặt hàng</span>
+                        </div>
+                        <div class="d-flex flex-column gap-2" style="max-height: 220px; overflow-y: auto;">
+                            @foreach ($selectedItems as $item)
+                                @php
+                                    $itemImg = $item->variant && $item->variant->image ? $item->variant->image : $item->product->image;
+                                @endphp
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="rounded-2 border overflow-hidden flex-shrink-0" style="width: 44px; height: 44px; background: var(--bg-surface-subtle);">
+                                        @if ($itemImg)
+                                            <img src="{{ $itemImg }}" alt="" class="w-100 h-100 object-fit-cover">
+                                        @else
+                                            <div class="w-100 h-100 d-flex align-items-center justify-content-center">
+                                                <i data-lucide="shopping-bag" style="width: 18px; height: 18px;" class="text-secondary"></i>
+                                            </div>
+                                        @endif
+                                    </div>
+                                    <div class="min-w-0 flex-grow-1">
+                                        <div class="fw-bold text-dark text-truncate small" style="font-size: 0.8rem;">{{ $item->product->name }}</div>
+                                        @if ($item->variant)
+                                            <div class="text-primary font-monospace" style="font-size: 0.72rem;">{{ $item->variant->variant_title }} &times; {{ $item->quantity }}</div>
+                                        @else
+                                            <div class="text-secondary" style="font-size: 0.72rem;">SL: {{ $item->quantity }}</div>
+                                        @endif
+                                    </div>
+                                    <div class="text-end fw-bold text-primary small" style="font-size: 0.82rem;">
+                                        {{ $item->formatted_subtotal }}
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+
                     <div class="d-flex flex-column gap-2.5 mb-3 text-secondary small">
                         <div class="d-flex justify-content-between">
                             <span>Tổng tiền hàng ({{ $summary['total_quantity'] }} chiếc):</span>

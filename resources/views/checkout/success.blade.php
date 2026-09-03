@@ -87,6 +87,11 @@
                                     </div>
                                     <div class="min-w-0">
                                         <div class="fw-semibold text-dark small text-truncate">{{ $item->product_name }}</div>
+                                        @if ($item->variant_title)
+                                            <div class="text-primary" style="font-size: 0.72rem; font-weight: 500;">
+                                                Phân loại: {{ $item->variant_title }}
+                                            </div>
+                                        @endif
                                         <div class="text-secondary" style="font-size: 0.75rem;">
                                             {{ $item->formatted_price }} &times; {{ $item->quantity }}
                                         </div>

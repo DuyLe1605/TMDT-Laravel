@@ -53,6 +53,19 @@
                         </div>
                     </div>
 
+                    <!-- Brand Filter -->
+                    <div class="mb-3.5">
+                        <label class="form-label-modern mb-1.5 small fw-semibold">Thương hiệu nhà mốt</label>
+                        <select name="brand_id" class="form-select form-select-modern w-100" onchange="this.form.submit()">
+                            <option value="">Tất cả thương hiệu</option>
+                            @foreach ($brands as $b)
+                                <option value="{{ $b->id }}" {{ (isset($brandId) && $brandId == $b->id) ? 'selected' : '' }}>
+                                    👑 {{ $b->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
                     <!-- Category Filter -->
                     <div class="mb-3.5">
                         <label class="form-label-modern mb-1.5 small fw-semibold">Dòng túi xách</label>
@@ -60,10 +73,51 @@
                             <option value="">Tất cả dòng túi</option>
                             @foreach ($categories as $cat)
                                 <option value="{{ $cat->id }}" {{ (isset($categoryId) && $categoryId == $cat->id) ? 'selected' : '' }}>
-                                    {{ $cat->name }} ({{ $cat->products_count ?? $cat->products()->count() }})
+                                    {{ $cat->parent_id ? '↳ ' . $cat->name : '📁 ' . $cat->name }}
                                 </option>
                             @endforeach
                         </select>
+                    </div>
+
+                    <!-- Price Range Filter -->
+                    <div class="mb-3.5">
+                        <label class="form-label-modern mb-1.5 small fw-semibold">Khoảng giá (VNĐ)</label>
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <input 
+                                type="number" 
+                                name="min_price" 
+                                class="form-control form-control-sm form-control-modern" 
+                                placeholder="Từ..." 
+                                value="{{ $minPrice ?? '' }}"
+                                step="50000"
+                            >
+                            <span class="text-secondary small">-</span>
+                            <input 
+                                type="number" 
+                                name="max_price" 
+                                class="form-control form-control-sm form-control-modern" 
+                                placeholder="Đến..." 
+                                value="{{ $maxPrice ?? '' }}"
+                                step="50000"
+                            >
+                        </div>
+                        <!-- Quick Price Presets -->
+                        <div class="d-flex flex-wrap gap-1.5">
+                            <button type="button" class="btn btn-xs btn-outline-secondary rounded-pill py-0.5 px-2" style="font-size: 0.72rem;" onclick="setPricePreset(0, 500000)">&lt; 500k</button>
+                            <button type="button" class="btn btn-xs btn-outline-secondary rounded-pill py-0.5 px-2" style="font-size: 0.72rem;" onclick="setPricePreset(500000, 1000000)">500k-1tr</button>
+                            <button type="button" class="btn btn-xs btn-outline-secondary rounded-pill py-0.5 px-2" style="font-size: 0.72rem;" onclick="setPricePreset(1000000, 2000000)">1tr-2tr</button>
+                            <button type="button" class="btn btn-xs btn-outline-secondary rounded-pill py-0.5 px-2" style="font-size: 0.72rem;" onclick="setPricePreset(2000000, '')">&gt; 2tr</button>
+                        </div>
+                    </div>
+
+                    <!-- In Stock Filter -->
+                    <div class="mb-3.5 p-2.5 rounded-3" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-default);">
+                        <div class="form-check mb-0">
+                            <input class="form-check-input" type="checkbox" name="in_stock" id="in_stock" value="1" {{ !empty($inStock) ? 'checked' : '' }} onchange="this.form.submit()">
+                            <label class="form-check-label text-dark small fw-medium user-select-none" for="in_stock">
+                                Chỉ hiện sản phẩm còn hàng
+                            </label>
+                        </div>
                     </div>
 
                     <!-- Sort Filter -->
@@ -82,7 +136,7 @@
                             <i data-lucide="filter" style="width: 15px; height: 15px; margin-right: 0.45rem;"></i>
                             <span>Áp dụng lọc</span>
                         </button>
-                        @if ($search || $categoryId || ($sort && $sort != 'created_desc'))
+                        @if ($search || $categoryId || $brandId || $minPrice || $maxPrice || $inStock || ($sort && $sort != 'created_desc'))
                             <a href="{{ route('shop.index') }}" class="btn btn-surface py-2.5 px-3 d-inline-flex align-items-center justify-content-center" title="Đặt lại bộ lọc">
                                 <i data-lucide="rotate-ccw" style="width: 16px; height: 16px;"></i>
                             </a>
@@ -94,6 +148,50 @@
 
         <!-- Products Grid (Right Column) -->
         <div class="col-lg-9">
+            <!-- Active Filters Summary Banner -->
+            @if (!empty($search) || !empty($categoryId) || !empty($brandId) || !empty($minPrice) || !empty($maxPrice) || !empty($inStock))
+                <div class="p-3 rounded-3 mb-4 d-flex flex-wrap align-items-center justify-content-between gap-2" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-default);">
+                    <div class="d-flex align-items-center flex-wrap gap-2">
+                        <span class="text-secondary small">Tìm thấy <strong>{{ $products->total() }}</strong> sản phẩm:</span>
+                        @if (!empty($search))
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1 small">
+                                Từ khóa: "{{ $search }}"
+                            </span>
+                        @endif
+                        @if (!empty($brandId))
+                            @php $activeBrand = $brands->firstWhere('id', $brandId); @endphp
+                            @if ($activeBrand)
+                                <span class="badge bg-dark-subtle text-dark border rounded-pill px-2.5 py-1 small">
+                                    👑 {{ $activeBrand->name }}
+                                </span>
+                            @endif
+                        @endif
+                        @if (!empty($categoryId))
+                            @php $activeCat = $categories->firstWhere('id', $categoryId); @endphp
+                            @if ($activeCat)
+                                <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2.5 py-1 small">
+                                    📁 {{ $activeCat->name }}
+                                </span>
+                            @endif
+                        @endif
+                        @if (!empty($minPrice) || !empty($maxPrice))
+                            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1 small">
+                                Giá: {{ $minPrice ? number_format($minPrice, 0, ',', '.') . ' ₫' : '0 ₫' }} - {{ $maxPrice ? number_format($maxPrice, 0, ',', '.') . ' ₫' : 'Tối đa' }}
+                            </span>
+                        @endif
+                        @if (!empty($inStock))
+                            <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-2.5 py-1 small">
+                                Còn hàng
+                            </span>
+                        @endif
+                    </div>
+                    <a href="{{ route('shop.index') }}" class="btn btn-sm btn-surface text-danger d-inline-flex align-items-center gap-1 text-decoration-none">
+                        <i data-lucide="x" style="width: 14px; height: 14px;"></i>
+                        <span>Xóa bộ lọc</span>
+                    </a>
+                </div>
+            @endif
+
             <div class="row g-3 g-xl-4">
                 @forelse ($products as $product)
                     <div class="col-6 col-md-4">
@@ -128,8 +226,15 @@
 
                             <!-- Content Area -->
                             <div class="p-3.5 d-flex flex-column flex-grow-1">
-                                <div class="product-store-category mb-1">
-                                    {{ $product->category?->name ?? 'Túi xách cao cấp' }}
+                                <div class="d-flex align-items-center gap-1.5 mb-1">
+                                    @if ($product->brand)
+                                        <span class="badge bg-dark-subtle text-dark border px-2 py-0.5 rounded-pill" style="font-size: 0.65rem;">
+                                            👑 {{ $product->brand->name }}
+                                        </span>
+                                    @endif
+                                    <div class="product-store-category">
+                                        {{ $product->category?->name ?? 'Túi xách' }}
+                                    </div>
                                 </div>
 
                                 <h6 class="mb-2">
@@ -151,9 +256,9 @@
                                 <div class="mt-auto pt-3 border-top d-flex align-items-center justify-content-between gap-2">
                                     <div>
                                         <div class="price-current-luxury">
-                                            {{ $product->has_discount ? $product->formatted_sale_price : $product->formatted_price }}
+                                            {{ $product->has_variants ? $product->formatted_price_range : ($product->has_discount ? $product->formatted_sale_price : $product->formatted_price) }}
                                         </div>
-                                        @if ($product->has_discount)
+                                        @if ($product->has_discount && !$product->has_variants)
                                             <div class="price-original-luxury">
                                                 {{ $product->formatted_price }}
                                             </div>
@@ -208,4 +313,17 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+    function setPricePreset(min, max) {
+        const form = document.getElementById('shopFilterForm');
+        const minInput = form.querySelector('input[name="min_price"]');
+        const maxInput = form.querySelector('input[name="max_price"]');
+        if (minInput) minInput.value = min || '';
+        if (maxInput) maxInput.value = max || '';
+        form.submit();
+    }
+</script>
 @endsection

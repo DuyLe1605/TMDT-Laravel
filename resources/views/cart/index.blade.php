@@ -101,9 +101,12 @@
                                         </div>
 
                                         <!-- Image -->
+                                        @php
+                                            $itemImage = $item->variant && $item->variant->image ? $item->variant->image : $item->product->image;
+                                        @endphp
                                         <a href="{{ route('shop.show', $item->product) }}" class="cart-item-thumb rounded-3 border overflow-hidden flex-shrink-0" style="width: 76px; height: 76px; background: var(--bg-surface-subtle);">
-                                            @if ($item->product->image)
-                                                <img src="{{ $item->product->image }}" alt="{{ $item->product->name }}" class="w-100 h-100 object-fit-cover">
+                                            @if ($itemImage)
+                                                <img src="{{ $itemImage }}" alt="{{ $item->product->name }}" class="w-100 h-100 object-fit-cover">
                                             @else
                                                 <div class="w-100 h-100 d-flex align-items-center justify-content-center">
                                                     <i data-lucide="shopping-bag" class="text-secondary" style="width: 24px; height: 24px;"></i>
@@ -113,19 +116,33 @@
 
                                         <!-- Name & Category -->
                                         <div class="min-w-0 flex-grow-1">
-                                            <span class="badge bg-primary-subtle text-primary mb-1" style="font-size: 0.68rem;">
-                                                {{ $item->product->category?->name ?? 'Túi xách' }}
-                                            </span>
+                                            <div class="d-flex align-items-center gap-1.5 mb-1">
+                                                @if ($item->product->brand)
+                                                    <span class="badge bg-dark-subtle text-dark border px-2 py-0.5 rounded-pill" style="font-size: 0.65rem;">
+                                                        👑 {{ $item->product->brand->name }}
+                                                    </span>
+                                                @endif
+                                                <span class="badge bg-primary-subtle text-primary" style="font-size: 0.68rem;">
+                                                    {{ $item->product->category?->name ?? 'Túi xách' }}
+                                                </span>
+                                            </div>
                                             <h6 class="fw-bold text-dark mb-1 text-truncate">
                                                 <a href="{{ route('shop.show', $item->product) }}" class="text-decoration-none text-dark hover-primary">
                                                     {{ $item->product->name }}
                                                 </a>
                                             </h6>
+                                            @if ($item->variant)
+                                                <div class="mb-1">
+                                                    <span class="badge bg-light text-dark border px-2 py-0.5" style="font-size: 0.72rem;">
+                                                        Phân loại: {{ $item->variant->variant_title }}
+                                                    </span>
+                                                </div>
+                                            @endif
                                             <div class="d-flex align-items-baseline gap-2">
                                                 <span class="fw-bold text-primary small">
                                                     {{ $item->formatted_unit_price }}
                                                 </span>
-                                                @if ($item->product->has_discount)
+                                                @if ($item->product->has_discount && !$item->variant)
                                                     <span class="text-muted text-decoration-line-through small" style="font-size: 0.75rem;">
                                                         {{ $item->product->formatted_price }}
                                                     </span>
@@ -141,7 +158,7 @@
                                             <button 
                                                 type="button" 
                                                 class="btn btn-stepper" 
-                                                onclick="updateCartItemQty({{ $item->id }}, -1, {{ $item->product->stock }})"
+                                                onclick="updateCartItemQty({{ $item->id }}, -1, {{ $item->available_stock }})"
                                                 aria-label="Giảm số lượng"
                                             >
                                                 <i data-lucide="minus" style="width: 13px; height: 13px;"></i>
@@ -151,15 +168,15 @@
                                                 id="qty-input-{{ $item->id }}" 
                                                 value="{{ $item->quantity }}" 
                                                 min="1" 
-                                                max="{{ $item->product->stock }}"
+                                                max="{{ $item->available_stock }}"
                                                 class="form-control text-center border-0 qty-input"
                                                 style="width: 48px; font-weight: 700; background: transparent;"
-                                                onchange="onQtyInputChange({{ $item->id }}, this, {{ $item->product->stock }})"
+                                                onchange="onQtyInputChange({{ $item->id }}, this, {{ $item->available_stock }})"
                                             >
                                             <button 
                                                 type="button" 
                                                 class="btn btn-stepper" 
-                                                onclick="updateCartItemQty({{ $item->id }}, 1, {{ $item->product->stock }})"
+                                                onclick="updateCartItemQty({{ $item->id }}, 1, {{ $item->available_stock }})"
                                                 aria-label="Tăng số lượng"
                                             >
                                                 <i data-lucide="plus" style="width: 13px; height: 13px;"></i>
