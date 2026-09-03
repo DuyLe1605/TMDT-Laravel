@@ -24,7 +24,7 @@ class UserController extends Controller
     ) {}
 
     /**
-     * Display a listing of the users.
+     * Display a listing of the users.khoang
      *
      * @param Request $request
      * @return View

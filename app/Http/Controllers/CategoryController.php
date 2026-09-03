@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Services\CategoryService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
@@ -22,10 +23,11 @@ class CategoryController extends Controller
     /**
      * Hiển thị danh sách các danh mục.
      */
-    public function index(): View
+    public function index(Request $request): View
     {
-        $categories = $this->categoryService->getPaginatedCategories();
-        return view('categories.index', compact('categories'));
+        $search = $request->input('search');
+        $categories = $this->categoryService->getPaginatedCategories($search);
+        return view('categories.index', compact('categories', 'search'));
     }
 
     /**
@@ -33,7 +35,8 @@ class CategoryController extends Controller
      */
     public function create(): View
     {
-        return view('categories.create');
+        $parentCategories = Category::roots()->orderBy('name')->get();
+        return view('categories.create', compact('parentCategories'));
     }
 
     /**
@@ -53,6 +56,7 @@ class CategoryController extends Controller
      */
     public function show(Category $category): View
     {
+        $category->load(['parent', 'children', 'products']);
         return view('categories.show', compact('category'));
     }
 
@@ -61,7 +65,8 @@ class CategoryController extends Controller
      */
     public function edit(Category $category): View
     {
-        return view('categories.edit', compact('category'));
+        $parentCategories = Category::roots()->where('id', '!=', $category->id)->orderBy('name')->get();
+        return view('categories.edit', compact('category', 'parentCategories'));
     }
 
     /**

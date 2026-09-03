@@ -35,7 +35,8 @@ class CartController extends Controller
         try {
             $cartItem = $this->cartService->addToCart(
                 (int) $request->input('product_id'),
-                (int) $request->input('quantity', 1)
+                (int) $request->input('quantity', 1),
+                $request->filled('product_variant_id') ? (int) $request->input('product_variant_id') : null
             );
 
             $cartCount = $this->cartService->getCartCount();

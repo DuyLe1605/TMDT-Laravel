@@ -8,19 +8,11 @@ use Illuminate\Validation\Rule;
 
 class UpdateCategoryRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         $categoryId = $this->route('category') instanceof \App\Models\Category 
@@ -35,34 +27,21 @@ class UpdateCategoryRequest extends FormRequest
                 'max:' . AppConstants::MAX_STRING_LENGTH,
                 Rule::unique('categories', 'name')->ignore($categoryId),
             ],
+            'parent_id' => ['nullable', 'integer', 'exists:categories,id'],
+            'description' => ['nullable', 'string', 'max:' . AppConstants::MAX_TEXT_LENGTH],
+            'image' => ['nullable', 'string', 'max:500'],
+            'is_active' => ['nullable', 'boolean'],
         ];
     }
 
-    /**
-     * Get custom attributes for validator errors.
-     *
-     * @return array<string, string>
-     */
-    public function attributes(): array
-    {
-        return [
-            'name' => 'Tên danh mục',
-        ];
-    }
-
-    /**
-     * Get the error messages for the defined validation rules.
-     *
-     * @return array<string, string>
-     */
     public function messages(): array
     {
         return [
             'name.required' => 'Vui lòng nhập tên danh mục.',
-            'name.string' => 'Tên danh mục phải là chuỗi ký tự hợp lệ.',
             'name.min' => 'Tên danh mục phải có tối thiểu :min ký tự.',
             'name.max' => 'Tên danh mục không được vượt quá :max ký tự.',
             'name.unique' => 'Tên danh mục này đã tồn tại trong hệ thống.',
+            'parent_id.exists' => 'Danh mục cha đã chọn không hợp lệ.',
         ];
     }
 }

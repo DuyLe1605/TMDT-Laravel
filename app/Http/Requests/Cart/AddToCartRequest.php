@@ -23,6 +23,7 @@ class AddToCartRequest extends FormRequest
     {
         return [
             'product_id' => ['required', 'integer', 'exists:products,id'],
+            'product_variant_id' => ['nullable', 'integer', 'exists:product_variants,id'],
             'quantity' => ['required', 'integer', 'min:1', 'max:100'],
         ];
     }
@@ -35,6 +36,7 @@ class AddToCartRequest extends FormRequest
         return [
             'product_id.required' => 'Vui lòng chọn sản phẩm cần thêm.',
             'product_id.exists' => 'Sản phẩm được chọn không tồn tại trong hệ thống.',
+            'product_variant_id.exists' => 'Phân loại hàng đã chọn không tồn tại trong hệ thống.',
             'quantity.required' => 'Vui lòng nhập số lượng.',
             'quantity.integer' => 'Số lượng phải là số nguyên hợp lệ.',
             'quantity.min' => 'Số lượng tối thiểu là 1.',

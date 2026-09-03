@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\ProductService;
+use App\Models\Brand;
+use App\Models\Product;
+use App\Services\BrandService;
 use App\Services\CategoryService;
+use App\Services\ProductService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
-use App\Models\Product;
 
 class StorefrontController extends Controller
 {
@@ -15,7 +17,8 @@ class StorefrontController extends Controller
      */
     public function __construct(
         protected ProductService $productService,
-        protected CategoryService $categoryService
+        protected CategoryService $categoryService,
+        protected BrandService $brandService
     ) {}
 
     /**
@@ -25,43 +28,73 @@ class StorefrontController extends Controller
     {
         $featuredProducts = Product::where('is_active', true)
             ->where('is_featured', true)
-            ->with('category')
+            ->with(['category', 'brand', 'variants'])
             ->latest()
             ->take(8)
             ->get();
 
         $latestProducts = Product::where('is_active', true)
-            ->with('category')
+            ->with(['category', 'brand', 'variants'])
             ->latest()
             ->take(8)
             ->get();
 
-        $categories = $this->categoryService->getAllCategories();
+        $categories = $this->categoryService->getCategoryTree();
+        $brands = $this->brandService->getAllActiveBrands();
 
-        return view('storefront.index', compact('featuredProducts', 'latestProducts', 'categories'));
+        return view('storefront.index', compact('featuredProducts', 'latestProducts', 'categories', 'brands'));
     }
 
     /**
-     * Trang cửa hàng — danh sách sản phẩm với filter.
+     * Trang cửa hàng — danh sách sản phẩm với filter danh mục & thương hiệu.
      */
     public function shop(Request $request): View
     {
         $categoryId = $request->filled('category_id') ? (int) $request->input('category_id') : null;
+        $brandId = $request->filled('brand_id') ? (int) $request->input('brand_id') : null;
         $search = $request->input('search');
         $sort = $request->input('sort', 'created_desc');
+        $minPrice = $request->filled('min_price') ? (float) $request->input('min_price') : null;
+        $maxPrice = $request->filled('max_price') ? (float) $request->input('max_price') : null;
+        $inStock = $request->input('in_stock');
 
-        $query = Product::where('is_active', true)->with('category');
+        $query = Product::where('is_active', true)->with(['category', 'brand', 'variants']);
 
         if ($categoryId) {
             $query->where('category_id', $categoryId);
         }
 
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%")
-                  ->orWhere('material', 'like', "%{$search}%")
-                  ->orWhere('color', 'like', "%{$search}%");
+        if ($brandId) {
+            $query->where('brand_id', $brandId);
+        }
+
+        if ($inStock === '1' || $inStock === 'true') {
+            $query->where('stock', '>', 0);
+        }
+
+        if ($minPrice !== null && $minPrice > 0) {
+            $query->where(function ($q) use ($minPrice) {
+                $q->whereRaw('COALESCE(sale_price, price) >= ?', [$minPrice]);
+            });
+        }
+
+        if ($maxPrice !== null && $maxPrice > 0) {
+            $query->where(function ($q) use ($maxPrice) {
+                $q->whereRaw('COALESCE(sale_price, price) <= ?', [$maxPrice]);
+            });
+        }
+
+        if (!empty($search)) {
+            $term = trim($search);
+            $unaccentedTerm = \App\Helpers\VietnameseHelper::removeAccents($term);
+
+            $query->where(function ($q) use ($term, $unaccentedTerm) {
+                $q->where('name', 'like', "%{$term}%")
+                  ->orWhere('search_index', 'like', "%{$unaccentedTerm}%")
+                  ->orWhere('sku', 'like', "%{$term}%")
+                  ->orWhere('material', 'like', "%{$term}%")
+                  ->orWhere('color', 'like', "%{$term}%")
+                  ->orWhere('description', 'like', "%{$term}%");
             });
         }
 
@@ -84,12 +117,24 @@ class StorefrontController extends Controller
 
         $products = $query->paginate(12)->withQueryString();
         $categories = $this->categoryService->getAllCategories();
+        $brands = $this->brandService->getAllActiveBrands();
 
-        return view('storefront.shop', compact('products', 'categories', 'categoryId', 'search', 'sort'));
+        return view('storefront.shop', compact(
+            'products', 
+            'categories', 
+            'brands', 
+            'categoryId', 
+            'brandId', 
+            'search', 
+            'sort',
+            'minPrice',
+            'maxPrice',
+            'inStock'
+        ));
     }
 
     /**
-     * Chi tiết sản phẩm.
+     * Chi tiết sản phẩm — hiển thị đầy đủ thương hiệu, bộ chọn biến thể thông minh.
      */
     public function show(Product $product): View
     {
@@ -98,12 +143,25 @@ class StorefrontController extends Controller
             abort(404);
         }
 
-        $product->load('category');
+        $product->load([
+            'category',
+            'brand',
+            'attributes.values',
+            'variants' => function ($q) {
+                $q->where('is_active', true);
+            }
+        ]);
 
-        // Related products from same category
+        // Related products from same category or brand
         $relatedProducts = Product::where('is_active', true)
-            ->where('category_id', $product->category_id)
+            ->where(function ($q) use ($product) {
+                $q->where('category_id', $product->category_id);
+                if ($product->brand_id) {
+                    $q->orWhere('brand_id', $product->brand_id);
+                }
+            })
             ->where('id', '!=', $product->id)
+            ->with(['category', 'brand'])
             ->take(4)
             ->get();
 

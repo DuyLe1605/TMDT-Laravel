@@ -6,6 +6,7 @@ use App\Constants\AppConstants;
 use App\Http\Requests\Product\StoreProductRequest;
 use App\Http\Requests\Product\UpdateProductRequest;
 use App\Models\Product;
+use App\Services\BrandService;
 use App\Services\CategoryService;
 use App\Services\ProductService;
 use Illuminate\Http\RedirectResponse;
@@ -19,10 +20,12 @@ class ProductController extends Controller
      *
      * @param ProductService $productService
      * @param CategoryService $categoryService
+     * @param BrandService $brandService
      */
     public function __construct(
         protected ProductService $productService,
-        protected CategoryService $categoryService
+        protected CategoryService $categoryService,
+        protected BrandService $brandService
     ) {}
 
     /**
@@ -34,13 +37,34 @@ class ProductController extends Controller
     public function index(Request $request): View
     {
         $categoryId = $request->filled('category_id') ? (int) $request->input('category_id') : null;
+        $brandId = $request->filled('brand_id') ? (int) $request->input('brand_id') : null;
+        $stockStatus = $request->input('stock_status');
+        $hasVariants = $request->input('has_variants');
         $search = $request->input('search');
         $sort = $request->input('sort', 'created_desc');
 
-        $products = $this->productService->getPaginatedProducts($categoryId, $search, $sort);
+        $products = $this->productService->getPaginatedProducts(
+            $categoryId, 
+            $brandId, 
+            $search, 
+            $sort, 
+            $stockStatus, 
+            $hasVariants
+        );
         $categories = $this->categoryService->getAllCategories();
+        $brands = $this->brandService->getAllBrands();
 
-        return view('products.index', compact('products', 'categories', 'categoryId', 'search', 'sort'));
+        return view('products.index', compact(
+            'products', 
+            'categories', 
+            'brands', 
+            'categoryId', 
+            'brandId', 
+            'stockStatus', 
+            'hasVariants', 
+            'search', 
+            'sort'
+        ));
     }
 
     /**
@@ -51,7 +75,9 @@ class ProductController extends Controller
     public function create(): View
     {
         $categories = $this->categoryService->getAllCategories();
-        return view('products.create', compact('categories'));
+        $brands = $this->brandService->getAllBrands();
+
+        return view('products.create', compact('categories', 'brands'));
     }
 
     /**
@@ -77,7 +103,7 @@ class ProductController extends Controller
      */
     public function show(Product $product): View
     {
-        $product->load('category');
+        $product->load(['category', 'brand', 'attributes.values', 'variants']);
         return view('products.show', compact('product'));
     }
 
@@ -89,8 +115,11 @@ class ProductController extends Controller
      */
     public function edit(Product $product): View
     {
+        $product->load(['category', 'brand', 'attributes.values', 'variants']);
         $categories = $this->categoryService->getAllCategories();
-        return view('products.edit', compact('product', 'categories'));
+        $brands = $this->brandService->getAllBrands();
+
+        return view('products.edit', compact('product', 'categories', 'brands'));
     }
 
     /**
