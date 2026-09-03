@@ -6,6 +6,7 @@ use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
@@ -42,18 +43,39 @@ class OrderService
 
             // 1. Validate stock and calculate subtotal
             foreach ($cartItems as $cartItem) {
-                // Lock product row for update to prevent race conditions
+                // Lock product row
                 $product = Product::where('id', $cartItem->product_id)->lockForUpdate()->first();
 
                 if (!$product || !$product->is_active) {
                     throw new Exception("Sản phẩm '{$cartItem->product->name}' không còn kinh doanh.");
                 }
 
-                if ($product->stock < $cartItem->quantity) {
-                    throw new Exception("Sản phẩm '{$product->name}' chỉ còn {$product->stock} chiếc trong kho, không đủ đáp ứng {$cartItem->quantity} chiếc yêu cầu.");
+                $variant = null;
+                $effectivePrice = 0.0;
+
+                if ($cartItem->product_variant_id) {
+                    $variant = ProductVariant::where('id', $cartItem->product_variant_id)
+                        ->where('product_id', $product->id)
+                        ->lockForUpdate()
+                        ->first();
+
+                    if (!$variant || !$variant->is_active) {
+                        throw new Exception("Phân loại hàng của sản phẩm '{$product->name}' hiện không còn khả dụng.");
+                    }
+
+                    if ($variant->stock < $cartItem->quantity) {
+                        throw new Exception("Phân loại '{$variant->variant_title}' của '{$product->name}' chỉ còn {$variant->stock} chiếc trong kho, không đủ đáp ứng {$cartItem->quantity} chiếc.");
+                    }
+
+                    $effectivePrice = $variant->effective_price;
+                } else {
+                    if ($product->stock < $cartItem->quantity) {
+                        throw new Exception("Sản phẩm '{$product->name}' chỉ còn {$product->stock} chiếc trong kho, không đủ đáp ứng {$cartItem->quantity} chiếc yêu cầu.");
+                    }
+
+                    $effectivePrice = $product->effective_price;
                 }
 
-                $effectivePrice = $product->has_discount ? (float) $product->sale_price : (float) $product->price;
                 $subtotal += $effectivePrice * $cartItem->quantity;
             }
 
@@ -85,27 +107,38 @@ class OrderService
             // 4. Create Order Items and decrement stock
             foreach ($cartItems as $cartItem) {
                 $product = Product::find($cartItem->product_id);
-                $effectivePrice = $product->has_discount ? (float) $product->sale_price : (float) $product->price;
+                $variant = $cartItem->product_variant_id ? ProductVariant::find($cartItem->product_variant_id) : null;
+
+                $effectivePrice = $variant ? $variant->effective_price : $product->effective_price;
                 $itemSubtotal = $effectivePrice * $cartItem->quantity;
+                $itemImage = $variant && !empty($variant->image) ? $variant->image : $product->image;
+                $variantTitle = $variant ? $variant->variant_title : null;
 
                 OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $product->id,
+                    'product_variant_id' => $variant?->id,
                     'product_name' => $product->name,
-                    'product_image' => $product->image,
+                    'variant_title' => $variantTitle,
+                    'product_image' => $itemImage,
                     'price' => $effectivePrice,
                     'quantity' => $cartItem->quantity,
                     'subtotal' => $itemSubtotal,
                 ]);
 
                 // Decrement inventory stock
-                $product->decrement('stock', $cartItem->quantity);
+                if ($variant) {
+                    $variant->decrement('stock', $cartItem->quantity);
+                    $product->decrement('stock', $cartItem->quantity);
+                } else {
+                    $product->decrement('stock', $cartItem->quantity);
+                }
 
                 // Remove from cart
                 $cartItem->delete();
             }
 
-            return $order->load(['items.product', 'user']);
+            return $order->load(['items.product', 'items.variant', 'user']);
         });
     }
 
@@ -127,6 +160,9 @@ class OrderService
         return DB::transaction(function () use ($order, $reason) {
             // Restore inventory stock
             foreach ($order->items as $item) {
+                if ($item->product_variant_id) {
+                    ProductVariant::where('id', $item->product_variant_id)->increment('stock', $item->quantity);
+                }
                 if ($item->product_id) {
                     Product::where('id', $item->product_id)->increment('stock', $item->quantity);
                 }

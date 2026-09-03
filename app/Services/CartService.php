@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\CartItem;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -36,12 +37,12 @@ class CartService
     }
 
     /**
-     * Get all cart items with products loaded.
+     * Get all cart items with products and variants loaded.
      */
     public function getCartItems(): Collection
     {
         return $this->getCartQuery()
-            ->with(['product.category'])
+            ->with(['product.category', 'product.brand', 'variant'])
             ->latest()
             ->get();
     }
@@ -57,7 +58,7 @@ class CartService
 
         return $this->getCartQuery()
             ->whereIn('id', $ids)
-            ->with(['product.category'])
+            ->with(['product.category', 'product.brand', 'variant'])
             ->get();
     }
 
@@ -70,38 +71,75 @@ class CartService
     }
 
     /**
-     * Add product to cart with stock validation.
+     * Add product (and optional variant) to cart with stock validation.
      *
      * @throws Exception
      */
-    public function addToCart(int $productId, int $quantity = 1): CartItem
+    public function addToCart(int $productId, int $quantity = 1, ?int $variantId = null): CartItem
     {
         $product = Product::where('is_active', true)->findOrFail($productId);
 
-        if ($product->stock <= 0) {
-            throw new Exception("Sản phẩm '{$product->name}' hiện đã hết hàng.");
+        $variant = null;
+        $maxStock = $product->stock;
+        $itemName = $product->name;
+
+        if ($variantId) {
+            $variant = ProductVariant::where('product_id', $productId)
+                ->where('is_active', true)
+                ->findOrFail($variantId);
+            $maxStock = $variant->stock;
+            $itemName = "{$product->name} ({$variant->variant_title})";
+        } elseif ($product->has_variants) {
+            // Product has variants, but no variant chosen: pick the first active available variant
+            $variant = ProductVariant::where('product_id', $productId)
+                ->where('is_active', true)
+                ->where('stock', '>', 0)
+                ->first();
+
+            if (!$variant) {
+                // If all variants out of stock, grab the first active
+                $variant = ProductVariant::where('product_id', $productId)
+                    ->where('is_active', true)
+                    ->first();
+            }
+
+            if ($variant) {
+                $variantId = $variant->id;
+                $maxStock = $variant->stock;
+                $itemName = "{$product->name} ({$variant->variant_title})";
+            }
+        }
+
+        if ($maxStock <= 0) {
+            throw new Exception("Sản phẩm/phân loại '{$itemName}' hiện đã hết hàng.");
         }
 
         $query = $this->getCartQuery()->where('product_id', $productId);
-        $cartItem = $query->first();
+        if ($variantId) {
+            $query->where('product_variant_id', $variantId);
+        } else {
+            $query->whereNull('product_variant_id');
+        }
 
+        $cartItem = $query->first();
         $newQuantity = $cartItem ? $cartItem->quantity + $quantity : $quantity;
 
-        if ($newQuantity > $product->stock) {
-            $available = $product->stock - ($cartItem ? $cartItem->quantity : 0);
+        if ($newQuantity > $maxStock) {
+            $available = $maxStock - ($cartItem ? $cartItem->quantity : 0);
             if ($available <= 0) {
-                throw new Exception("Bạn đã có {$cartItem->quantity} sản phẩm trong giỏ, không thể thêm vượt quá tồn kho ({$product->stock}).");
+                throw new Exception("Bạn đã có {$cartItem->quantity} sản phẩm trong giỏ, không thể thêm vượt quá tồn kho ({$maxStock}).");
             }
-            throw new Exception("Chỉ có thể thêm tối đa {$available} sản phẩm nữa vào giỏ hàng (tồn kho: {$product->stock}).");
+            throw new Exception("Chỉ có thể thêm tối đa {$available} sản phẩm nữa vào giỏ hàng (tồn kho: {$maxStock}).");
         }
 
         if ($cartItem) {
             $cartItem->update(['quantity' => $newQuantity]);
-            return $cartItem->fresh(['product']);
+            return $cartItem->fresh(['product', 'variant']);
         }
 
         $attributes = [
             'product_id' => $productId,
+            'product_variant_id' => $variantId,
             'quantity' => $newQuantity,
         ];
 
@@ -111,7 +149,7 @@ class CartService
             $attributes['session_id'] = $this->getSessionId();
         }
 
-        return CartItem::create($attributes)->load('product');
+        return CartItem::create($attributes)->load(['product', 'variant']);
     }
 
     /**
@@ -121,20 +159,22 @@ class CartService
      */
     public function updateQuantity(int $cartItemId, int $quantity): CartItem
     {
-        $cartItem = $this->getCartQuery()->with('product')->findOrFail($cartItemId);
+        $cartItem = $this->getCartQuery()->with(['product', 'variant'])->findOrFail($cartItemId);
 
         if ($quantity <= 0) {
             $cartItem->delete();
             throw new Exception("Sản phẩm đã được xóa khỏi giỏ hàng.");
         }
 
-        if ($quantity > $cartItem->product->stock) {
-            throw new Exception("Số lượng yêu cầu ({$quantity}) vượt quá số lượng còn lại trong kho ({$cartItem->product->stock}).");
+        $stockLimit = $cartItem->variant ? $cartItem->variant->stock : $cartItem->product->stock;
+
+        if ($quantity > $stockLimit) {
+            throw new Exception("Số lượng yêu cầu ({$quantity}) vượt quá số lượng còn lại trong kho ({$stockLimit}).");
         }
 
         $cartItem->update(['quantity' => $quantity]);
 
-        return $cartItem->fresh(['product']);
+        return $cartItem->fresh(['product', 'variant']);
     }
 
     /**
@@ -195,6 +235,7 @@ class CartService
         foreach ($guestItems as $guestItem) {
             $userItem = CartItem::where('user_id', $userId)
                 ->where('product_id', $guestItem->product_id)
+                ->where('product_variant_id', $guestItem->product_variant_id)
                 ->first();
 
             if ($userItem) {

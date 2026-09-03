@@ -24,6 +24,12 @@ final class AppConstants
     public const MSG_CATEGORY_DELETED = 'Danh mục túi xách đã được xóa thành công.';
     public const MSG_CATEGORY_NOT_FOUND = 'Không tìm thấy danh mục yêu cầu.';
 
+    // Thông báo mặc định cho Brand
+    public const MSG_BRAND_CREATED = 'Thương hiệu túi xách đã được tạo mới thành công.';
+    public const MSG_BRAND_UPDATED = 'Thương hiệu túi xách đã được cập nhật thành công.';
+    public const MSG_BRAND_DELETED = 'Thương hiệu túi xách đã được xóa thành công.';
+    public const MSG_BRAND_NOT_FOUND = 'Không tìm thấy thương hiệu yêu cầu.';
+
     // Thông báo mặc định cho Product
     public const MSG_PRODUCT_CREATED = 'Sản phẩm túi xách nữ đã được thêm mới thành công.';
     public const MSG_PRODUCT_UPDATED = 'Thông tin sản phẩm túi xách đã được cập nhật thành công.';
