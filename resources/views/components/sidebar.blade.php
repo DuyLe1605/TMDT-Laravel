@@ -60,7 +60,17 @@
                 <span class="sidebar-icon-box">
                     <i data-lucide="folder-tree" style="width: 18px; height: 18px;"></i>
                 </span>
-                <span>Dòng túi xách</span>
+                <span>Dòng túi xách (Danh mục)</span>
+            </div>
+        </a>
+
+        <!-- Active Brands Module -->
+        <a href="{{ route('admin.brands.index') }}" class="sidebar-nav-link {{ request()->routeIs('admin.brands.*') ? 'active' : '' }}">
+            <div class="d-flex align-items-center">
+                <span class="sidebar-icon-box">
+                    <i data-lucide="award" style="width: 18px; height: 18px;"></i>
+                </span>
+                <span>Thương hiệu thời trang</span>
             </div>
         </a>
 

@@ -49,9 +49,16 @@
                         </div>
                         <div class="col-md-9">
                             <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-2">
-                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1 rounded-pill" style="font-size: 0.78rem;">
-                                    {{ $product->category?->name ?? 'Túi xách' }}
-                                </span>
+                                <div class="d-flex align-items-center gap-2">
+                                    @if ($product->brand)
+                                        <span class="badge bg-dark text-white px-3 py-1 rounded-pill" style="font-size: 0.78rem;">
+                                            👑 {{ $product->brand->name }}
+                                        </span>
+                                    @endif
+                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1 rounded-pill" style="font-size: 0.78rem;">
+                                        {{ $product->category?->name ?? 'Túi xách' }}
+                                    </span>
+                                </div>
                                 <div>
                                     @if ($product->is_featured)
                                         <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2.5 py-1 rounded-pill me-1" style="font-size: 0.75rem;">
@@ -138,6 +145,68 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Product Variants Matrix Table (if has_variants) -->
+                @if ($product->has_variants && $product->variants->isNotEmpty())
+                    <div class="card-modern p-4 mb-4 border">
+                        <h6 class="fw-bold text-dark mb-3 pb-2 border-bottom d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-2">
+                                <i data-lucide="layers" class="text-primary" style="width: 18px; height: 18px;"></i>
+                                <span>Cấu Hình Biến Thể Chi Tiết ({{ $product->variants->count() }} biến thể)</span>
+                            </div>
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1 small">
+                                Tổng kho: {{ $product->total_stock }} chiếc
+                            </span>
+                        </h6>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead style="background: var(--bg-surface-subtle);">
+                                    <tr>
+                                        <th style="width: 50px;">Ảnh</th>
+                                        <th>Phân loại biến thể</th>
+                                        <th>Mã SKU</th>
+                                        <th>Giá bán</th>
+                                        <th>Tồn kho</th>
+                                        <th class="text-center" style="width: 90px;">Trạng thái</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($product->variants as $variant)
+                                        <tr>
+                                            <td>
+                                                <img src="{{ $variant->image ?: $product->image }}" class="rounded-2 border object-fit-cover" style="width: 40px; height: 40px;">
+                                            </td>
+                                            <td>
+                                                <span class="fw-bold text-dark small">{{ $variant->variant_title }}</span>
+                                            </td>
+                                            <td>
+                                                <code class="small text-secondary">{{ $variant->sku }}</code>
+                                            </td>
+                                            <td>
+                                                <span class="fw-bold text-primary small">{{ $variant->formatted_effective_price }}</span>
+                                                @if ($variant->has_discount)
+                                                    <span class="text-muted text-decoration-line-through small ms-1" style="font-size: 0.75rem;">{{ $variant->formatted_price }}</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <span class="badge {{ $variant->stock > 0 ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }} rounded-pill px-2.5 py-1">
+                                                    {{ $variant->stock }} chiếc
+                                                </span>
+                                            </td>
+                                            <td class="text-center">
+                                                @if ($variant->is_active)
+                                                    <span class="badge bg-success-subtle text-success rounded-pill px-2 py-0.5" style="font-size: 0.7rem;">Bật</span>
+                                                @else
+                                                    <span class="badge bg-secondary-subtle text-secondary rounded-pill px-2 py-0.5" style="font-size: 0.7rem;">Tắt</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                @endif
 
                 <!-- Product Description Box -->
                 @if ($product->description)

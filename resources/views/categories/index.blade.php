@@ -142,11 +142,25 @@
                                     <i data-lucide="shopping-bag" style="width: 18px; height: 18px;"></i>
                                 </div>
                                 <div>
-                                    <a href="{{ route('admin.categories.show', $category) }}" class="category-name-text d-block text-decoration-none">
-                                        {{ $category->name }}
-                                    </a>
+                                    <div class="d-flex align-items-center gap-2">
+                                        @if ($category->parent_id)
+                                            <span class="text-secondary small">↳</span>
+                                        @endif
+                                        <a href="{{ route('admin.categories.show', $category) }}" class="category-name-text text-decoration-none">
+                                            {{ $category->name }}
+                                        </a>
+                                        @if ($category->parent_id)
+                                            <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2 py-0.5" style="font-size: 0.7rem;">
+                                                Con của: {{ $category->parent?->name }}
+                                            </span>
+                                        @else
+                                            <span class="badge bg-secondary-subtle text-secondary rounded-pill px-2 py-0.5" style="font-size: 0.7rem;">
+                                                Danh mục gốc
+                                            </span>
+                                        @endif
+                                    </div>
                                     <span class="text-tertiary" style="font-size: 0.8rem;">
-                                        /danh-muc/{{ $slug }} &bull; Ngành hàng Túi xách nữ
+                                        /danh-muc/{{ $slug }} &bull; {{ $category->products_count ?? $category->products()->count() }} sản phẩm
                                     </span>
                                 </div>
                             </div>

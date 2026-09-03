@@ -84,19 +84,55 @@
         <div class="d-flex align-items-center gap-2.5 flex-nowrap">
             <!-- Filter by Category -->
             <form method="GET" action="{{ route('admin.products.index') }}" class="d-flex align-items-center gap-2.5 flex-nowrap mb-0">
-                <div class="select-box-modern" style="width: 170px;">
-                    <i data-lucide="folder-tree" class="select-icon" style="width: 15px; height: 15px;"></i>
-                    <select name="category_id" class="form-select form-select-modern" onchange="this.form.submit()">
-                        <option value="">Tất cả dòng túi</option>
-                        @foreach ($categories as $cat)
-                            <option value="{{ $cat->id }}" {{ (isset($categoryId) && $categoryId == $cat->id) ? 'selected' : '' }}>
-                                {{ $cat->name }}
+                <!-- Filter by Brand -->
+                <div class="select-box-modern" style="width: 155px;">
+                    <i data-lucide="award" class="select-icon" style="width: 15px; height: 15px;"></i>
+                    <select name="brand_id" class="form-select form-select-modern" onchange="this.form.submit()">
+                        <option value="">Tất cả thương hiệu</option>
+                        @foreach ($brands as $b)
+                            <option value="{{ $b->id }}" {{ (isset($brandId) && $brandId == $b->id) ? 'selected' : '' }}>
+                                {{ $b->name }}
                             </option>
                         @endforeach
                     </select>
                 </div>
 
-                <div class="select-box-modern" style="width: 165px;">
+                <!-- Filter by Category -->
+                <div class="select-box-modern" style="width: 155px;">
+                    <i data-lucide="folder-tree" class="select-icon" style="width: 15px; height: 15px;"></i>
+                    <select name="category_id" class="form-select form-select-modern" onchange="this.form.submit()">
+                        <option value="">Tất cả dòng túi</option>
+                        @foreach ($categories as $cat)
+                            <option value="{{ $cat->id }}" {{ (isset($categoryId) && $categoryId == $cat->id) ? 'selected' : '' }}>
+                                {{ $cat->parent_id ? '↳ ' . $cat->name : $cat->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Filter by Stock Status -->
+                <div class="select-box-modern" style="width: 150px;">
+                    <i data-lucide="boxes" class="select-icon" style="width: 15px; height: 15px;"></i>
+                    <select name="stock_status" class="form-select form-select-modern" onchange="this.form.submit()">
+                        <option value="">Tất cả tồn kho</option>
+                        <option value="in_stock" {{ (isset($stockStatus) && $stockStatus == 'in_stock') ? 'selected' : '' }}>Còn hàng (>0)</option>
+                        <option value="low_stock" {{ (isset($stockStatus) && $stockStatus == 'low_stock') ? 'selected' : '' }}>Sắp hết (≤10)</option>
+                        <option value="out_of_stock" {{ (isset($stockStatus) && $stockStatus == 'out_of_stock') ? 'selected' : '' }}>Hết hàng (=0)</option>
+                    </select>
+                </div>
+
+                <!-- Filter by Variant Type -->
+                <div class="select-box-modern" style="width: 140px;">
+                    <i data-lucide="layers" class="select-icon" style="width: 15px; height: 15px;"></i>
+                    <select name="has_variants" class="form-select form-select-modern" onchange="this.form.submit()">
+                        <option value="">Tất cả loại</option>
+                        <option value="1" {{ (isset($hasVariants) && $hasVariants === '1') ? 'selected' : '' }}>⚡ Có biến thể</option>
+                        <option value="0" {{ (isset($hasVariants) && $hasVariants === '0') ? 'selected' : '' }}>Đơn giản</option>
+                    </select>
+                </div>
+
+                <!-- Sort Filter -->
+                <div class="select-box-modern" style="width: 150px;">
                     <i data-lucide="arrow-up-down" class="select-icon" style="width: 15px; height: 15px;"></i>
                     <select name="sort" class="form-select form-select-modern" onchange="this.form.submit()">
                         <option value="created_desc" {{ (isset($sort) && $sort == 'created_desc') ? 'selected' : '' }}>Mới nhất trước</option>
@@ -145,6 +181,7 @@
                     <tr class="product-data-row" 
                         data-id="{{ $product->id }}" 
                         data-name="{{ $product->name }}" 
+                        data-search="{{ $product->search_index }} {{ $product->sku }}" 
                         data-material="{{ $product->material }}" 
                         data-color="{{ $product->color }}" 
                         data-category="{{ $product->category?->name }}">
@@ -161,6 +198,18 @@
                                     </div>
                                 @endif
                                 <div>
+                                    <div class="d-flex align-items-center flex-wrap gap-1 mb-0.5">
+                                        @if ($product->brand)
+                                            <span class="badge bg-dark-subtle text-dark border px-2 py-0.5 rounded-pill" style="font-size: 0.68rem;">
+                                                👑 {{ $product->brand->name }}
+                                            </span>
+                                        @endif
+                                        @if ($product->has_variants)
+                                            <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-0.5 rounded-pill" style="font-size: 0.68rem;">
+                                                ⚡ {{ $product->variants->count() }} biến thể
+                                            </span>
+                                        @endif
+                                    </div>
                                     <a href="{{ route('admin.products.show', $product) }}" class="category-name-text d-block text-decoration-none">
                                         {{ $product->name }}
                                     </a>
@@ -183,10 +232,10 @@
                         </td>
                         <td>
                             <div>
-                                <span class="fw-bold text-dark d-block" style="font-size: 0.95rem;">
-                                    {{ $product->has_discount ? $product->formatted_sale_price : $product->formatted_price }}
+                                <span class="fw-bold text-dark d-block" style="font-size: 0.92rem;">
+                                    {{ $product->formatted_price_range }}
                                 </span>
-                                @if ($product->has_discount)
+                                @if ($product->has_discount && !$product->has_variants)
                                     <span class="text-muted text-decoration-line-through small" style="font-size: 0.8rem;">
                                         {{ $product->formatted_price }}
                                     </span>
@@ -360,17 +409,15 @@
     }
 
     function filterProductRows() {
-        const query = removeVietnameseTones(document.getElementById('productSearchInput').value);
+        const query = removeVietnameseTones(document.getElementById('productSearchInput').value.trim());
         const rows = document.querySelectorAll('.product-data-row');
         
         rows.forEach(row => {
+            const searchIndex = (row.getAttribute('data-search') || '').toLowerCase();
             const name = removeVietnameseTones(row.getAttribute('data-name') || '');
-            const material = removeVietnameseTones(row.getAttribute('data-material') || '');
-            const color = removeVietnameseTones(row.getAttribute('data-color') || '');
-            const category = removeVietnameseTones(row.getAttribute('data-category') || '');
             const id = row.getAttribute('data-id') || '';
             
-            const match = name.includes(query) || material.includes(query) || color.includes(query) || category.includes(query) || id.includes(query);
+            const match = !query || searchIndex.includes(query) || name.includes(query) || id.includes(query);
             row.style.display = match ? '' : 'none';
         });
     }
