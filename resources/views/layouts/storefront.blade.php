@@ -27,7 +27,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <!-- Bespoke Design System Stylesheet -->
-    <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/custom.css') }}?v={{ filemtime(public_path('css/custom.css')) }}">
     @yield('styles')
 </head>
 <body class="storefront-body">
@@ -36,7 +36,7 @@
         <div class="container d-flex flex-wrap justify-content-between align-items-center gap-2">
             <div class="d-flex align-items-center gap-2.5 small">
                 <span class="badge bg-white text-primary px-2.5 py-1 rounded-pill fw-bold" style="font-size: 0.72rem; letter-spacing: 0.03em;">ƯU ĐÃI</span>
-                <span class="text-white fw-medium">Miễn phí vận chuyển toàn quốc cho đơn từ 500.000₫ &bull; Đổi trả 30 ngày</span>
+                <span class="text-white fw-medium">Tặng Voucher Freeship 30K &bull; Giao hàng toàn quốc &bull; Đổi trả 30 ngày</span>
             </div>
             <div class="d-flex align-items-center gap-3 small d-none d-md-flex text-white-50">
                 <span class="d-inline-flex align-items-center gap-1.5 text-white">
@@ -53,7 +53,7 @@
     </div>
 
     <!-- Main Storefront Navigation Header -->
-    <header class="storefront-navbar sticky-top">
+    <header class="storefront-navbar sticky-top" style="background-color: var(--bg-surface) !important; z-index: 1050 !important;">
         <div class="container d-flex align-items-center justify-content-between py-2.5">
             <!-- Brand Logo -->
             <a href="{{ route('home') }}" class="d-flex align-items-center text-decoration-none">
@@ -143,6 +143,17 @@
                                 <a href="{{ route('account.addresses') }}" class="dropdown-item-modern">
                                     <i data-lucide="map-pin" style="width: 16px; height: 16px; margin-right: 0.5rem;"></i>
                                     <span>Sổ địa chỉ nhận hàng</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('account.coins') }}" class="dropdown-item-modern d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-coin text-warning me-2" style="font-size: 1rem;"></i>
+                                        <span>Ví Xu Aurelia</span>
+                                    </div>
+                                    <span class="badge bg-warning-subtle text-dark fw-bold rounded-pill" style="font-size: 0.72rem;">
+                                        {{ number_format(Auth::user()->coins_balance) }} Xu
+                                    </span>
                                 </a>
                             </li>
                             <li><hr class="dropdown-divider-modern"></li>

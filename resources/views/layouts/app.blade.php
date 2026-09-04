@@ -27,7 +27,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <!-- Bespoke Design System Stylesheet -->
-    <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/custom.css') }}?v={{ filemtime(public_path('css/custom.css')) }}">
     @yield('styles')
 </head>
 <body>

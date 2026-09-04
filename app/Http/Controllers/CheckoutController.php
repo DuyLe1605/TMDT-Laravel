@@ -52,8 +52,8 @@ class CheckoutController extends Controller
         $addresses = Auth::check() ? $this->addressService->getUserAddresses(Auth::id()) : collect();
         $defaultAddress = Auth::check() ? (Auth::user()->defaultAddress() ?: $addresses->first()) : null;
 
-        // Shipping fee rule: Free if subtotal >= 500,000, else standard 30,000
-        $shippingFee = ($summary['total_amount'] >= 500000) ? 0 : 30000;
+        // Phí vận chuyển tiêu chuẩn ước tính ban đầu (sẽ được tính chính xác qua GHN theo địa chỉ)
+        $shippingFee = 30000;
         $grandTotal = $summary['total_amount'] + $shippingFee;
 
         return view('checkout.index', compact(

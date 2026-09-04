@@ -129,18 +129,18 @@ class ShippingController extends Controller
 
         $fee = (float) ($result['fee'] ?? 30000);
 
-        // Store promotion rule: If subtotal >= 500k, free standard shipping!
-        $isFreeshipEligible = ($subtotal >= 500000 && $serviceTypeId === 2);
-        $finalFee = $isFreeshipEligible ? 0.0 : $fee;
+        // Cước vận chuyển chuẩn theo tính toán thực tế của GHN theo từng địa chỉ
+        // Miễn phí vận chuyển chỉ áp dụng khi khách hàng áp dụng mã Voucher FREESHIP
+        $finalFee = $fee;
 
         return response()->json([
             'success' => true,
             'original_fee' => $fee,
             'formatted_original_fee' => number_format($fee, 0, ',', '.') . ' ₫',
             'shipping_fee' => $finalFee,
-            'formatted_shipping_fee' => $finalFee > 0 ? number_format($finalFee, 0, ',', '.') . ' ₫' : 'Miễn phí',
-            'is_freeship' => $isFreeshipEligible,
-            'discount_freeship' => $isFreeshipEligible ? $fee : 0,
+            'formatted_shipping_fee' => number_format($finalFee, 0, ',', '.') . ' ₫',
+            'is_freeship' => false,
+            'discount_freeship' => 0,
             'leadtime_text' => $result['leadtime_text'] ?? 'Giao hàng sau 2 - 3 ngày',
             'leadtime_date' => $result['leadtime_date'] ?? null,
             'district_id' => $toDistrictId,

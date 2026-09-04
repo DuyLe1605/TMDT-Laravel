@@ -106,6 +106,22 @@
             @endif
         </a>
 
+        <!-- Product Reviews Module -->
+        <a href="{{ route('admin.reviews.index') }}" class="sidebar-nav-link {{ request()->routeIs('admin.reviews.*') ? 'active' : '' }}">
+            <div class="d-flex align-items-center">
+                <span class="sidebar-icon-box">
+                    <i data-lucide="star" style="width: 18px; height: 18px;"></i>
+                </span>
+                <span>Đánh giá sản phẩm</span>
+            </div>
+            @php
+                $pendingReviewsCount = \App\Models\Review::whereNull('admin_reply')->count();
+            @endphp
+            @if($pendingReviewsCount > 0)
+                <span class="badge bg-warning bg-opacity-20 text-warning-emphasis px-2 py-0.5 rounded-pill fw-bold" style="font-size: 0.72rem;">{{ $pendingReviewsCount }} chờ trả lời</span>
+            @endif
+        </a>
+
         <!-- Section: System & Users -->
         <div class="sidebar-section-title mt-3">HỆ THỐNG & TÀI KHOẢN</div>
 

@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'role'])]
+#[Fillable(['name', 'email', 'password', 'role', 'coins_balance'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -27,6 +27,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'coins_balance' => 'integer',
         ];
     }
 
@@ -84,5 +85,29 @@ class User extends Authenticatable implements MustVerifyEmail
     public function voucherUsages()
     {
         return $this->hasMany(VoucherUsage::class);
+    }
+
+    /**
+     * Get product reviews by user.
+     */
+    public function reviews()
+    {
+        return $this->hasMany(Review::class)->latest();
+    }
+
+    /**
+     * Get coin transactions history for user.
+     */
+    public function coinTransactions()
+    {
+        return $this->hasMany(CoinTransaction::class)->latest();
+    }
+
+    /**
+     * Formatted coins balance string.
+     */
+    public function getFormattedCoinsBalanceAttribute(): string
+    {
+        return number_format((int) $this->coins_balance, 0, ',', '.') . ' Xu';
     }
 }

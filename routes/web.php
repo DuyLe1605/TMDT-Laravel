@@ -24,6 +24,9 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\Admin\AdminVoucherController;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\CoinController;
+use App\Http\Controllers\Admin\AdminReviewController;
 
 // =============================================================================
 // PUBLIC STOREFRONT ROUTES
@@ -36,6 +39,9 @@ Route::get(RouteConstants::PATH_SHOP, [StorefrontController::class, 'shop'])
 
 Route::get(RouteConstants::PATH_SHOP_SHOW, [StorefrontController::class, 'show'])
     ->name(RouteConstants::NAME_SHOP_SHOW);
+
+Route::get('/products/{product}/reviews', [ReviewController::class, 'getReviewsJson'])
+    ->name('products.reviews.filter');
 
 // =============================================================================
 // CART ROUTES (Khách vãng lai & Thành viên)
@@ -150,7 +156,15 @@ Route::middleware('auth')->group(function () {
             ->name('orders.confirm_delivery');
         Route::get(RouteConstants::PATH_ACCOUNT_ADDRESSES, [AccountController::class, 'addresses'])
             ->name('addresses');
+        Route::get(RouteConstants::PATH_ACCOUNT_COINS, [CoinController::class, 'index'])
+            ->name('coins');
     });
+
+    // Reviews & Coins Actions
+    Route::post('/reviews', [ReviewController::class, 'store'])
+        ->name('reviews.store');
+    Route::post('/checkout/calculate-coins', [CoinController::class, 'calculateRedeemable'])
+        ->name('checkout.calculate_coins');
 });
 
 // =============================================================================
@@ -178,6 +192,11 @@ Route::middleware(['auth', 'admin'])->prefix(RouteConstants::PREFIX_ADMIN)->name
     // Admin Voucher Management
     Route::resource(RouteConstants::RESOURCE_VOUCHERS, AdminVoucherController::class);
     Route::post('/vouchers/{voucher}/toggle', [AdminVoucherController::class, 'toggleStatus'])->name('vouchers.toggle');
+
+    // Admin Review Management
+    Route::get('/reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
+    Route::post('/reviews/{review}/reply', [AdminReviewController::class, 'reply'])->name('reviews.reply');
+    Route::post('/reviews/{review}/toggle', [AdminReviewController::class, 'toggleVisibility'])->name('reviews.toggle');
 });
 
 // =============================================================================

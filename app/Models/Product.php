@@ -35,6 +35,8 @@ class Product extends Model
         'search_index',
         'is_featured',
         'is_active',
+        'avg_rating',
+        'reviews_count',
     ];
 
     /**
@@ -51,6 +53,8 @@ class Product extends Model
         'stock' => 'integer',
         'is_featured' => 'boolean',
         'is_active' => 'boolean',
+        'avg_rating' => 'float',
+        'reviews_count' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
@@ -216,5 +220,39 @@ class Product extends Model
     public function orderItems(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    /**
+     * Product reviews relationship.
+     */
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class)->latest();
+    }
+
+    /**
+     * Approved/Visible reviews relationship.
+     */
+    public function visibleReviews(): HasMany
+    {
+        return $this->hasMany(Review::class)->where('is_visible', true)->latest();
+    }
+
+    /**
+     * Recalculate and update cached rating stats on product.
+     */
+    public function recalculateRatingStats(): void
+    {
+        $stats = $this->visibleReviews()
+            ->selectRaw('COUNT(*) as total_reviews, AVG(rating) as average_rating')
+            ->first();
+
+        $total = (int) ($stats->total_reviews ?? 0);
+        $avg = $total > 0 ? round((float) $stats->average_rating, 1) : 5.0;
+
+        $this->updateQuietly([
+            'reviews_count' => $total,
+            'avg_rating' => $avg,
+        ]);
     }
 }

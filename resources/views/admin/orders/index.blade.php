@@ -243,10 +243,11 @@
                                 </a>
                                 @if ($order->ghn_order_code)
                                     <div class="mt-1">
-                                        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle d-inline-flex align-items-center gap-1" style="font-size: 0.7rem;" title="Mã vận đơn GHN">
+                                        <a href="https://donhang.ghn.vn/?order_code={{ $order->ghn_order_code }}" target="_blank" class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle d-inline-flex align-items-center gap-1 text-decoration-none" style="font-size: 0.7rem;" title="Nhấn để tra cứu hành trình trên GHN Portal">
                                             <i data-lucide="truck" style="width: 11px; height: 11px;"></i>
                                             <span>{{ $order->ghn_order_code }}</span>
-                                        </span>
+                                            <i data-lucide="external-link" style="width: 9px; height: 9px;"></i>
+                                        </a>
                                     </div>
                                 @endif
                             </td>
@@ -328,11 +329,22 @@
 
                                     <!-- Quick Confirm if pending -->
                                     @if ($order->canBeConfirmed())
+                                        <!-- 1-Click Confirm & Send to GHN -->
+                                        <form action="{{ route('admin.orders.update_status', $order) }}" method="POST" class="d-inline" onsubmit="return confirm('Xác nhận đơn và đẩy thông tin sang GHN ngay?');">
+                                            @csrf
+                                            @method('PATCH')
+                                            <input type="hidden" name="action" value="confirm_and_ghn">
+                                            <button type="submit" class="btn btn-sm btn-success p-1.5 px-2" title="Xác nhận & Đẩy GHN ngay (1-Click)">
+                                                <i data-lucide="send" style="width: 15px; height: 15px;"></i>
+                                            </button>
+                                        </form>
+
+                                        <!-- Confirm only (prepare goods) -->
                                         <form action="{{ route('admin.orders.update_status', $order) }}" method="POST" class="d-inline">
                                             @csrf
                                             @method('PATCH')
                                             <input type="hidden" name="action" value="confirm">
-                                            <button type="submit" class="btn btn-sm btn-primary p-1.5 px-2" title="Xác nhận đơn hàng (chuẩn bị hàng)">
+                                            <button type="submit" class="btn btn-sm btn-outline-primary p-1.5 px-2" title="Chỉ xác nhận (Chuẩn bị hàng)">
                                                 <i data-lucide="check" style="width: 15px; height: 15px;"></i>
                                             </button>
                                         </form>
@@ -342,14 +354,17 @@
                                     @if ($order->canBeSentToGhn())
                                         <form action="{{ route('admin.orders.send_ghn', $order) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn gửi đơn hàng này sang GHN để lấy hàng?');">
                                             @csrf
-                                            <button type="submit" class="btn btn-sm btn-success p-1.5 px-2" title="Gửi đơn hàng sang GHN">
+                                            <button type="submit" class="btn btn-sm btn-success p-1.5 px-2" title="Gửi đơn hàng sang GHN (Lấy mã bưu tá)">
                                                 <i data-lucide="send" style="width: 15px; height: 15px;"></i>
                                             </button>
                                         </form>
                                     @endif
 
-                                    <!-- Quick Print Label if has GHN code -->
+                                    <!-- Quick GHN Link & Print Label if has GHN code -->
                                     @if ($order->isGhnOrder())
+                                        <a href="https://donhang.ghn.vn/?order_code={{ $order->ghn_order_code }}" target="_blank" class="btn btn-sm btn-surface p-1.5 px-2 text-primary" title="Tra cứu trên GHN Portal">
+                                            <i data-lucide="external-link" style="width: 15px; height: 15px;"></i>
+                                        </a>
                                         <a href="{{ route('admin.orders.print_label', $order) }}" target="_blank" class="btn btn-sm btn-surface p-1.5 px-2" title="In vận đơn GHN (A5)">
                                             <i data-lucide="printer" style="width: 15px; height: 15px;"></i>
                                         </a>

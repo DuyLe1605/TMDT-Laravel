@@ -82,10 +82,10 @@
                         <!-- Items List -->
                         <div class="cart-items-wrapper">
                             @foreach ($cartItems as $item)
-                                <div class="cart-item-row p-3.5 border-bottom d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3" id="cart-item-row-{{ $item->id }}">
+                                <div class="cart-item-row border-bottom d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3" id="cart-item-row-{{ $item->id }}">
                                     <!-- Checkbox & Product Info -->
-                                    <div class="d-flex align-items-center gap-3 flex-grow-1 min-w-0">
-                                        <div class="form-check mb-0">
+                                    <div class="cart-item-info d-flex align-items-center gap-3 min-w-0">
+                                        <div class="form-check mb-0 flex-shrink-0">
                                             <input 
                                                 type="checkbox" 
                                                 name="items[]" 
@@ -115,10 +115,10 @@
                                         </a>
 
                                         <!-- Name & Category -->
-                                        <div class="min-w-0 flex-grow-1">
-                                            <div class="d-flex align-items-center gap-1.5 mb-1">
+                                        <div class="min-w-0 flex-grow-1 pe-2">
+                                            <div class="d-flex align-items-center gap-2 mb-1.5 flex-wrap">
                                                 @if ($item->product->brand)
-                                                    <span class="badge bg-dark-subtle text-dark border px-2 py-0.5 rounded-pill" style="font-size: 0.65rem;">
+                                                    <span class="brand-pill-luxury">
                                                         👑 {{ $item->product->brand->name }}
                                                     </span>
                                                 @endif
@@ -126,8 +126,8 @@
                                                     {{ $item->product->category?->name ?? 'Túi xách' }}
                                                 </span>
                                             </div>
-                                            <h6 class="fw-bold text-dark mb-1 text-truncate">
-                                                <a href="{{ route('shop.show', $item->product) }}" class="text-decoration-none text-dark hover-primary">
+                                            <h6 class="fw-bold text-dark mb-1 text-truncate" style="max-width: 320px;">
+                                                <a href="{{ route('shop.show', $item->product) }}" class="text-decoration-none text-dark hover-primary" title="{{ $item->product->name }}">
                                                     {{ $item->product->name }}
                                                 </a>
                                             </h6>
@@ -152,7 +152,7 @@
                                     </div>
 
                                     <!-- Stepper, Subtotal & Actions -->
-                                    <div class="d-flex align-items-center justify-content-between justify-content-md-end gap-3.5 pt-2 pt-md-0 border-top border-md-0">
+                                    <div class="cart-item-actions-box d-flex align-items-center justify-content-between justify-content-md-end gap-3 pt-2 pt-md-0 border-top border-md-0 flex-shrink-0">
                                         <!-- Quantity Stepper -->
                                         <div class="qty-stepper d-inline-flex align-items-center rounded-3 border">
                                             <button 
@@ -184,7 +184,7 @@
                                         </div>
 
                                         <!-- Item Subtotal -->
-                                        <div class="text-end" style="min-width: 110px;">
+                                        <div class="cart-item-subtotal-box">
                                             <div class="text-secondary small d-none d-md-block" style="font-size: 0.72rem;">Thành tiền</div>
                                             <div class="fw-extrabold text-primary item-subtotal-text" id="subtotal-{{ $item->id }}">
                                                 {{ $item->formatted_subtotal }}
@@ -194,7 +194,7 @@
                                         <!-- Delete Single Item -->
                                         <button 
                                             type="button" 
-                                            class="btn btn-link text-danger p-1 text-decoration-none hover-scale" 
+                                            class="btn btn-link text-danger p-1 text-decoration-none hover-scale flex-shrink-0" 
                                             onclick="deleteCartItem({{ $item->id }}, '{{ addslashes($item->product->name) }}')"
                                             title="Xóa sản phẩm này"
                                         >
@@ -243,7 +243,7 @@
                         </div>
 
                         <!-- Notice message when no item is selected -->
-                        <div id="noSelectionNotice" class="d-flex align-items-center gap-2 p-3 rounded-3 mb-3 small" style="background: var(--warning-50); border: 1px solid var(--warning-100); color: var(--warning-text, #92400e);">
+                        <div id="noSelectionNotice" class="d-flex align-items-center gap-2 p-3 rounded-3 mb-3 small">
                             <i data-lucide="info" style="width: 16px; height: 16px; flex-shrink: 0;"></i>
                             <span>Vui lòng tích chọn ít nhất 1 sản phẩm để thanh toán hoặc xóa.</span>
                         </div>

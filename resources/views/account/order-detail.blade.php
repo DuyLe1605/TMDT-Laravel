@@ -50,6 +50,21 @@
                 </form>
             @endif
 
+            <!-- Review Incentive Button if delivered -->
+            @if ($order->shipping_status === 'delivered')
+                @php
+                    $unreviewed = $order->items->first(fn($i) => !$i->review);
+                @endphp
+                @if ($unreviewed)
+                    <button type="button" class="btn btn-outline-warning text-dark fw-bold py-2 px-3.5 d-inline-flex align-items-center gap-1.5 shadow-sm"
+                            style="border-color: #f59e0b; background: #fffbeb;"
+                            onclick="openReviewModal({{ $unreviewed->id }}, '{{ addslashes($unreviewed->product_name) }}', '{{ addslashes($unreviewed->variant_title ?? '') }}', '{{ $unreviewed->product_image }}')">
+                        <i class="bi bi-star-fill text-warning"></i>
+                        <span>Đánh Giá Nhận Xu</span>
+                    </button>
+                @endif
+            @endif
+
             <!-- Reorder Button -->
             @if ($order->canReorder())
                 <form action="{{ route('account.orders.reorder', $order) }}" method="POST" class="d-inline">
@@ -233,9 +248,28 @@
                                             Phân loại: {{ $item->variant_title }}
                                         </div>
                                     @endif
-                                    <div class="text-secondary small">
+                                    <div class="text-secondary small mb-2">
                                         Đơn giá: {{ $item->formatted_price }} &times; <span class="fw-bold text-dark">{{ $item->quantity }}</span>
                                     </div>
+
+                                    <!-- Review Status / Review Action Button -->
+                                    @if ($order->shipping_status === 'delivered')
+                                        <div class="pt-1.5 border-top border-secondary border-opacity-10">
+                                            @if ($item->review)
+                                                <div class="d-inline-flex align-items-center gap-1.5 text-success small">
+                                                    <i class="bi bi-patch-check-fill text-warning"></i>
+                                                    <span class="fw-semibold">Đã đánh giá: {{ $item->review->rating }}★ (+{{ number_format($item->review->coins_rewarded) }} Xu)</span>
+                                                </div>
+                                            @else
+                                                <button type="button" class="btn btn-sm btn-outline-warning text-dark fw-bold d-inline-flex align-items-center gap-1.5 py-1 px-2.5 shadow-sm"
+                                                        onclick="openReviewModal({{ $item->id }}, '{{ addslashes($item->product_name) }}', '{{ addslashes($item->variant_title ?? '') }}', '{{ $item->product_image }}')"
+                                                        style="border-color: #f59e0b; background: #fffbeb; font-size: 0.8rem;">
+                                                    <i class="bi bi-star-fill text-warning"></i>
+                                                    <span>Đánh Giá (+1.000 Xu)</span>
+                                                </button>
+                                            @endif
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                             <div class="text-end flex-shrink-0">
@@ -275,6 +309,15 @@
                             <span class="fw-bold">-{{ number_format($order->discount_amount, 0, ',', '.') }} ₫</span>
                         </div>
                     @endif
+                    @if ($order->coins_used > 0)
+                        <div class="d-flex justify-content-between text-warning-emphasis align-items-center">
+                            <span class="d-flex align-items-center gap-1">
+                                <i class="bi bi-coin text-warning"></i>
+                                <span>Xu Aurelia đã dùng (-{{ number_format($order->coins_used, 0, ',', '.') }} Xu):</span>
+                            </span>
+                            <span class="fw-bold">-{{ number_format($order->coins_discount_amount, 0, ',', '.') }} ₫</span>
+                        </div>
+                    @endif
                     <div class="d-flex justify-content-between align-items-baseline pt-2 border-top">
                         <span class="fw-bold text-dark fs-6">Tổng thanh toán:</span>
                         <span class="fw-extrabold text-primary fs-4">{{ $order->formatted_total_amount }}</span>
@@ -295,6 +338,21 @@
                 </div>
 
                 <div class="d-flex flex-column gap-2 pt-2 border-top">
+                    <!-- Review incentive in summary card if delivered -->
+                    @if ($order->shipping_status === 'delivered')
+                        @php
+                            $unreviewed = $order->items->first(fn($i) => !$i->review);
+                        @endphp
+                        @if ($unreviewed)
+                            <button type="button" class="btn btn-outline-warning text-dark fw-bold w-100 py-2.5 d-flex align-items-center justify-content-center gap-2 shadow-xs"
+                                    style="border-color: #f59e0b; background: #fffbeb;"
+                                    onclick="openReviewModal({{ $unreviewed->id }}, '{{ addslashes($unreviewed->product_name) }}', '{{ addslashes($unreviewed->variant_title ?? '') }}', '{{ $unreviewed->product_image }}')">
+                                <i class="bi bi-star-fill text-warning"></i>
+                                <span>Đánh Giá Nhận Xu (+1.000 Xu)</span>
+                            </button>
+                        @endif
+                    @endif
+
                     <!-- Reorder Button -->
                     @if ($order->canReorder())
                         <form action="{{ route('account.orders.reorder', $order) }}" method="POST" class="w-100">
@@ -356,4 +414,216 @@
         </div>
     </div>
 @endif
+
+<!-- Review Modal (Shopee-style Coin Reward) -->
+<div class="modal fade" id="reviewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <form action="{{ route('reviews.store') }}" method="POST" enctype="multipart/form-data" id="reviewForm">
+                @csrf
+                <input type="hidden" name="order_item_id" id="modalOrderItemId" value="">
+                
+                <!-- Header -->
+                <div class="modal-header bg-light border-bottom p-4">
+                    <div>
+                        <h5 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+                            <i class="bi bi-star-fill text-warning"></i>
+                            Đánh Giá Sản Phẩm
+                        </h5>
+                        <p class="text-secondary small mb-0">Đóng góp đánh giá để giúp cộng đồng mua sắm và nhận thưởng Xu Aurelia!</p>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <!-- Body -->
+                <div class="modal-body p-4">
+                    <!-- Product Info Snapshot -->
+                    <div class="d-flex align-items-center gap-3 p-3 rounded-3 bg-light mb-4 border">
+                        <img id="modalProductImg" src="" alt="" class="rounded-2 object-fit-cover border" style="width: 56px; height: 56px;">
+                        <div>
+                            <h6 id="modalProductName" class="fw-bold text-dark mb-1">Tên sản phẩm</h6>
+                            <div id="modalProductVariant" class="text-secondary small"></div>
+                        </div>
+                    </div>
+
+                    <!-- Coin Incentive Banner (Shopee Style) -->
+                    <div class="p-3 rounded-3 mb-4 d-flex align-items-center gap-3" style="background: #fffbeb; border: 1px solid #fde68a;">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 44px; height: 44px; background: #fef3c7; color: #d97706;">
+                            <i class="bi bi-coin fs-4"></i>
+                        </div>
+                        <div class="small">
+                            <div class="fw-bold text-dark">Thưởng Xu Aurelia cực hấp dẫn:</div>
+                            <div class="text-secondary">
+                                &bull; <strong class="text-warning-emphasis">+1.000 Xu</strong>: Đánh giá có hình ảnh kèm ít nhất 50 ký tự.<br>
+                                &bull; <strong class="text-warning-emphasis">+300 Xu</strong>: Đánh giá từ 50 ký tự không có ảnh.<br>
+                                &bull; <strong class="text-warning-emphasis">+100 Xu</strong>: Đánh giá ngắn hoặc chấm sao.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rating Stars -->
+                    <div class="text-center mb-4">
+                        <label class="form-label fw-bold text-dark d-block mb-2">Chất lượng sản phẩm:</label>
+                        <div class="d-inline-flex gap-2 text-warning fs-2" id="starRatingGroup" style="cursor: pointer;">
+                            <i class="bi bi-star-fill star-item" data-value="1"></i>
+                            <i class="bi bi-star-fill star-item" data-value="2"></i>
+                            <i class="bi bi-star-fill star-item" data-value="3"></i>
+                            <i class="bi bi-star-fill star-item" data-value="4"></i>
+                            <i class="bi bi-star-fill star-item" data-value="5"></i>
+                        </div>
+                        <input type="hidden" name="rating" id="ratingInput" value="5">
+                        <div id="starRatingLabel" class="fw-semibold text-danger small mt-1">Tuyệt vời</div>
+                    </div>
+
+                    <!-- Comment Textarea -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-dark d-flex justify-content-between">
+                            <span>Bình luận & Chia sẻ trải nghiệm:</span>
+                            <span class="text-muted small fw-normal"><span id="charCount">0</span>/2000 ký tự</span>
+                        </label>
+                        <textarea 
+                            name="comment" 
+                            id="reviewCommentInput"
+                            rows="4" 
+                            class="form-control" 
+                            placeholder="Hãy chia sẻ cảm nhận về chất lượng da, đường may, form dáng và dịch vụ đóng gói giao hàng..."
+                            maxlength="2000"
+                            oninput="updateCharCount(this)"
+                        ></textarea>
+                    </div>
+
+                    <!-- Image Upload (Max 5 files) -->
+                    <div class="mb-2">
+                        <label class="form-label fw-bold text-dark d-flex justify-content-between align-items-center">
+                            <span>Hình ảnh thực tế sản phẩm (tối đa 5 ảnh):</span>
+                            <span class="text-success small fw-semibold">
+                                <i class="bi bi-image me-1"></i>Thêm ảnh để nhận tối đa 1.000 Xu
+                            </span>
+                        </label>
+                        
+                        <input type="file" name="images[]" id="reviewImagesInput" class="d-none" multiple accept="image/png,image/jpeg,image/webp" onchange="handleImageSelect(event)">
+
+                        <div class="d-flex flex-wrap gap-2 align-items-center" id="imagePreviewList">
+                            <button type="button" class="btn btn-outline-secondary border-dashed d-flex flex-column align-items-center justify-content-center p-3 rounded-3" 
+                                    style="width: 80px; height: 80px; border-style: dashed !important;"
+                                    onclick="document.getElementById('reviewImagesInput').click()">
+                                <i class="bi bi-camera fs-5"></i>
+                                <span style="font-size: 0.65rem;">Thêm ảnh</span>
+                            </button>
+                        </div>
+                        <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">Định dạng: JPG, PNG, WEBP. Tối đa 5MB mỗi ảnh.</small>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="modal-footer p-3 bg-light border-top">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Để sau</button>
+                    <button type="submit" class="btn btn-danger fw-bold px-4 d-inline-flex align-items-center gap-2 shadow-sm">
+                        <i class="bi bi-send-fill"></i>
+                        <span>Hoàn Tất & Nhận Xu</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentRating = 5;
+    const starLabels = {
+        1: 'Tệ',
+        2: 'Không hài lòng',
+        3: 'Bình thường',
+        4: 'Hài lòng',
+        5: 'Tuyệt vời'
+    };
+
+    function openReviewModal(itemId, productName, variantTitle, imgUrl) {
+        // Reset form first
+        document.getElementById('reviewForm').reset();
+
+        document.getElementById('modalOrderItemId').value = itemId;
+        document.getElementById('modalProductName').textContent = productName;
+        document.getElementById('modalProductVariant').textContent = variantTitle ? `Phân loại: ${variantTitle}` : '';
+        document.getElementById('modalProductImg').src = imgUrl || 'https://placehold.co/100';
+
+        document.getElementById('imagePreviewList').innerHTML = `
+            <button type="button" class="btn btn-outline-secondary border-dashed d-flex flex-column align-items-center justify-content-center p-3 rounded-3" 
+                    style="width: 80px; height: 80px; border-style: dashed !important;"
+                    onclick="document.getElementById('reviewImagesInput').click()">
+                <i class="bi bi-camera fs-5"></i>
+                <span style="font-size: 0.65rem;">Thêm ảnh</span>
+            </button>
+        `;
+        document.getElementById('charCount').textContent = '0';
+        setRating(5);
+
+        const modal = new bootstrap.Modal(document.getElementById('reviewModal'));
+        modal.show();
+    }
+
+    function setRating(val) {
+        currentRating = parseInt(val);
+        document.getElementById('ratingInput').value = currentRating;
+        document.getElementById('starRatingLabel').textContent = starLabels[currentRating] || 'Tuyệt vời';
+
+        const stars = document.querySelectorAll('#starRatingGroup .star-item');
+        stars.forEach(star => {
+            const starVal = parseInt(star.getAttribute('data-value'));
+            if (starVal <= currentRating) {
+                star.className = 'bi bi-star-fill star-item text-warning';
+            } else {
+                star.className = 'bi bi-star star-item text-muted opacity-25';
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const stars = document.querySelectorAll('#starRatingGroup .star-item');
+        stars.forEach(star => {
+            star.addEventListener('click', function () {
+                setRating(this.getAttribute('data-value'));
+            });
+            star.addEventListener('mouseenter', function () {
+                const hoverVal = parseInt(this.getAttribute('data-value'));
+                stars.forEach(s => {
+                    const sVal = parseInt(s.getAttribute('data-value'));
+                    s.className = sVal <= hoverVal ? 'bi bi-star-fill star-item text-warning' : 'bi bi-star star-item text-muted opacity-25';
+                });
+                document.getElementById('starRatingLabel').textContent = starLabels[hoverVal] || '';
+            });
+        });
+
+        document.getElementById('starRatingGroup').addEventListener('mouseleave', function () {
+            setRating(currentRating);
+        });
+    });
+
+    function updateCharCount(el) {
+        const len = el.value.length;
+        document.getElementById('charCount').textContent = len;
+    }
+
+    function handleImageSelect(event) {
+        const files = Array.from(event.target.files).slice(0, 5);
+        const container = document.getElementById('imagePreviewList');
+        
+        // Remove existing previews except the add button
+        container.querySelectorAll('.preview-thumb').forEach(el => el.remove());
+
+        files.forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const div = document.createElement('div');
+                div.className = 'position-relative rounded-3 overflow-hidden border preview-thumb';
+                div.style.cssText = 'width: 80px; height: 80px;';
+                div.innerHTML = `
+                    <img src="${e.target.result}" class="w-100 h-100 object-fit-cover">
+                `;
+                container.insertBefore(div, container.firstChild);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+</script>
 @endsection

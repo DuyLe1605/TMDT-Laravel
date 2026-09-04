@@ -34,11 +34,11 @@ class VoucherController extends Controller
         $user = Auth::user();
 
         $validation = $this->voucherService->validateVoucher(
-            code: $validated['code'],
-            orderSubtotal: $subtotal,
-            shippingFee: $shippingFee,
-            paymentMethod: $paymentMethod,
-            user: $user
+            $validated['code'],
+            $subtotal,
+            $shippingFee,
+            $paymentMethod,
+            $user
         );
 
         if (!$validation['valid']) {
@@ -83,10 +83,10 @@ class VoucherController extends Controller
         $user = Auth::user();
 
         $data = $this->voucherService->getAvailableVouchersForCart(
-            orderSubtotal: $subtotal,
-            shippingFee: $shippingFee,
-            paymentMethod: $paymentMethod,
-            user: $user
+            $subtotal,
+            $shippingFee,
+            $paymentMethod,
+            $user
         );
 
         // Format items for clean frontend consumption

@@ -39,15 +39,27 @@
                 <span>Quay lại</span>
             </a>
 
-            <!-- Confirm Order Button (pending -> processing) -->
+            <!-- Confirm Order Options (pending) -->
             @if ($order->canBeConfirmed())
+                <!-- 1-Click Confirm & Send to GHN -->
+                <form action="{{ route('admin.orders.update_status', $order) }}" method="POST" class="d-inline" onsubmit="return confirm('Xác nhận đơn hàng và đẩy thông tin sang GHN để tài xế đến lấy hàng ngay?');">
+                    @csrf
+                    @method('PATCH')
+                    <input type="hidden" name="action" value="confirm_and_ghn">
+                    <button type="submit" class="btn btn-success d-inline-flex align-items-center shadow-sm">
+                        <i data-lucide="send" style="width: 16px; height: 16px; margin-right: 0.4rem;"></i>
+                        <span class="fw-semibold">Xác nhận & Gửi GHN ngay</span>
+                    </button>
+                </form>
+
+                <!-- Regular Confirm only (pending -> processing) -->
                 <form action="{{ route('admin.orders.update_status', $order) }}" method="POST" class="d-inline">
                     @csrf
                     @method('PATCH')
                     <input type="hidden" name="action" value="confirm">
-                    <button type="submit" class="btn btn-primary d-inline-flex align-items-center">
+                    <button type="submit" class="btn btn-outline-primary d-inline-flex align-items-center">
                         <i data-lucide="check" style="width: 16px; height: 16px; margin-right: 0.4rem;"></i>
-                        <span>Xác nhận đơn (Chuẩn bị hàng)</span>
+                        <span>Xác nhận (Chuẩn bị hàng)</span>
                     </button>
                 </form>
             @endif
@@ -56,9 +68,9 @@
             @if ($order->canBeSentToGhn())
                 <form action="{{ route('admin.orders.send_ghn', $order) }}" method="POST" class="d-inline" onsubmit="return confirm('Xác nhận gửi thông tin kiện hàng lên GHN để tài xế đến lấy hàng?');">
                     @csrf
-                    <button type="submit" class="btn btn-success d-inline-flex align-items-center">
+                    <button type="submit" class="btn btn-success d-inline-flex align-items-center shadow-sm">
                         <i data-lucide="send" style="width: 16px; height: 16px; margin-right: 0.4rem;"></i>
-                        <span>Gửi đơn sang GHN</span>
+                        <span class="fw-semibold">Gửi đơn sang GHN (Lấy mã bưu tá)</span>
                     </button>
                 </form>
             @endif
@@ -180,27 +192,52 @@
                     </div>
                 @endif
             @elseif ($order->shipping_status === 'pending')
-                <div class="alert alert-warning d-flex align-items-center gap-2 mb-0" role="alert">
-                    <i data-lucide="alert-triangle" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
-                    <div class="small">
-                        Đơn hàng đang ở trạng thái <strong>Chờ xác nhận</strong>. Vui lòng xác nhận đơn hàng sau khi liên hệ hoặc kiểm tra thông tin khách hàng, sau đó gói hàng và gửi sang GHN.
+                <div class="alert alert-warning p-3 rounded-3 mb-0" role="alert">
+                    <div class="d-flex align-items-start gap-2 mb-2">
+                        <i data-lucide="alert-triangle" class="text-warning flex-shrink-0 mt-0.5" style="width: 18px; height: 18px;"></i>
+                        <div class="small">
+                            Đơn hàng đang ở trạng thái <strong>Chờ xác nhận</strong> (chưa đẩy sang GHN). Bạn có thể chọn gửi sang GHN ngay để bưu tá đến lấy hoặc chỉ xác nhận chuẩn bị hàng:
+                        </div>
+                    </div>
+                    <div class="d-flex flex-wrap align-items-center gap-2 mt-2 pt-2 border-top border-warning border-opacity-25">
+                        <form action="{{ route('admin.orders.update_status', $order) }}" method="POST" class="d-inline" onsubmit="return confirm('Xác nhận đơn hàng và đẩy thông tin sang GHN để tài xế đến lấy hàng ngay?');">
+                            @csrf
+                            @method('PATCH')
+                            <input type="hidden" name="action" value="confirm_and_ghn">
+                            <button type="submit" class="btn btn-sm btn-success d-inline-flex align-items-center gap-1">
+                                <i data-lucide="send" style="width: 13px; height: 13px;"></i>
+                                <span class="fw-semibold">Xác nhận & Gửi GHN ngay</span>
+                            </button>
+                        </form>
+                        <form action="{{ route('admin.orders.update_status', $order) }}" method="POST" class="d-inline">
+                            @csrf
+                            @method('PATCH')
+                            <input type="hidden" name="action" value="confirm">
+                            <button type="submit" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1">
+                                <i data-lucide="check" style="width: 13px; height: 13px;"></i>
+                                <span>Chỉ chuẩn bị hàng</span>
+                            </button>
+                        </form>
                     </div>
                 </div>
             @elseif ($order->shipping_status === 'processing')
-                <div class="alert alert-info d-flex align-items-center justify-content-between flex-wrap gap-2 mb-0" role="alert">
-                    <div class="d-flex align-items-center gap-2 small">
-                        <i data-lucide="package-check" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
-                        <div>
-                            Đơn hàng đã được xác nhận và đang đóng gói. Nhấn <strong>"Gửi đơn sang GHN"</strong> để tạo mã vận đơn và điều phối shipper lấy hàng!
+                <div class="alert alert-info p-3 rounded-3 mb-0" role="alert">
+                    <div class="d-flex align-items-start gap-2 mb-2">
+                        <i data-lucide="package-check" class="text-info flex-shrink-0 mt-0.5" style="width: 20px; height: 20px;"></i>
+                        <div class="small">
+                            <div><strong>Đơn hàng đang đóng gói:</strong> Chưa gửi sang GHN nên chưa có mã vận đơn &amp; liên kết tra cứu.</div>
+                            <div class="text-muted mt-1">Khi bạn đóng gói xong hộp hàng, hãy nhấn nút <strong>"Gửi đơn sang GHN ngay"</strong> bên dưới. Hệ thống sẽ kết nối trực tiếp với GHN, sinh mã vận đơn bưu tá và hiển thị liên kết tra cứu hành trình.</div>
                         </div>
                     </div>
-                    <form action="{{ route('admin.orders.send_ghn', $order) }}" method="POST" class="d-inline">
-                        @csrf
-                        <button type="submit" class="btn btn-sm btn-success">
-                            <i data-lucide="send" style="width: 14px; height: 14px; margin-right: 0.3rem;"></i>
-                            <span>Gửi GHN ngay</span>
-                        </button>
-                    </form>
+                    <div class="mt-2 pt-2 border-top border-info border-opacity-25 d-flex justify-content-end">
+                        <form action="{{ route('admin.orders.send_ghn', $order) }}" method="POST" class="d-inline" onsubmit="return confirm('Xác nhận gửi thông tin kiện hàng lên GHN để tài xế đến lấy hàng?');">
+                            @csrf
+                            <button type="submit" class="btn btn-sm btn-success d-inline-flex align-items-center gap-1 shadow-sm px-3">
+                                <i data-lucide="send" style="width: 14px; height: 14px;"></i>
+                                <span class="fw-semibold">Gửi đơn sang GHN ngay</span>
+                            </button>
+                        </form>
+                    </div>
                 </div>
             @elseif ($order->shipping_status === 'cancelled')
                 <div class="alert alert-danger d-flex align-items-center gap-2 mb-0" role="alert">

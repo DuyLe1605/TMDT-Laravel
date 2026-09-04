@@ -51,6 +51,8 @@ class Order extends Model
         'voucher_id',
         'voucher_code',
         'discount_amount',
+        'coins_used',
+        'coins_discount_amount',
         'total_amount',
         'notes',
         'cancel_reason',
@@ -63,6 +65,8 @@ class Order extends Model
         'voucher_id'            => 'integer',
         'to_district_id'        => 'integer',
         'total_weight'          => 'integer',
+        'coins_used'            => 'integer',
+        'coins_discount_amount' => 'decimal:2',
         'subtotal'              => 'decimal:2',
         'shipping_fee'          => 'decimal:2',
         'discount_amount'       => 'decimal:2',
@@ -97,6 +101,11 @@ class Order extends Model
     public function voucher(): BelongsTo
     {
         return $this->belongsTo(Voucher::class);
+    }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
     }
 
     // =========================================================================
@@ -271,6 +280,16 @@ class Order extends Model
     {
         return (float) $this->discount_amount > 0
             ? '-' . number_format((float) $this->discount_amount, 0, ',', '.') . ' ₫'
+            : '0 ₫';
+    }
+
+    /**
+     * Formatted coins discount amount string.
+     */
+    public function getFormattedCoinsDiscountAmountAttribute(): string
+    {
+        return (float) $this->coins_discount_amount > 0
+            ? '-' . number_format((float) $this->coins_discount_amount, 0, ',', '.') . ' ₫'
             : '0 ₫';
     }
 

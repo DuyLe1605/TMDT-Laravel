@@ -26,7 +26,7 @@ class AccountController extends Controller
         $currentStatus = $request->query('status', 'all');
 
         $query = Order::where('user_id', Auth::id())
-            ->with(['items'])
+            ->with(['items.review', 'items.product'])
             ->byShippingStatus($currentStatus)
             ->latest();
 
@@ -63,7 +63,7 @@ class AccountController extends Controller
             abort(403);
         }
 
-        $order->load(['items.product']);
+        $order->load(['items.product', 'items.review']);
 
         return view('account.order-detail', compact('order'));
     }

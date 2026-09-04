@@ -194,8 +194,8 @@
 
             <div class="row g-3 g-xl-4">
                 @forelse ($products as $product)
-                    <div class="col-6 col-md-4">
-                        <div class="product-store-card h-100 d-flex flex-column">
+                    <div class="col-6 col-md-4 d-flex">
+                        <div class="product-store-card w-100 d-flex flex-column">
                             <!-- Thumbnail with Luxury Badges -->
                             <div class="product-store-img-box">
                                 <a href="{{ route('shop.show', $product) }}" class="d-block w-100 h-100">
@@ -225,10 +225,10 @@
                             </div>
 
                             <!-- Content Area -->
-                            <div class="p-3.5 d-flex flex-column flex-grow-1">
-                                <div class="d-flex align-items-center gap-1.5 mb-1">
+                            <div class="product-store-body">
+                                <div class="d-flex align-items-center gap-2 mb-1.5">
                                     @if ($product->brand)
-                                        <span class="badge bg-dark-subtle text-dark border px-2 py-0.5 rounded-pill" style="font-size: 0.65rem;">
+                                        <span class="brand-pill-luxury">
                                             👑 {{ $product->brand->name }}
                                         </span>
                                     @endif
@@ -253,7 +253,7 @@
                                 @endif
 
                                 <!-- Price & Quick Action Toolbar -->
-                                <div class="mt-auto pt-3 border-top d-flex align-items-center justify-content-between gap-2">
+                                <div class="product-store-footer">
                                     <div>
                                         <div class="price-current-luxury">
                                             {{ $product->has_variants ? $product->formatted_price_range : ($product->has_discount ? $product->formatted_sale_price : $product->formatted_price) }}
@@ -264,7 +264,7 @@
                                             </div>
                                         @endif
                                     </div>
-                                    <div class="d-flex align-items-center gap-1.5 flex-shrink-0">
+                                    <div class="d-flex align-items-center gap-2 flex-shrink-0">
                                         <button 
                                             type="button" 
                                             class="btn-card-action" 

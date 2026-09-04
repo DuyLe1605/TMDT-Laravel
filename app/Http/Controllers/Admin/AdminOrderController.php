@@ -88,7 +88,12 @@ class AdminOrderController extends Controller
             switch ($action) {
                 case 'confirm':
                     $this->orderService->confirmOrder($order);
-                    return redirect()->back()->with('success', "Đã xác nhận đơn hàng {$order->order_code}. Trạng thái: Đang chuẩn bị.");
+                    return redirect()->back()->with('success', "Đã xác nhận đơn hàng {$order->order_code}. Trạng thái: Đang chuẩn bị hàng.");
+
+                case 'confirm_and_ghn':
+                    $this->orderService->confirmOrder($order);
+                    $this->orderService->sendToGhn($order);
+                    return redirect()->back()->with('success', "Đã xác nhận và tạo vận đơn GHN thành công! Mã vận đơn GHN: {$order->fresh()->ghn_order_code}");
 
                 case 'mark_delivered':
                     $this->orderService->markDelivered($order);

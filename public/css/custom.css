@@ -1646,11 +1646,22 @@ input::-ms-clear {
 }
 
 .storefront-navbar {
-    background: var(--bg-surface);
-    border-bottom: 1px solid var(--border-default);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
-    z-index: 1020;
-    padding: 0.55rem 0;
+    background-color: var(--bg-surface) !important;
+    border-bottom: 1px solid var(--border-default) !important;
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.08);
+    z-index: 1050 !important;
+    padding: 0.65rem 0;
+}
+
+.checkout-coin-box {
+    background: #fffdf5;
+    border: 1px solid #fef08a;
+    transition: all 0.2s ease;
+}
+
+[data-theme="dark"] .checkout-coin-box {
+    background: rgba(245, 158, 11, 0.08) !important;
+    border: 1px solid rgba(245, 158, 11, 0.25) !important;
 }
 
 .storefront-nav-link {
@@ -2107,5 +2118,173 @@ input::-ms-clear {
 @keyframes cartBounce {
     0% { transform: translate(-50%, -50%) scale(0.5); }
     100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+/* ==========================================================================
+   DECIMAL SPACING UTILITIES (Bootstrap 5 compatibility)
+   ========================================================================== */
+.p-3\.5 { padding: 0.875rem !important; }
+.px-3\.5 { padding-left: 0.875rem !important; padding-right: 0.875rem !important; }
+.py-3\.5 { padding-top: 0.875rem !important; padding-bottom: 0.875rem !important; }
+.pt-3\.5 { padding-top: 0.875rem !important; }
+.pb-3\.5 { padding-bottom: 0.875rem !important; }
+.mb-1\.5 { margin-bottom: 0.375rem !important; }
+.mt-1\.5 { margin-top: 0.375rem !important; }
+.gap-1\.5 { gap: 0.375rem !important; }
+.gap-2\.5 { gap: 0.625rem !important; }
+.gap-3\.5 { gap: 0.875rem !important; }
+
+/* ==========================================================================
+   PRODUCT STORE CARD REFINEMENTS (Spacing, Borders, Badges & Price)
+   ========================================================================== */
+.product-store-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    transition: all 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+    display: flex !important;
+    flex-direction: column !important;
+    height: auto !important;
+    min-height: 100%;
+}
+
+.product-store-img-box {
+    width: 100%;
+    aspect-ratio: 1 / 1.05;
+    overflow: hidden;
+    position: relative;
+    background: var(--bg-surface-subtle);
+    flex-shrink: 0 !important;
+    border-bottom: 1px solid var(--border-default);
+}
+
+.product-store-body {
+    padding: 1.1rem 1.15rem 1.25rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    flex-grow: 1 !important;
+    flex-shrink: 0 !important;
+    min-height: 200px !important;
+    width: 100%;
+}
+
+.brand-pill-luxury {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 0.2rem 0.55rem;
+    border-radius: 9999px;
+    background: var(--bg-surface-subtle);
+    color: var(--text-primary);
+    border: 1px solid var(--border-default);
+    white-space: nowrap;
+    line-height: 1.2;
+    flex-shrink: 0;
+}
+
+[data-theme="dark"] .brand-pill-luxury {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.16);
+    color: #f8fafc;
+}
+
+.product-store-footer {
+    margin-top: auto;
+    padding-top: 0.85rem;
+    border-top: 1px solid var(--border-default);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    flex-shrink: 0 !important;
+}
+
+/* ==========================================================================
+   CART TABLE & SUMMARY REFINEMENTS (Dark/Light Mode & Flex Sizing)
+   ========================================================================== */
+.cart-item-row {
+    padding: 1.1rem 1.25rem !important;
+    border-bottom: 1px solid var(--border-default);
+    transition: background-color 0.15s ease;
+}
+
+.cart-item-row:hover {
+    background-color: var(--bg-surface-subtle);
+}
+
+.cart-item-info {
+    min-width: 0;
+    flex-grow: 1;
+}
+
+.cart-item-actions-box {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1.25rem;
+    flex-shrink: 0;
+}
+
+.cart-item-subtotal-box {
+    min-width: 130px;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.cart-item-subtotal-box .item-subtotal-text {
+    white-space: nowrap;
+    font-size: 1.05rem;
+    line-height: 1.2;
+}
+
+/* Warning alert in cart summary (Dark mode fix) */
+[data-theme="dark"] #noSelectionNotice {
+    background: rgba(245, 158, 11, 0.12) !important;
+    border-color: rgba(245, 158, 11, 0.3) !important;
+    color: #fbbf24 !important;
+}
+
+/* Checkout button disabled state in dark mode */
+[data-theme="dark"] #checkoutSubmitBtn.opacity-50 {
+    opacity: 0.6 !important;
+    background: #312e81 !important;
+    color: #a5b4fc !important;
+    border: 1px solid rgba(99, 102, 241, 0.3) !important;
+}
+
+/* ==========================================================================
+   CHECKOUT ADDRESS CARD (Padding, Spacing & Brand Accent Border)
+   ========================================================================== */
+.checkout-address-card,
+#activeAddressDisplay,
+#guestActiveAddressBox {
+    padding: 1.1rem 1.25rem 1.1rem 1.4rem !important;
+    border-radius: var(--radius-lg) !important;
+    border: 1px solid var(--border-default);
+    border-left: 4px solid var(--brand-500) !important;
+    background: var(--bg-surface-subtle) !important;
+}
+
+.checkout-address-card .address-header,
+#activeAddressDisplay .address-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.45rem;
+}
+
+.checkout-address-card .address-detail,
+#activeAddressDisplay .address-detail,
+#guestActiveAddressBox .address-detail {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    line-height: 1.55;
+    color: var(--text-primary);
 }
 

@@ -121,6 +121,21 @@ class RouteConstants
     public const PATH_ACCOUNT_ADDRESSES = '/addresses';
     public const NAME_ACCOUNT_ADDRESSES = 'account.addresses';
 
+    public const PATH_ACCOUNT_COINS = '/coins';
+    public const NAME_ACCOUNT_COINS = 'account.coins';
+
+    // =========================================================================
+    // REVIEW & COIN ROUTES
+    // =========================================================================
+    public const PATH_REVIEWS_STORE = '/reviews';
+    public const NAME_REVIEWS_STORE = 'reviews.store';
+
+    public const PATH_REVIEWS_FILTER = '/products/{product}/reviews';
+    public const NAME_REVIEWS_FILTER = 'products.reviews.filter';
+
+    public const PATH_COINS_CALCULATE = '/checkout/calculate-coins';
+    public const NAME_COINS_CALCULATE = 'checkout.calculate_coins';
+
     // =========================================================================
     // ADMIN ROUTES
     // =========================================================================
@@ -136,6 +151,7 @@ class RouteConstants
     public const RESOURCE_USERS = 'users';
     public const RESOURCE_ORDERS = 'orders';
     public const RESOURCE_VOUCHERS = 'vouchers';
+    public const RESOURCE_REVIEWS = 'reviews';
 
     public const NAME_ADMIN_PRODUCTS_INDEX = 'admin.products.index';
     public const NAME_ADMIN_PRODUCTS_CREATE = 'admin.products.create';
@@ -164,4 +180,8 @@ class RouteConstants
     public const NAME_ADMIN_VOUCHERS_UPDATE = 'admin.vouchers.update';
     public const NAME_ADMIN_VOUCHERS_DESTROY = 'admin.vouchers.destroy';
     public const NAME_ADMIN_VOUCHERS_TOGGLE = 'admin.vouchers.toggle';
+
+    public const NAME_ADMIN_REVIEWS_INDEX = 'admin.reviews.index';
+    public const NAME_ADMIN_REVIEWS_REPLY = 'admin.reviews.reply';
+    public const NAME_ADMIN_REVIEWS_TOGGLE = 'admin.reviews.toggle';
 }

@@ -71,16 +71,16 @@
                     @auth
                         @if ($defaultAddress)
                             <!-- Active Selected Address Display (Shopee style card) -->
-                            <div id="activeAddressDisplay" class="p-3.5 rounded-3" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-default); border-left: 4px solid var(--brand-500) !important;">
-                                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-1.5">
-                                    <div class="d-flex align-items-center gap-2">
+                            <div id="activeAddressDisplay" class="checkout-address-card rounded-3 shadow-sm">
+                                <div class="address-header d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+                                    <div class="d-flex flex-wrap align-items-center gap-2">
                                         <span class="fw-bold text-dark fs-6" id="dispRecipientName">{{ $defaultAddress->recipient_name }}</span>
                                         <span class="fw-bold text-secondary small" id="dispPhone">({{ $defaultAddress->phone }})</span>
-                                        <span class="badge bg-primary-subtle text-primary" id="dispTypeBadge" style="font-size: 0.7rem;">
+                                        <span class="badge bg-primary-subtle text-primary px-2 py-1" id="dispTypeBadge" style="font-size: 0.72rem;">
                                             {{ $defaultAddress->type_label }}
                                         </span>
                                         @if ($defaultAddress->is_default)
-                                            <span class="badge bg-danger-subtle text-danger" id="dispDefaultBadge" style="font-size: 0.7rem;">Mặc định</span>
+                                            <span class="badge bg-danger-subtle text-danger px-2 py-1" id="dispDefaultBadge" style="font-size: 0.72rem;">Mặc định</span>
                                         @endif
                                     </div>
 
@@ -90,9 +90,9 @@
                                         </button>
                                     @endif
                                 </div>
-                                <div class="text-dark small leading-relaxed" id="dispFullAddress">
-                                    <i data-lucide="map-pin" class="text-danger inline-block me-1" style="width: 13px; height: 13px;"></i>
-                                    {{ $defaultAddress->full_address }}
+                                <div class="address-detail text-dark small" id="dispFullAddress">
+                                    <i data-lucide="map-pin" class="text-danger flex-shrink-0 mt-0.5" style="width: 14px; height: 14px;"></i>
+                                    <span>{{ $defaultAddress->full_address }}</span>
                                 </div>
                             </div>
 
@@ -113,15 +113,15 @@
                             </div>
 
                             <!-- Active Address Box (Hidden initially until created via dialog) -->
-                            <div id="activeAddressDisplay" class="p-3.5 rounded-3 d-none" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-default); border-left: 4px solid var(--brand-500) !important;">
-                                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-1.5">
-                                    <div class="d-flex align-items-center gap-2">
+                            <div id="activeAddressDisplay" class="checkout-address-card rounded-3 shadow-sm d-none">
+                                <div class="address-header d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+                                    <div class="d-flex flex-wrap align-items-center gap-2">
                                         <span class="fw-bold text-dark fs-6" id="dispRecipientName"></span>
                                         <span class="fw-bold text-secondary small" id="dispPhone"></span>
-                                        <span class="badge bg-primary-subtle text-primary" id="dispTypeBadge" style="font-size: 0.7rem;">Nhà riêng</span>
+                                        <span class="badge bg-primary-subtle text-primary px-2 py-1" id="dispTypeBadge" style="font-size: 0.72rem;">Nhà riêng</span>
                                     </div>
                                 </div>
-                                <div class="text-dark small leading-relaxed" id="dispFullAddress"></div>
+                                <div class="address-detail text-dark small" id="dispFullAddress"></div>
                             </div>
 
                             <input type="hidden" name="recipient_name" id="hiddenRecipientName" value="">
@@ -141,18 +141,18 @@
                         </div>
 
                         <!-- Active Selected Guest Address Display if created via Modal -->
-                        <div id="guestActiveAddressBox" class="p-3 rounded-3 mb-3 d-none" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-default); border-left: 4px solid var(--brand-500) !important;">
-                            <div class="d-flex align-items-center justify-content-between mb-1">
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="fw-bold text-dark" id="guestDispName"></span>
+                        <div id="guestActiveAddressBox" class="checkout-address-card rounded-3 shadow-sm mb-3 d-none">
+                            <div class="address-header d-flex align-items-center justify-content-between mb-2">
+                                <div class="d-flex flex-wrap align-items-center gap-2">
+                                    <span class="fw-bold text-dark fs-6" id="guestDispName"></span>
                                     <span class="text-secondary small" id="guestDispPhone"></span>
-                                    <span class="badge bg-primary-subtle text-primary" style="font-size: 0.68rem;">Đã chọn</span>
+                                    <span class="badge bg-primary-subtle text-primary px-2 py-1" style="font-size: 0.72rem;">Đã chọn</span>
                                 </div>
                                 <button type="button" class="btn btn-sm btn-link text-primary p-0 text-decoration-none" onclick="openNewAddressModal()">
                                     Thay đổi
                                 </button>
                             </div>
-                            <div class="text-dark small" id="guestDispAddress"></div>
+                            <div class="address-detail text-dark small" id="guestDispAddress"></div>
                         </div>
 
                         <!-- Cascading Inline Form for Guests -->
@@ -260,9 +260,11 @@
                                             <div class="text-secondary" id="standardLeadtimeText" style="font-size: 0.72rem;">Nhận hàng sau 2 - 3 ngày</div>
                                         </div>
                                     </div>
-                                    <span class="fw-bold text-primary small" id="standardShippingFeeDisplay">
-                                        {{ $summary['total_amount'] >= 500000 ? 'Miễn phí' : ($shippingFee > 0 ? number_format($shippingFee, 0, ',', '.') . ' ₫' : '30.000 ₫') }}
-                                    </span>
+                                    <div class="text-end">
+                                        <span class="fw-bold text-primary small" id="standardShippingFeeDisplay">
+                                            {{ $shippingFee > 0 ? number_format($shippingFee, 0, ',', '.') . ' ₫' : '30.000 ₫' }}
+                                        </span>
+                                    </div>
                                 </label>
                             </div>
                             <div class="col-md-6">
@@ -384,7 +386,7 @@
                 <div class="card-modern p-4 sticky-top shadow-sm border" style="top: 85px;">
                     <h5 class="fw-bold text-dark mb-3 pb-2 border-bottom d-flex align-items-center justify-content-between">
                         <span>Chi Tiết Thanh Toán</span>
-                        <i data-lucide="receipt-check" class="text-primary" style="width: 18px; height: 18px;"></i>
+                        <i data-lucide="receipt" class="text-primary" style="width: 18px; height: 18px;"></i>
                     </h5>
 
                     <!-- Selected Items Preview List -->
@@ -466,6 +468,49 @@
                     <!-- Hidden voucher code field for backend order processing -->
                     <input type="hidden" name="voucher_code" id="hiddenVoucherCode" value="">
 
+                    <!-- Aurelia Coins Section (Shopee-style) -->
+                    @auth
+                        @php
+                            $userCoins = auth()->user()->coins_balance;
+                        @endphp
+                        <div class="p-3 rounded-3 mb-3 checkout-coin-box">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: rgba(245, 158, 11, 0.18); color: #d97706;">
+                                        <i class="bi bi-coin fs-6"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-dark small d-flex align-items-center gap-1.5">
+                                            <span>Dùng Xu Aurelia</span>
+                                            <span class="badge bg-warning-subtle text-warning-emphasis" style="font-size: 0.65rem;">1 Xu = 1 ₫</span>
+                                        </div>
+                                        <div class="text-secondary" style="font-size: 0.72rem;">
+                                            Hiện có: <strong class="text-warning-emphasis" id="checkoutUserCoinsText">{{ number_format($userCoins, 0, ',', '.') }} Xu</strong>
+                                            @if($userCoins > 0)
+                                                <span id="maxCoinUsableNotice" class="text-muted d-block" style="font-size: 0.68rem;"></span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-check form-switch m-0">
+                                    <input 
+                                        type="checkbox" 
+                                        name="use_coins" 
+                                        value="1" 
+                                        id="useCoinsCheckbox" 
+                                        class="form-check-input" 
+                                        style="cursor: pointer; width: 2.2rem; height: 1.15rem;"
+                                        {{ $userCoins <= 0 ? 'disabled' : '' }}
+                                        onchange="onToggleCoins(this.checked)"
+                                    >
+                                </div>
+                            </div>
+
+                            <input type="hidden" name="coins_to_use" id="hiddenCoinsToUse" value="0">
+                        </div>
+                    @endauth
+
                     <div class="d-flex flex-column gap-2.5 mb-3 text-secondary small">
                         <div class="d-flex justify-content-between">
                             <span>Tổng tiền hàng ({{ $summary['total_quantity'] }} chiếc):</span>
@@ -475,17 +520,10 @@
                             <span>Phí vận chuyển:</span>
                             <div class="text-end">
                                 <span class="fw-bold text-dark" id="displayShippingFee">
-                                    {{ $shippingFee > 0 ? number_format($shippingFee, 0, ',', '.') . ' ₫' : 'Miễn phí' }}
+                                    {{ $shippingFee > 0 ? number_format($shippingFee, 0, ',', '.') . ' ₫' : '30.000 ₫' }}
                                 </span>
                                 <div id="shippingLeadtimeDisplay" class="text-success small fw-medium" style="font-size: 0.72rem;"></div>
                             </div>
-                        </div>
-                        <div class="d-flex justify-content-between text-success {{ $summary['total_amount'] >= 500000 ? '' : 'd-none' }}" id="freeshipDiscountRow">
-                            <span class="d-inline-flex align-items-center gap-1">
-                                <i data-lucide="sparkles" style="width: 14px; height: 14px;"></i>
-                                <span>Ưu đãi Freeship:</span>
-                            </span>
-                            <span id="freeshipDiscountAmount">-30.000 ₫</span>
                         </div>
                         <!-- Dynamic Voucher Discount Row -->
                         <div class="d-flex justify-content-between text-success d-none" id="voucherDiscountRow">
@@ -494,6 +532,14 @@
                                 <span>Giảm giá Voucher (<strong id="summaryVoucherCode" class="font-monospace"></strong>):</span>
                             </span>
                             <span class="fw-bold" id="summaryVoucherDiscount">-0 ₫</span>
+                        </div>
+                        <!-- Dynamic Coins Discount Row -->
+                        <div class="d-flex justify-content-between text-warning-emphasis d-none" id="coinsDiscountRow">
+                            <span class="d-inline-flex align-items-center gap-1">
+                                <i class="bi bi-coin text-warning"></i>
+                                <span>Dùng Xu Aurelia (<strong id="summaryCoinsUsed">0</strong> Xu):</span>
+                            </span>
+                            <span class="fw-bold" id="summaryCoinsDiscount">-0 ₫</span>
                         </div>
                     </div>
 
@@ -676,13 +722,15 @@
             </form>
         </div>
     </div>
+</div>
+
 <!-- ========================================================================= -->
 <!-- SHOPEE-STYLE VOUCHER SELECTION MODAL -->
 <!-- ========================================================================= -->
 <div class="modal fade" id="voucherSelectModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" style="max-width: 620px;">
         <div class="modal-content modal-content-modern border-0 shadow-lg">
-            <div class="modal-header border-bottom p-3.5 bg-white">
+            <div class="modal-header border-bottom p-3.5">
                 <div class="d-flex align-items-center gap-2">
                     <div class="p-1.5 rounded-2 bg-warning-subtle text-warning">
                         <i data-lucide="ticket" style="width: 22px; height: 22px;"></i>
@@ -695,9 +743,9 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <div class="modal-body p-3.5 bg-light-subtle">
+            <div class="modal-body p-3.5">
                 <!-- Manual Code Input Bar -->
-                <div class="card p-3 mb-3 border shadow-sm rounded-3 bg-white">
+                <div class="p-3 mb-3 border shadow-sm rounded-3" style="background: var(--bg-surface-subtle); border-color: var(--border-default) !important;">
                     <label class="form-label text-dark fw-bold small mb-1.5 d-flex align-items-center gap-1">
                         <i data-lucide="tag" style="width: 14px; height: 14px;" class="text-primary"></i>
                         <span>Nhập mã ưu đãi của bạn</span>
@@ -743,7 +791,7 @@
                 </div>
             </div>
 
-            <div class="modal-footer border-top p-3 d-flex justify-content-between align-items-center bg-white">
+            <div class="modal-footer border-top p-3 d-flex justify-content-between align-items-center">
                 <div class="text-secondary small">
                     Đang chọn: <strong class="text-primary font-monospace fs-6" id="modalSelectedVoucherCode">Chưa chọn mã nào</strong>
                 </div>
@@ -762,8 +810,8 @@
 /* Shopee Style Voucher Ticket Styles */
 .shopee-ticket-card {
     display: flex;
-    background: #ffffff;
-    border: 1px solid #e0e0e0;
+    background: var(--bg-surface, #ffffff);
+    border: 1px solid var(--border-default, #e0e0e0);
     border-radius: 8px;
     overflow: hidden;
     position: relative;
@@ -776,8 +824,8 @@
     box-shadow: 0 3px 10px rgba(212, 175, 55, 0.15);
 }
 .shopee-ticket-card.selected {
-    border-color: #d4af37;
-    background: #fffdf5;
+    border-color: #d4af37 !important;
+    background: rgba(212, 175, 55, 0.08) !important;
 }
 .shopee-ticket-left {
     width: 115px;
@@ -843,12 +891,76 @@
     let tempSelectedVoucher = null;
     let availableVouchersData = null;
 
+    // Aurelia Coins Configuration
+    const userCoinsBalance = {{ auth()->check() ? (int) auth()->user()->coins_balance : 0 }};
+    let currentCoinsUsed = 0;
+    let currentCoinsDiscount = 0;
+
     function formatCurrency(amount) {
         return new Intl.NumberFormat('vi-VN').format(Math.max(0, amount)) + ' ₫';
     }
 
+    /**
+     * Tối đa 10% tiền hàng sau voucher, trần 30.000 Xu
+     */
+    function calculateMaxCoinsUsable() {
+        if (userCoinsBalance <= 0) return 0;
+        const netGoods = Math.max(0, subtotalAmount - currentVoucherDiscount);
+        const percentLimit = Math.floor(netGoods * 0.10);
+        const ceilingLimit = Math.min(percentLimit, 30000);
+        return Math.min(userCoinsBalance, ceilingLimit);
+    }
+
+    function updateCoinsNotice() {
+        const noticeEl = document.getElementById('maxCoinUsableNotice');
+        if (noticeEl && userCoinsBalance > 0) {
+            const maxUsable = calculateMaxCoinsUsable();
+            noticeEl.textContent = `(Tối đa ${new Intl.NumberFormat('vi-VN').format(maxUsable)} Xu cho đơn này)`;
+        }
+    }
+
+    function onToggleCoins(isChecked) {
+        const hiddenCoins = document.getElementById('hiddenCoinsToUse');
+        const coinsRow = document.getElementById('coinsDiscountRow');
+        const coinsUsedText = document.getElementById('summaryCoinsUsed');
+        const coinsDiscountText = document.getElementById('summaryCoinsDiscount');
+
+        if (isChecked) {
+            const maxUsable = calculateMaxCoinsUsable();
+            currentCoinsUsed = maxUsable;
+            currentCoinsDiscount = maxUsable * 1; // 1 Xu = 1 VNĐ
+            if (hiddenCoins) hiddenCoins.value = currentCoinsUsed;
+            if (coinsUsedText) coinsUsedText.textContent = new Intl.NumberFormat('vi-VN').format(currentCoinsUsed);
+            if (coinsDiscountText) coinsDiscountText.textContent = '-' + formatCurrency(currentCoinsDiscount);
+            if (coinsRow) coinsRow.classList.remove('d-none');
+        } else {
+            currentCoinsUsed = 0;
+            currentCoinsDiscount = 0;
+            if (hiddenCoins) hiddenCoins.value = 0;
+            if (coinsRow) coinsRow.classList.add('d-none');
+        }
+
+        recalculateGrandTotal();
+    }
+
     function recalculateGrandTotal() {
-        const finalTotal = Math.max(0, subtotalAmount + currentShippingFee - currentVoucherDiscount);
+        // Cập nhật lại số xu tối đa nếu đang bật switch
+        const useCoinsCheckbox = document.getElementById('useCoinsCheckbox');
+        if (useCoinsCheckbox && useCoinsCheckbox.checked) {
+            const maxUsable = calculateMaxCoinsUsable();
+            currentCoinsUsed = maxUsable;
+            currentCoinsDiscount = maxUsable * 1;
+            const hiddenCoins = document.getElementById('hiddenCoinsToUse');
+            if (hiddenCoins) hiddenCoins.value = currentCoinsUsed;
+            const coinsUsedText = document.getElementById('summaryCoinsUsed');
+            if (coinsUsedText) coinsUsedText.textContent = new Intl.NumberFormat('vi-VN').format(currentCoinsUsed);
+            const coinsDiscountText = document.getElementById('summaryCoinsDiscount');
+            if (coinsDiscountText) coinsDiscountText.textContent = '-' + formatCurrency(currentCoinsDiscount);
+        }
+
+        updateCoinsNotice();
+
+        const finalTotal = Math.max(0, subtotalAmount + currentShippingFee - currentVoucherDiscount - currentCoinsDiscount);
         const grandTotalEl = document.getElementById('displayGrandTotal');
         if (grandTotalEl) {
             grandTotalEl.textContent = formatCurrency(finalTotal);
@@ -1066,22 +1178,14 @@
                     if (standardLeadEl && currentShippingMethod === 'standard') standardLeadEl.textContent = data.leadtime_text;
                 }
 
-                // Update freeship badge row
-                const freeshipRow = document.getElementById('freeshipDiscountRow');
-                const freeshipAmount = document.getElementById('freeshipDiscountAmount');
-                if (freeshipRow) {
-                    if (data.is_freeship) {
-                        freeshipRow.classList.remove('d-none');
-                        if (freeshipAmount) freeshipAmount.textContent = '-' + data.formatted_original_fee;
-                    } else {
-                        freeshipRow.classList.add('d-none');
-                    }
-                }
-
-                // Update shipping method card display
+                // Update shipping method card and summary fee displays
                 const stdDisplay = document.getElementById('standardShippingFeeDisplay');
                 if (stdDisplay) {
-                    stdDisplay.textContent = (subtotalAmount >= 500000) ? 'Miễn phí' : data.formatted_original_fee;
+                    stdDisplay.textContent = data.formatted_shipping_fee;
+                }
+                const feeDisplay = document.getElementById('displayShippingFee');
+                if (feeDisplay) {
+                    feeDisplay.textContent = data.formatted_shipping_fee;
                 }
             }
         } catch (e) {
@@ -1188,7 +1292,11 @@
         document.getElementById('dispPhone').textContent = `(${addr.phone})`;
         
         const fullAddr = [addr.specific_address, addr.ward, addr.district, addr.province].filter(Boolean).join(', ');
-        document.getElementById('dispFullAddress').textContent = fullAddr;
+        const fullAddrEl = document.getElementById('dispFullAddress');
+        if (fullAddrEl) {
+            fullAddrEl.innerHTML = `<i data-lucide="map-pin" class="text-danger flex-shrink-0 mt-0.5" style="width: 14px; height: 14px;"></i><span>${fullAddr}</span>`;
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
         
         document.getElementById('hiddenRecipientName').value = addr.recipient_name;
         document.getElementById('hiddenPhone').value = addr.phone;
@@ -1411,7 +1519,7 @@
         // Render eligible
         if (eligible.length === 0) {
             eligibleList.innerHTML = `
-                <div class="p-3 bg-white rounded-3 border text-center text-secondary small">
+                <div class="p-3 rounded-3 border text-center text-secondary small" style="background: var(--bg-surface);">
                     Hiện chưa có mã ưu đãi phù hợp với giỏ hàng hiện tại.
                 </div>
             `;
@@ -1453,7 +1561,7 @@
         // Render ineligible
         if (ineligible.length === 0) {
             ineligibleList.innerHTML = `
-                <div class="p-2.5 bg-white rounded-3 border text-center text-secondary small" style="font-size: 0.78rem;">
+                <div class="p-2.5 rounded-3 border text-center text-secondary small" style="background: var(--bg-surface); font-size: 0.78rem;">
                     Không có mã nào trong danh mục này.
                 </div>
             `;
@@ -1663,6 +1771,9 @@
                 ward: '{{ $defaultAddress->ward }}'
             });
         @endif
+
+        // Init Coins Notice if applicable
+        updateCoinsNotice();
     });
 </script>
 @endsection

@@ -124,8 +124,8 @@
 
         <div class="row g-4">
             @forelse ($featuredProducts as $product)
-                <div class="col-6 col-md-4 col-lg-3">
-                    <div class="product-store-card h-100 d-flex flex-column">
+                <div class="col-6 col-md-4 col-lg-3 d-flex">
+                    <div class="product-store-card w-100 d-flex flex-column">
                         <!-- Thumbnail & Badges -->
                         <div class="product-store-img-box position-relative">
                             <a href="{{ route('shop.show', $product) }}">
@@ -155,7 +155,7 @@
                         </div>
 
                         <!-- Card Body -->
-                        <div class="p-3.5 d-flex flex-column flex-grow-1">
+                        <div class="product-store-body">
                             <div class="product-store-category mb-1">
                                 {{ $product->category?->name ?? 'Túi xách cao cấp' }}
                             </div>
@@ -174,7 +174,7 @@
                                 </div>
                             @endif
 
-                            <div class="mt-auto pt-3 border-top d-flex align-items-center justify-content-between gap-2">
+                            <div class="product-store-footer">
                                 <div>
                                     <div class="price-current-luxury">
                                         {{ $product->has_discount ? $product->formatted_sale_price : $product->formatted_price }}
@@ -185,7 +185,7 @@
                                         </div>
                                     @endif
                                 </div>
-                                <div class="d-flex align-items-center gap-1.5 flex-shrink-0">
+                                <div class="d-flex align-items-center gap-2 flex-shrink-0">
                                     <button 
                                         type="button" 
                                         class="btn-card-action" 

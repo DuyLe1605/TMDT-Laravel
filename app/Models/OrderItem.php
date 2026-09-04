@@ -58,6 +58,22 @@ class OrderItem extends Model
     }
 
     /**
+     * Get review for this order item if exists.
+     */
+    public function review(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Review::class);
+    }
+
+    /**
+     * Check if this item can be reviewed.
+     */
+    public function canBeReviewed(): bool
+    {
+        return $this->order?->shipping_status === Order::STATUS_DELIVERED && !$this->review()->exists();
+    }
+
+    /**
      * Formatted price string.
      */
     public function getFormattedPriceAttribute(): string

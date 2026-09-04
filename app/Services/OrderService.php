@@ -18,7 +18,8 @@ class OrderService
 {
     public function __construct(
         protected GhnShippingService $ghnService,
-        protected VoucherService $voucherService
+        protected VoucherService $voucherService,
+        protected CoinService $coinService
     ) {}
 
     /**
@@ -96,7 +97,7 @@ class OrderService
                 $baseShippingFee = max(0, (float) $orderData['shipping_fee']);
             }
 
-            $shippingFee = ($subtotal >= 500000 && $shippingMethod === 'standard') ? 0 : $baseShippingFee;
+            $shippingFee = $baseShippingFee;
 
             // 3. Voucher calculation
             $paymentMethod = $orderData['payment_method'] ?? 'cod';
@@ -124,9 +125,20 @@ class OrderService
                 }
             }
 
-            $totalAmount = max(0, $subtotal + $shippingFee - $discountAmount);
+            // 4. Aurelia Coins calculation (Shopee-style)
+            $coinsUsed = 0;
+            $coinsDiscountAmount = 0.0;
+            if ($user && !empty($orderData['use_coins'])) {
+                $netGoodsTotal = max(0, $subtotal - $discountAmount);
+                $maxRedeemable = $this->coinService->calculateMaxRedeemableCoins($user, $netGoodsTotal);
+                $requestedCoins = isset($orderData['coins_to_use']) ? (int) $orderData['coins_to_use'] : $maxRedeemable;
+                $coinsUsed = min($maxRedeemable, max(0, $requestedCoins));
+                $coinsDiscountAmount = (float) ($coinsUsed * CoinService::COIN_EXCHANGE_RATE);
+            }
 
-            // 4. Determine payment status based on payment method
+            $totalAmount = max(0, $subtotal + $shippingFee - $discountAmount - $coinsDiscountAmount);
+
+            // 5. Determine payment status based on payment method
             $paymentStatus = Order::PAYMENT_PENDING;
             $paidAt = null;
 
@@ -136,7 +148,7 @@ class OrderService
                 $paidAt = now();
             }
 
-            // 5. Parse expected delivery from GHN if available
+            // 6. Parse expected delivery from GHN if available
             $expectedDeliveryAt = null;
             if (!empty($orderData['expected_delivery_at'])) {
                 try {
@@ -146,33 +158,46 @@ class OrderService
                 }
             }
 
-            // 6. Create Order
+            // 7. Create Order
             $order = Order::create([
-                'user_id'              => $user?->id,
-                'order_code'           => $this->generateOrderCode(),
-                'recipient_name'       => $orderData['recipient_name'],
-                'phone'                => $orderData['phone'],
-                'shipping_address'     => $orderData['shipping_address'],
-                'to_district_id'       => $orderData['to_district_id'] ?? null,
-                'to_ward_code'         => $orderData['to_ward_code'] ?? null,
-                'total_weight'         => max(100, $totalWeight),
-                'expected_delivery_at' => $expectedDeliveryAt,
-                'payment_method'       => $paymentMethod,
-                'payment_status'       => $paymentStatus,
-                'shipping_status'      => Order::STATUS_PENDING,
-                'subtotal'             => $subtotal,
-                'shipping_fee'         => $shippingFee,
-                'voucher_id'           => $voucherId,
-                'voucher_code'         => $voucherCode,
-                'discount_amount'      => $discountAmount,
-                'total_amount'         => $totalAmount,
-                'notes'                => $orderData['notes'] ?? null,
-                'paid_at'              => $paidAt,
+                'user_id'               => $user?->id,
+                'order_code'            => $this->generateOrderCode(),
+                'recipient_name'        => $orderData['recipient_name'],
+                'phone'                 => $orderData['phone'],
+                'shipping_address'      => $orderData['shipping_address'],
+                'to_district_id'        => $orderData['to_district_id'] ?? null,
+                'to_ward_code'          => $orderData['to_ward_code'] ?? null,
+                'total_weight'          => max(100, $totalWeight),
+                'expected_delivery_at'  => $expectedDeliveryAt,
+                'payment_method'        => $paymentMethod,
+                'payment_status'        => $paymentStatus,
+                'shipping_status'       => Order::STATUS_PENDING,
+                'subtotal'              => $subtotal,
+                'shipping_fee'          => $shippingFee,
+                'voucher_id'            => $voucherId,
+                'voucher_code'          => $voucherCode,
+                'discount_amount'       => $discountAmount,
+                'coins_used'            => $coinsUsed,
+                'coins_discount_amount' => $coinsDiscountAmount,
+                'total_amount'          => $totalAmount,
+                'notes'                 => $orderData['notes'] ?? null,
+                'paid_at'               => $paidAt,
             ]);
 
             // Record voucher redemption log
             if ($appliedVoucher && $discountAmount > 0) {
                 $this->voucherService->recordUsage($appliedVoucher, $order, $user, $discountAmount);
+            }
+
+            // Deduct Coins from user balance
+            if ($coinsUsed > 0 && $user) {
+                $this->coinService->deductCoins(
+                    $user,
+                    $coinsUsed,
+                    'order',
+                    $order->id,
+                    "Sử dụng {$coinsUsed} Xu thanh toán cho đơn hàng #{$order->order_code}"
+                );
             }
 
             // 6. Create Order Items and decrement stock
@@ -373,6 +398,17 @@ class OrderService
             // Restore voucher usage if applied
             if ($order->voucher_id) {
                 $this->voucherService->restoreUsage($order);
+            }
+
+            // Restore coins if used
+            if ($order->coins_used > 0 && $order->user) {
+                $this->coinService->refundCoins(
+                    $order->user,
+                    $order->coins_used,
+                    'order',
+                    $order->id,
+                    "Hoàn trả {$order->coins_used} Xu cho đơn hàng #{$order->order_code} bị hủy"
+                );
             }
 
             // Determine payment status after cancellation

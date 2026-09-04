@@ -51,6 +51,15 @@
                         <i data-lucide="map-pin" style="width: 16px; height: 16px;"></i>
                         <span>Sổ địa chỉ nhận hàng</span>
                     </a>
+                    <a href="{{ route('account.coins') }}" class="btn-surface w-100 text-start py-2 px-3 text-decoration-none d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-coin text-warning"></i>
+                            <span>Ví Xu Aurelia</span>
+                        </div>
+                        <span class="badge bg-warning-subtle text-dark fw-bold rounded-pill px-2" style="font-size: 0.7rem;">
+                            {{ number_format(Auth::user()->coins_balance) }} Xu
+                        </span>
+                    </a>
                 </div>
             </div>
         </div>

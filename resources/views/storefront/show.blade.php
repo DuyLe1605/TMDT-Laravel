@@ -265,6 +265,101 @@
                 </div>
             </div>
         @endif
+
+        <!-- Customer Reviews Section (Shopee & Luxury Style) -->
+        <div class="mt-5 pt-4 border-top" id="reviews-section">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+                    <i class="bi bi-star-fill text-warning"></i>
+                    ĐÁNH GIÁ SẢN PHẨM
+                </h5>
+                <span class="badge bg-warning-subtle text-dark border border-warning-subtle px-3 py-1.5 rounded-pill font-monospace">
+                    {{ $reviewSummary['total'] ?? 0 }} đánh giá
+                </span>
+            </div>
+
+            <!-- Shopee Rating Overview Board -->
+            <div class="p-4 rounded-4 mb-4" style="background: #fffbf8; border: 1px solid #fbe5d8;">
+                <div class="row align-items-center g-4">
+                    <!-- Left Score Column -->
+                    <div class="col-12 col-md-3 text-center border-md-end border-warning-subtle pe-md-4">
+                        <div class="display-4 fw-bold text-danger mb-1">
+                            {{ number_format($reviewSummary['avg_rating'] ?? 5.0, 1) }}
+                            <span class="fs-4 text-muted fw-normal">/ 5</span>
+                        </div>
+                        <div class="d-flex justify-content-center gap-1 text-warning fs-5 mb-1">
+                            @for($i = 1; $i <= 5; $i++)
+                                @if($i <= round($reviewSummary['avg_rating'] ?? 5.0))
+                                    <i class="bi bi-star-fill"></i>
+                                @else
+                                    <i class="bi bi-star text-muted opacity-25"></i>
+                                @endif
+                            @endfor
+                        </div>
+                        <small class="text-muted">Dựa trên {{ $reviewSummary['total'] ?? 0 }} lượt đánh giá</small>
+                    </div>
+
+                    <!-- Right Filter Pills Column (Shopee Style) -->
+                    <div class="col-12 col-md-9">
+                        <div class="d-flex flex-wrap gap-2" id="reviewFilterGroup">
+                            <button type="button" class="btn btn-sm review-filter-btn active" data-rating="all" onclick="filterReviews('all', null, this)">
+                                Tất Cả ({{ $reviewSummary['total'] ?? 0 }})
+                            </button>
+                            <button type="button" class="btn btn-sm review-filter-btn" data-rating="5" onclick="filterReviews(5, null, this)">
+                                5 Sao ({{ $reviewSummary['star_counts'][5] ?? 0 }})
+                            </button>
+                            <button type="button" class="btn btn-sm review-filter-btn" data-rating="4" onclick="filterReviews(4, null, this)">
+                                4 Sao ({{ $reviewSummary['star_counts'][4] ?? 0 }})
+                            </button>
+                            <button type="button" class="btn btn-sm review-filter-btn" data-rating="3" onclick="filterReviews(3, null, this)">
+                                3 Sao ({{ $reviewSummary['star_counts'][3] ?? 0 }})
+                            </button>
+                            <button type="button" class="btn btn-sm review-filter-btn" data-rating="2" onclick="filterReviews(2, null, this)">
+                                2 Sao ({{ $reviewSummary['star_counts'][2] ?? 0 }})
+                            </button>
+                            <button type="button" class="btn btn-sm review-filter-btn" data-rating="1" onclick="filterReviews(1, null, this)">
+                                1 Sao ({{ $reviewSummary['star_counts'][1] ?? 0 }})
+                            </button>
+                            <button type="button" class="btn btn-sm review-filter-btn" data-has-images="true" onclick="filterReviews(null, true, this)">
+                                Có Hình Ảnh ({{ $reviewSummary['with_images_count'] ?? 0 }})
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reviews Container with Loading Spinner -->
+            <div id="reviewsListContainer" class="position-relative">
+                <div id="reviewsLoadingSpinner" class="d-none position-absolute top-0 start-0 w-100 h-100 bg-white bg-opacity-75 d-flex align-items-center justify-content-center" style="z-index: 5; min-height: 200px;">
+                    <div class="spinner-border text-danger" role="status">
+                        <span class="visually-hidden">Đang tải đánh giá...</span>
+                    </div>
+                </div>
+
+                <div id="reviewsContent">
+                    @include('storefront.partials.review-items', ['reviews' => $reviews])
+                </div>
+
+                <!-- Pagination Container -->
+                <div id="reviewsPagination" class="mt-4 d-flex justify-content-center">
+                    {{ $reviews->fragment('reviews-section')->links() }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lightbox Image Modal -->
+    <div class="modal fade" id="reviewImageModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content bg-transparent border-0 shadow-none">
+                <div class="modal-body p-0 text-center position-relative">
+                    <button type="button" class="btn btn-dark btn-sm rounded-circle position-absolute top-0 end-0 m-3 shadow" data-bs-dismiss="modal" style="width: 38px; height: 38px; z-index: 10;">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                    <img id="reviewModalImage" src="" alt="Ảnh phóng to" class="img-fluid rounded-3 shadow-lg" style="max-height: 85vh; object-fit: contain;">
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Related Products -->
@@ -312,6 +407,35 @@
 
 @section('styles')
 <style>
+    /* Shopee Review Filter Buttons */
+    .review-filter-btn {
+        background: #ffffff;
+        border: 1px solid #dee2e6;
+        color: #495057;
+        font-weight: 500;
+        padding: 0.4rem 0.85rem;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+    }
+    .review-filter-btn:hover {
+        border-color: #dc3545;
+        color: #dc3545;
+        background: #fff8f8;
+    }
+    .review-filter-btn.active {
+        background: #dc3545 !important;
+        border-color: #dc3545 !important;
+        color: #ffffff !important;
+        box-shadow: 0 2px 6px rgba(220, 53, 69, 0.25);
+    }
+    .review-img-wrapper:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+    .review-img-wrapper:hover .overlay-zoom {
+        opacity: 1 !important;
+    }
+
     /* Variant Option Pills (Shopee / Lazada Style) */
     .variant-option-pill {
         display: inline-flex;
@@ -600,6 +724,59 @@
                 buyBtn.innerHTML = originalBuyHtml;
             }
             if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+    }
+
+    // Review Lightbox Modal
+    function showReviewImage(url) {
+        const modalImg = document.getElementById('reviewModalImage');
+        if (modalImg) {
+            modalImg.src = url;
+            const modal = new bootstrap.Modal(document.getElementById('reviewImageModal'));
+            modal.show();
+        }
+    }
+
+    // Review AJAX Filter
+    let currentReviewRating = null;
+    let currentReviewHasImages = null;
+
+    async function filterReviews(rating, hasImages, clickedBtn) {
+        if (clickedBtn) {
+            document.querySelectorAll('#reviewFilterGroup .review-filter-btn').forEach(btn => btn.classList.remove('active'));
+            clickedBtn.classList.add('active');
+        }
+
+        currentReviewRating = rating === 'all' ? null : rating;
+        currentReviewHasImages = hasImages;
+
+        const spinner = document.getElementById('reviewsLoadingSpinner');
+        const content = document.getElementById('reviewsContent');
+        const pagination = document.getElementById('reviewsPagination');
+
+        if (spinner) spinner.classList.remove('d-none');
+
+        const params = new URLSearchParams();
+        if (currentReviewRating) params.append('rating', currentReviewRating);
+        if (currentReviewHasImages) params.append('has_images', '1');
+
+        try {
+            const res = await fetch(`{{ route('products.reviews.filter', $product) }}?${params.toString()}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            });
+            const data = await res.json();
+            if (data.success) {
+                if (content) content.innerHTML = data.html;
+                if (pagination) pagination.innerHTML = data.pagination;
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            }
+        } catch (err) {
+            console.error('Lỗi tải đánh giá:', err);
+        } finally {
+            if (spinner) spinner.classList.add('d-none');
         }
     }
 

@@ -34,6 +34,8 @@ class ProcessCheckoutRequest extends FormRequest
             'expected_delivery_at' => ['nullable', 'string'],
             'payment_method' => ['required', 'in:cod,bank_transfer,momo'],
             'voucher_code' => ['nullable', 'string', 'max:50'],
+            'use_coins' => ['nullable', 'boolean'],
+            'coins_to_use' => ['nullable', 'integer', 'min:0'],
             'notes' => ['nullable', 'string', 'max:1000'],
         ];
     }

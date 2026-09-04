@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Services\BrandService;
 use App\Services\CategoryService;
 use App\Services\ProductService;
+use App\Services\ReviewService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -18,7 +19,8 @@ class StorefrontController extends Controller
     public function __construct(
         protected ProductService $productService,
         protected CategoryService $categoryService,
-        protected BrandService $brandService
+        protected BrandService $brandService,
+        protected ReviewService $reviewService
     ) {}
 
     /**
@@ -165,6 +167,10 @@ class StorefrontController extends Controller
             ->take(4)
             ->get();
 
-        return view('storefront.show', compact('product', 'relatedProducts'));
+        // Đánh giá sản phẩm và tổng hợp số sao (Shopee-style)
+        $reviewSummary = $this->reviewService->getProductReviewsSummary($product);
+        $reviews = $this->reviewService->getFilteredReviews($product, [], 5);
+
+        return view('storefront.show', compact('product', 'relatedProducts', 'reviewSummary', 'reviews'));
     }
 }
