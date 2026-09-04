@@ -28,6 +28,9 @@ class ProcessCheckoutRequest extends FormRequest
             'phone' => ['required', 'string', 'regex:/^(0[3|5|7|8|9])[0-9]{8}$/'],
             'shipping_address' => ['required', 'string', 'max:500'],
             'shipping_method' => ['required', 'in:standard,express'],
+            'shipping_fee' => ['nullable', 'numeric', 'min:0'],
+            'to_district_id' => ['nullable', 'integer'],
+            'to_ward_code' => ['nullable', 'string'],
             'payment_method' => ['required', 'in:cod,bank_transfer,momo'],
             'notes' => ['nullable', 'string', 'max:1000'],
         ];

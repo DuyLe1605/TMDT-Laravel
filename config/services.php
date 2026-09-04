@@ -35,4 +35,13 @@ return [
         ],
     ],
 
+    'ghn' => [
+        'api_url' => env('GHN_API_URL', 'https://dev-online-gateway.ghn.vn/shiip/public-api'),
+        'api_token' => env('GHN_API_TOKEN'),
+        'shop_id' => (int) env('GHN_SHOP_ID', 216720),
+        'origin_province_id' => (int) env('GHN_ORIGIN_PROVINCE_ID', 201),
+        'origin_district_id' => (int) env('GHN_ORIGIN_DISTRICT_ID', 1492),
+        'origin_ward_code' => (string) env('GHN_ORIGIN_WARD_CODE', '1A0501'),
+    ],
+
 ];

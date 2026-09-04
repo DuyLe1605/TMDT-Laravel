@@ -79,10 +79,15 @@ class OrderService
                 $subtotal += $effectivePrice * $cartItem->quantity;
             }
 
-            // 2. Shipping calculation: Free ship if subtotal >= 500,000
+            // 2. Shipping calculation: Use calculated GHN fee if provided, else fallback
             $shippingMethod = $orderData['shipping_method'] ?? 'standard';
             $baseShippingFee = ($shippingMethod === 'express') ? 50000 : 30000;
-            $shippingFee = ($subtotal >= 500000) ? 0 : $baseShippingFee;
+
+            if (isset($orderData['shipping_fee']) && is_numeric($orderData['shipping_fee'])) {
+                $baseShippingFee = max(0, (float) $orderData['shipping_fee']);
+            }
+
+            $shippingFee = ($subtotal >= 500000 && $shippingMethod === 'standard') ? 0 : $baseShippingFee;
 
             $discountAmount = 0.0;
             $totalAmount = $subtotal + $shippingFee - $discountAmount;

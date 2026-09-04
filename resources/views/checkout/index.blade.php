@@ -32,6 +32,11 @@
             <input type="hidden" name="selected_items[]" value="{{ $item->id }}">
         @endforeach
 
+        <!-- Hidden shipping parameters -->
+        <input type="hidden" name="shipping_fee" id="hiddenShippingFee" value="{{ $shippingFee }}">
+        <input type="hidden" name="to_district_id" id="hiddenToDistrictId" value="">
+        <input type="hidden" name="to_ward_code" id="hiddenToWardCode" value="">
+
         <div class="row g-4">
             <!-- Left Column: Shipping Address & Order Review -->
             <div class="col-lg-8">
@@ -245,27 +250,33 @@
                             <div class="col-md-6">
                                 <label class="shipping-method-card p-3 rounded-3 border d-flex align-items-center justify-content-between cursor-pointer active" id="labelStandardShipping">
                                     <div class="d-flex align-items-center gap-2.5">
-                                        <input type="radio" name="shipping_method" value="standard" class="form-check-input mt-0" checked onchange="updateShippingFee(30000)">
+                                        <input type="radio" name="shipping_method" value="standard" class="form-check-input mt-0" checked onchange="onShippingMethodChanged('standard')">
                                         <div>
-                                            <div class="fw-bold text-dark small">Giao hàng tiêu chuẩn</div>
-                                            <div class="text-secondary" style="font-size: 0.72rem;">Nhận hàng sau 2 - 3 ngày</div>
+                                            <div class="fw-bold text-dark small d-flex align-items-center gap-1.5">
+                                                <span>Giao tiêu chuẩn (GHN)</span>
+                                                <span class="badge bg-success-subtle text-success py-0 px-1" style="font-size: 0.65rem;">Tiết kiệm</span>
+                                            </div>
+                                            <div class="text-secondary" id="standardLeadtimeText" style="font-size: 0.72rem;">Nhận hàng sau 2 - 3 ngày</div>
                                         </div>
                                     </div>
-                                    <span class="fw-bold text-primary small">
-                                        {{ $summary['total_amount'] >= 500000 ? 'Miễn phí' : '30.000 ₫' }}
+                                    <span class="fw-bold text-primary small" id="standardShippingFeeDisplay">
+                                        {{ $summary['total_amount'] >= 500000 ? 'Miễn phí' : ($shippingFee > 0 ? number_format($shippingFee, 0, ',', '.') . ' ₫' : '30.000 ₫') }}
                                     </span>
                                 </label>
                             </div>
                             <div class="col-md-6">
                                 <label class="shipping-method-card p-3 rounded-3 border d-flex align-items-center justify-content-between cursor-pointer" id="labelExpressShipping">
                                     <div class="d-flex align-items-center gap-2.5">
-                                        <input type="radio" name="shipping_method" value="express" class="form-check-input mt-0" onchange="updateShippingFee(50000)">
+                                        <input type="radio" name="shipping_method" value="express" class="form-check-input mt-0" onchange="onShippingMethodChanged('express')">
                                         <div>
-                                            <div class="fw-bold text-dark small">Giao hàng Hỏa tốc 24h</div>
+                                            <div class="fw-bold text-dark small d-flex align-items-center gap-1.5">
+                                                <span>Giao Hỏa tốc 24h</span>
+                                                <span class="badge bg-warning-subtle text-warning-emphasis py-0 px-1" style="font-size: 0.65rem;">Hỏa tốc</span>
+                                            </div>
                                             <div class="text-secondary" style="font-size: 0.72rem;">Nhận ngay trong 24 giờ</div>
                                         </div>
                                     </div>
-                                    <span class="fw-bold text-primary small">50.000 ₫</span>
+                                    <span class="fw-bold text-primary small" id="expressShippingFeeDisplay">50.000 ₫</span>
                                 </label>
                             </div>
                         </div>
@@ -417,21 +428,22 @@
                             <span>Tổng tiền hàng ({{ $summary['total_quantity'] }} chiếc):</span>
                             <span class="fw-bold text-dark">{{ $summary['formatted_total_amount'] }}</span>
                         </div>
-                        <div class="d-flex justify-content-between">
+                        <div class="d-flex justify-content-between align-items-start">
                             <span>Phí vận chuyển:</span>
-                            <span class="fw-bold text-dark" id="displayShippingFee">
-                                {{ $shippingFee > 0 ? number_format($shippingFee, 0, ',', '.') . ' ₫' : 'Miễn phí' }}
-                            </span>
-                        </div>
-                        @if ($summary['total_amount'] >= 500000)
-                            <div class="d-flex justify-content-between text-success">
-                                <span class="d-inline-flex align-items-center gap-1">
-                                    <i data-lucide="sparkles" style="width: 14px; height: 14px;"></i>
-                                    <span>Ưu đãi Freeship:</span>
+                            <div class="text-end">
+                                <span class="fw-bold text-dark" id="displayShippingFee">
+                                    {{ $shippingFee > 0 ? number_format($shippingFee, 0, ',', '.') . ' ₫' : 'Miễn phí' }}
                                 </span>
-                                <span>-30.000 ₫</span>
+                                <div id="shippingLeadtimeDisplay" class="text-success small fw-medium" style="font-size: 0.72rem;"></div>
                             </div>
-                        @endif
+                        </div>
+                        <div class="d-flex justify-content-between text-success {{ $summary['total_amount'] >= 500000 ? '' : 'd-none' }}" id="freeshipDiscountRow">
+                            <span class="d-inline-flex align-items-center gap-1">
+                                <i data-lucide="sparkles" style="width: 14px; height: 14px;"></i>
+                                <span>Ưu đãi Freeship:</span>
+                            </span>
+                            <span id="freeshipDiscountAmount">-30.000 ₫</span>
+                        </div>
                     </div>
 
                     <div class="p-3 rounded-3 mb-4" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-default);">
@@ -622,13 +634,270 @@
     let addNewAddressModalInstance = null;
 
     const subtotalAmount = {{ (float) $summary['total_amount'] }};
+    const selectedItemIds = [{{ $selectedItems->pluck('id')->implode(',') }}];
     let currentShippingFee = {{ (float) $shippingFee }};
+    let currentShippingMethod = 'standard';
+    let currentLocationData = {
+        province: '{{ $defaultAddress->province ?? "" }}',
+        district: '{{ $defaultAddress->district ?? "" }}',
+        ward: '{{ $defaultAddress->ward ?? "" }}',
+        district_id: null,
+        ward_code: null
+    };
+
+    function formatCurrency(amount) {
+        return new Intl.NumberFormat('vi-VN').format(Math.max(0, amount)) + ' ₫';
+    }
+
+    /**
+     * Cascading Location Selects using GHN API with local fallback
+     */
+    async function initGhnCascadingSelects(provId, distId, wardId, options = {}) {
+        const provEl = document.getElementById(provId);
+        const distEl = document.getElementById(distId);
+        const wardEl = document.getElementById(wardId);
+        if (!provEl || !distEl || !wardEl) return;
+
+        try {
+            provEl.innerHTML = '<option value="">Đang tải danh sách Tỉnh/Thành...</option>';
+            const res = await fetch('/api/shipping/provinces');
+            const json = await res.json();
+
+            if (json.success && json.data && json.data.length > 0) {
+                provEl.innerHTML = '<option value="">-- Chọn Tỉnh / Thành phố --</option>';
+                json.data.forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p.ProvinceName;
+                    opt.dataset.id = p.ProvinceID;
+                    opt.textContent = p.ProvinceName;
+                    provEl.appendChild(opt);
+                });
+            } else {
+                fallbackLocalProvinces(provEl);
+            }
+        } catch (e) {
+            fallbackLocalProvinces(provEl);
+        }
+
+        provEl.onchange = async function () {
+            const selectedOpt = provEl.options[provEl.selectedIndex];
+            const pId = selectedOpt?.dataset?.id;
+            distEl.innerHTML = '<option value="">-- Chọn Quận / Huyện --</option>';
+            distEl.disabled = true;
+            wardEl.innerHTML = '<option value="">-- Chọn Phường / Xã --</option>';
+            wardEl.disabled = true;
+
+            if (!pId) {
+                if (typeof VN_LOCATIONS_DATA !== 'undefined') {
+                    const found = VN_LOCATIONS_DATA.find(p => p.name === provEl.value);
+                    if (found) {
+                        found.districts.forEach(d => {
+                            const opt = document.createElement('option');
+                            opt.value = d.name;
+                            opt.textContent = d.name;
+                            distEl.appendChild(opt);
+                        });
+                        distEl.disabled = false;
+                    }
+                }
+                if (options.onChange) options.onChange();
+                return;
+            }
+
+            try {
+                distEl.innerHTML = '<option value="">Đang tải Quận / Huyện...</option>';
+                const res = await fetch(`/api/shipping/districts?province_id=${pId}`);
+                const json = await res.json();
+                distEl.innerHTML = '<option value="">-- Chọn Quận / Huyện --</option>';
+                if (json.success && json.data && json.data.length > 0) {
+                    json.data.forEach(d => {
+                        const opt = document.createElement('option');
+                        opt.value = d.DistrictName;
+                        opt.dataset.id = d.DistrictID;
+                        opt.textContent = d.DistrictName;
+                        distEl.appendChild(opt);
+                    });
+                    distEl.disabled = false;
+                }
+            } catch (err) {
+                distEl.disabled = false;
+            }
+
+            if (options.onChange) options.onChange();
+        };
+
+        distEl.onchange = async function () {
+            const selectedOpt = distEl.options[distEl.selectedIndex];
+            const dId = selectedOpt?.dataset?.id;
+            wardEl.innerHTML = '<option value="">-- Chọn Phường / Xã --</option>';
+            wardEl.disabled = true;
+
+            if (!dId) {
+                if (typeof VN_LOCATIONS_DATA !== 'undefined') {
+                    const provFound = VN_LOCATIONS_DATA.find(p => p.name === provEl.value);
+                    const distFound = provFound?.districts?.find(d => d.name === distEl.value);
+                    if (distFound) {
+                        distFound.wards.forEach(w => {
+                            const opt = document.createElement('option');
+                            opt.value = w;
+                            opt.textContent = w;
+                            wardEl.appendChild(opt);
+                        });
+                        wardEl.disabled = false;
+                    }
+                }
+                if (options.onChange) options.onChange();
+                return;
+            }
+
+            try {
+                wardEl.innerHTML = '<option value="">Đang tải Phường / Xã...</option>';
+                const res = await fetch(`/api/shipping/wards?district_id=${dId}`);
+                const json = await res.json();
+                wardEl.innerHTML = '<option value="">-- Chọn Phường / Xã --</option>';
+                if (json.success && json.data && json.data.length > 0) {
+                    json.data.forEach(w => {
+                        const opt = document.createElement('option');
+                        opt.value = w.WardName;
+                        opt.dataset.code = w.WardCode;
+                        opt.textContent = w.WardName;
+                        wardEl.appendChild(opt);
+                    });
+                    wardEl.disabled = false;
+                }
+            } catch (err) {
+                wardEl.disabled = false;
+            }
+
+            if (options.onChange) options.onChange();
+        };
+
+        wardEl.onchange = function () {
+            if (options.onChange) options.onChange();
+        };
+    }
+
+    function fallbackLocalProvinces(selectEl) {
+        selectEl.innerHTML = '<option value="">-- Chọn Tỉnh / Thành phố --</option>';
+        if (typeof VN_LOCATIONS_DATA !== 'undefined') {
+            VN_LOCATIONS_DATA.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.name;
+                opt.textContent = p.name;
+                selectEl.appendChild(opt);
+            });
+        }
+    }
+
+    /**
+     * Calculate GHN shipping fee dynamically
+     */
+    async function calculateRealShippingFee(locData) {
+        if (!locData || (!locData.district && !locData.district_id)) {
+            return;
+        }
+
+        const feeEl = document.getElementById('displayShippingFee');
+        if (feeEl) {
+            feeEl.innerHTML = '<span class="spinner-border spinner-border-sm text-primary"></span> <span class="text-secondary small">Đang tính cước GHN...</span>';
+        }
+
+        try {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            const res = await fetch('/api/shipping/calculate-fee', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({
+                    province: locData.province,
+                    district: locData.district,
+                    ward: locData.ward,
+                    district_id: locData.district_id,
+                    ward_code: locData.ward_code,
+                    service_type_id: currentShippingMethod === 'express' ? 1 : 2,
+                    items: selectedItemIds
+                })
+            });
+
+            const data = await res.json();
+            if (data.success) {
+                currentShippingFee = data.shipping_fee;
+                
+                // Update hidden inputs
+                const hiddenFee = document.getElementById('hiddenShippingFee');
+                if (hiddenFee) hiddenFee.value = currentShippingFee;
+
+                const hiddenDist = document.getElementById('hiddenToDistrictId');
+                if (hiddenDist && data.district_id) hiddenDist.value = data.district_id;
+
+                const hiddenWard = document.getElementById('hiddenToWardCode');
+                if (hiddenWard && data.ward_code) hiddenWard.value = data.ward_code;
+
+                // Update summary displays
+                if (feeEl) {
+                    feeEl.textContent = data.formatted_shipping_fee;
+                }
+
+                const grandTotalEl = document.getElementById('displayGrandTotal');
+                if (grandTotalEl) {
+                    grandTotalEl.textContent = formatCurrency(subtotalAmount + currentShippingFee);
+                }
+
+                // Update leadtime
+                const leadtimeEl = document.getElementById('shippingLeadtimeDisplay');
+                const standardLeadEl = document.getElementById('standardLeadtimeText');
+                if (data.leadtime_text) {
+                    if (leadtimeEl) leadtimeEl.textContent = data.leadtime_text;
+                    if (standardLeadEl && currentShippingMethod === 'standard') standardLeadEl.textContent = data.leadtime_text;
+                }
+
+                // Update freeship badge row
+                const freeshipRow = document.getElementById('freeshipDiscountRow');
+                const freeshipAmount = document.getElementById('freeshipDiscountAmount');
+                if (freeshipRow) {
+                    if (data.is_freeship) {
+                        freeshipRow.classList.remove('d-none');
+                        if (freeshipAmount) freeshipAmount.textContent = '-' + data.formatted_original_fee;
+                    } else {
+                        freeshipRow.classList.add('d-none');
+                    }
+                }
+
+                // Update shipping method card display
+                const stdDisplay = document.getElementById('standardShippingFeeDisplay');
+                if (stdDisplay) {
+                    stdDisplay.textContent = (subtotalAmount >= 500000) ? 'Miễn phí' : data.formatted_original_fee;
+                }
+            }
+        } catch (e) {
+            console.warn('Lỗi tính phí GHN:', e);
+            if (feeEl) feeEl.textContent = formatCurrency(currentShippingFee);
+        }
+    }
 
     function updateGuestShippingAddress() {
-        const prov = document.getElementById('guestProvinceSelect')?.value || '';
-        const dist = document.getElementById('guestDistrictSelect')?.value || '';
-        const ward = document.getElementById('guestWardSelect')?.value || '';
+        const provEl = document.getElementById('guestProvinceSelect');
+        const distEl = document.getElementById('guestDistrictSelect');
+        const wardEl = document.getElementById('guestWardSelect');
         const spec = document.getElementById('guestSpecific')?.value || '';
+
+        const prov = provEl?.value || '';
+        const dist = distEl?.value || '';
+        const ward = wardEl?.value || '';
+
+        const distOpt = distEl?.options[distEl.selectedIndex];
+        const wardOpt = wardEl?.options[wardEl.selectedIndex];
+
+        currentLocationData = {
+            province: prov,
+            district: dist,
+            ward: ward,
+            district_id: distOpt?.dataset?.id || null,
+            ward_code: wardOpt?.dataset?.code || null
+        };
 
         const full = [spec, ward, dist, prov].filter(Boolean).join(', ');
         const hiddenAddr = document.getElementById('hiddenShippingAddress');
@@ -641,6 +910,37 @@
         if (hiddenName) hiddenName.value = name;
         const hiddenPhone = document.getElementById('hiddenPhone');
         if (hiddenPhone) hiddenPhone.value = phone;
+
+        // Auto trigger GHN fee calculation if district is selected
+        if (dist) {
+            calculateRealShippingFee(currentLocationData);
+        }
+    }
+
+    function onShippingMethodChanged(method) {
+        currentShippingMethod = method;
+
+        // Toggle card active states
+        const stdCard = document.getElementById('labelStandardShipping');
+        const expCard = document.getElementById('labelExpressShipping');
+        if (method === 'standard') {
+            stdCard?.classList.add('active');
+            expCard?.classList.remove('active');
+        } else {
+            expCard?.classList.add('active');
+            stdCard?.classList.remove('active');
+        }
+
+        // Re-calculate shipping fee with chosen method
+        if (currentLocationData.district || currentLocationData.district_id) {
+            calculateRealShippingFee(currentLocationData);
+        } else {
+            const fee = (method === 'express') ? 50000 : (subtotalAmount >= 500000 ? 0 : 30000);
+            currentShippingFee = fee;
+            document.getElementById('hiddenShippingFee').value = fee;
+            document.getElementById('displayShippingFee').textContent = fee > 0 ? formatCurrency(fee) : 'Miễn phí';
+            document.getElementById('displayGrandTotal').textContent = formatCurrency(subtotalAmount + fee);
+        }
     }
 
     function openAddressModal() {
@@ -661,8 +961,8 @@
             addNewAddressModalInstance = new bootstrap.Modal(modalEl);
         }
 
-        // Initialize cascading selects for modal
-        initVnLocationSelects('newProvince', 'newDistrict', 'newWard');
+        // Initialize cascading selects for modal with GHN API
+        initGhnCascadingSelects('newProvince', 'newDistrict', 'newWard');
 
         addNewAddressModalInstance.show();
         setTimeout(() => { if (typeof lucide !== 'undefined') lucide.createIcons(); }, 100);
@@ -692,6 +992,16 @@
         if (card) {
             card.classList.add('border-primary', 'bg-primary-subtle', 'bg-opacity-10');
         }
+
+        // Update current location and trigger GHN fee calculation
+        currentLocationData = {
+            province: addr.province,
+            district: addr.district,
+            ward: addr.ward,
+            district_id: addr.district_id || null,
+            ward_code: addr.ward_code || null
+        };
+        calculateRealShippingFee(currentLocationData);
     }
 
     async function submitAjaxAddress(event) {
@@ -701,9 +1011,13 @@
 
         const recipientName = document.getElementById('newRecipientName').value;
         const phone = document.getElementById('newPhone').value;
-        const province = document.getElementById('newProvince').value;
-        const district = document.getElementById('newDistrict').value;
-        const ward = document.getElementById('newWard').value;
+        const provEl = document.getElementById('newProvince');
+        const distEl = document.getElementById('newDistrict');
+        const wardEl = document.getElementById('newWard');
+
+        const province = provEl.value;
+        const district = distEl.value;
+        const ward = wardEl.value;
         const specificAddress = document.getElementById('newSpecific').value;
         const addressType = document.querySelector('input[name="modal_address_type"]:checked')?.value || 'home';
         const isDefault = document.getElementById('newIsDefault') ? (document.getElementById('newIsDefault').checked ? 1 : 0) : 1;
@@ -776,22 +1090,18 @@
 
             if (addNewAddressModalInstance) addNewAddressModalInstance.hide();
             submitBtn.disabled = false;
+
+            currentLocationData = {
+                province: province,
+                district: district,
+                ward: ward,
+                district_id: distEl.options[distEl.selectedIndex]?.dataset?.id || null,
+                ward_code: wardEl.options[wardEl.selectedIndex]?.dataset?.code || null
+            };
+            calculateRealShippingFee(currentLocationData);
+
             if (window.showToast) window.showToast('Đã lưu địa chỉ nhận hàng!', 'success');
         }
-    }
-
-    function updateShippingFee(fee) {
-        if (subtotalAmount >= 500000 && fee === 30000) {
-            currentShippingFee = 0;
-        } else {
-            currentShippingFee = fee;
-        }
-
-        const feeText = currentShippingFee > 0 ? new Intl.NumberFormat('vi-VN').format(currentShippingFee) + ' ₫' : 'Miễn phí';
-        document.getElementById('displayShippingFee').textContent = feeText;
-
-        const grand = subtotalAmount + currentShippingFee;
-        document.getElementById('displayGrandTotal').textContent = new Intl.NumberFormat('vi-VN').format(grand) + ' ₫';
     }
 
     function togglePaymentDetail(type) {
@@ -816,13 +1126,22 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-        // Init guest cascading selects if present
+        // Init guest cascading selects with GHN API
         const guestProv = document.getElementById('guestProvinceSelect');
         if (guestProv) {
-            initVnLocationSelects('guestProvinceSelect', 'guestDistrictSelect', 'guestWardSelect', {
+            initGhnCascadingSelects('guestProvinceSelect', 'guestDistrictSelect', 'guestWardSelect', {
                 onChange: updateGuestShippingAddress
             });
         }
+
+        // If authenticated user already has a selected address, calculate real shipping fee
+        @if (Auth::check() && $defaultAddress)
+            calculateRealShippingFee({
+                province: '{{ $defaultAddress->province }}',
+                district: '{{ $defaultAddress->district }}',
+                ward: '{{ $defaultAddress->ward }}'
+            });
+        @endif
     });
 </script>
 @endsection

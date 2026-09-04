@@ -18,6 +18,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\ShippingController;
 use App\Http\Controllers\UserController;
 
 // =============================================================================
@@ -60,6 +61,16 @@ Route::prefix(RouteConstants::PREFIX_CHECKOUT)->name(RouteConstants::NAME_CHECKO
         ->name('process');
     Route::get(RouteConstants::PATH_CHECKOUT_SUCCESS, [CheckoutController::class, 'success'])
         ->name('success');
+});
+
+// =============================================================================
+// SHIPPING & GHN API ROUTES (Public for Checkout & Address Book)
+// =============================================================================
+Route::prefix('api/shipping')->name('shipping.')->group(function () {
+    Route::get('/provinces', [ShippingController::class, 'getProvinces'])->name('provinces');
+    Route::get('/districts', [ShippingController::class, 'getDistricts'])->name('districts');
+    Route::get('/wards', [ShippingController::class, 'getWards'])->name('wards');
+    Route::post('/calculate-fee', [ShippingController::class, 'calculateFee'])->name('calculate_fee');
 });
 
 // =============================================================================

@@ -286,56 +286,61 @@ const VN_LOCATIONS_DATA = [
     }
 ];
 
-// Asynchronously load full 63 provinces from open data if available online, otherwise use rich built-in dataset
+// Asynchronously load full 63 provinces from GHN API via internal backend cache, otherwise fallback to built-in dataset
 let fullVnLocations = VN_LOCATIONS_DATA;
-
-async function fetchFullVnLocations() {
-    try {
-        const res = await fetch('https://provinces.open-api.vn/api/?depth=3');
-        if (res.ok) {
-            const raw = await res.json();
-            if (Array.isArray(raw) && raw.length > 0) {
-                fullVnLocations = raw.map(p => ({
-                    name: p.name,
-                    districts: (p.districts || []).map(d => ({
-                        name: d.name,
-                        wards: (d.wards || []).map(w => w.name)
-                    }))
-                }));
-            }
-        }
-    } catch (e) {
-        // Fallback to built-in dataset seamlessly
-    }
-}
-
-// Initial API fetch attempt in background
-fetchFullVnLocations();
 
 /**
  * Initialize 3 cascading select dropdowns for Province, District, Ward
+ * Prioritizes GHN Master Data API via /api/shipping/... with instant fallback to static dataset
  */
-function initVnLocationSelects(provinceElId, districtElId, wardElId, initialData = {}) {
+async function initVnLocationSelects(provinceElId, districtElId, wardElId, initialData = {}) {
     const provinceSelect = typeof provinceElId === 'string' ? document.getElementById(provinceElId) : provinceElId;
     const districtSelect = typeof districtElId === 'string' ? document.getElementById(districtElId) : districtElId;
     const wardSelect = typeof wardElId === 'string' ? document.getElementById(wardElId) : wardElId;
 
     if (!provinceSelect || !districtSelect || !wardSelect) return;
 
-    function populateProvinces(selectedProvinceName = '') {
-        provinceSelect.innerHTML = '<option value="">-- Chọn Tỉnh / Thành phố --</option>';
+    let useGhnApi = true;
+
+    // 1. Populate Provinces
+    provinceSelect.innerHTML = '<option value="">-- Chọn Tỉnh / Thành phố --</option>';
+    try {
+        const res = await fetch('/api/shipping/provinces');
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+            json.data.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.ProvinceName;
+                opt.dataset.id = p.ProvinceID;
+                opt.textContent = p.ProvinceName;
+                if (initialData.province && (p.ProvinceName === initialData.province || p.ProvinceName.includes(initialData.province))) {
+                    opt.selected = true;
+                }
+                provinceSelect.appendChild(opt);
+            });
+        } else {
+            useGhnApi = false;
+            fallbackPopulateProvinces();
+        }
+    } catch (e) {
+        useGhnApi = false;
+        fallbackPopulateProvinces();
+    }
+
+    function fallbackPopulateProvinces() {
         fullVnLocations.forEach(prov => {
             const opt = document.createElement('option');
             opt.value = prov.name;
             opt.textContent = prov.name;
-            if (selectedProvinceName && (prov.name === selectedProvinceName || prov.name.includes(selectedProvinceName))) {
+            if (initialData.province && (prov.name === initialData.province || prov.name.includes(initialData.province))) {
                 opt.selected = true;
             }
             provinceSelect.appendChild(opt);
         });
     }
 
-    function populateDistricts(selectedProvinceName, selectedDistrictName = '') {
+    // 2. Populate Districts
+    async function populateDistricts(selectedProvinceName, selectedDistrictName = '') {
         districtSelect.innerHTML = '<option value="">-- Chọn Quận / Huyện --</option>';
         wardSelect.innerHTML = '<option value="">-- Chọn Phường / Xã --</option>';
 
@@ -345,10 +350,40 @@ function initVnLocationSelects(provinceElId, districtElId, wardElId, initialData
             return;
         }
 
+        const selectedOpt = provinceSelect.options[provinceSelect.selectedIndex];
+        const provinceId = selectedOpt?.dataset?.id;
+
+        if (useGhnApi && provinceId) {
+            districtSelect.disabled = true;
+            districtSelect.innerHTML = '<option value="">Đang tải Quận / Huyện...</option>';
+            try {
+                const res = await fetch(`/api/shipping/districts?province_id=${provinceId}`);
+                const json = await res.json();
+                districtSelect.innerHTML = '<option value="">-- Chọn Quận / Huyện --</option>';
+                if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+                    json.data.forEach(dist => {
+                        const opt = document.createElement('option');
+                        opt.value = dist.DistrictName;
+                        opt.dataset.id = dist.DistrictID;
+                        opt.textContent = dist.DistrictName;
+                        if (selectedDistrictName && (dist.DistrictName === selectedDistrictName || dist.DistrictName.includes(selectedDistrictName))) {
+                            opt.selected = true;
+                        }
+                        districtSelect.appendChild(opt);
+                    });
+                    districtSelect.disabled = false;
+                    return;
+                }
+            } catch (e) {
+                // Fallback below
+            }
+        }
+
+        // Static Fallback for districts
         districtSelect.disabled = false;
         const province = fullVnLocations.find(p => p.name === selectedProvinceName || p.name.includes(selectedProvinceName));
-        
         if (province && province.districts) {
+            districtSelect.innerHTML = '<option value="">-- Chọn Quận / Huyện --</option>';
             province.districts.forEach(dist => {
                 const opt = document.createElement('option');
                 opt.value = dist.name;
@@ -361,7 +396,8 @@ function initVnLocationSelects(provinceElId, districtElId, wardElId, initialData
         }
     }
 
-    function populateWards(selectedProvinceName, selectedDistrictName, selectedWardName = '') {
+    // 3. Populate Wards
+    async function populateWards(selectedProvinceName, selectedDistrictName, selectedWardName = '') {
         wardSelect.innerHTML = '<option value="">-- Chọn Phường / Xã --</option>';
 
         if (!selectedProvinceName || !selectedDistrictName) {
@@ -369,11 +405,42 @@ function initVnLocationSelects(provinceElId, districtElId, wardElId, initialData
             return;
         }
 
+        const selectedOpt = districtSelect.options[districtSelect.selectedIndex];
+        const districtId = selectedOpt?.dataset?.id;
+
+        if (useGhnApi && districtId) {
+            wardSelect.disabled = true;
+            wardSelect.innerHTML = '<option value="">Đang tải Phường / Xã...</option>';
+            try {
+                const res = await fetch(`/api/shipping/wards?district_id=${districtId}`);
+                const json = await res.json();
+                wardSelect.innerHTML = '<option value="">-- Chọn Phường / Xã --</option>';
+                if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+                    json.data.forEach(ward => {
+                        const opt = document.createElement('option');
+                        opt.value = ward.WardName;
+                        opt.dataset.code = ward.WardCode;
+                        opt.textContent = ward.WardName;
+                        if (selectedWardName && (ward.WardName === selectedWardName || ward.WardName.includes(selectedWardName))) {
+                            opt.selected = true;
+                        }
+                        wardSelect.appendChild(opt);
+                    });
+                    wardSelect.disabled = false;
+                    return;
+                }
+            } catch (e) {
+                // Fallback below
+            }
+        }
+
+        // Static Fallback for wards
         wardSelect.disabled = false;
         const province = fullVnLocations.find(p => p.name === selectedProvinceName || p.name.includes(selectedProvinceName));
         if (province && province.districts) {
             const district = province.districts.find(d => d.name === selectedDistrictName || d.name.includes(selectedDistrictName));
             if (district && district.wards) {
+                wardSelect.innerHTML = '<option value="">-- Chọn Phường / Xã --</option>';
                 district.wards.forEach(wardName => {
                     const opt = document.createElement('option');
                     opt.value = wardName;
@@ -387,32 +454,30 @@ function initVnLocationSelects(provinceElId, districtElId, wardElId, initialData
         }
     }
 
-    // Populate initial
-    populateProvinces(initialData.province || '');
+    // Populate initial values if provided
     if (initialData.province) {
-        populateDistricts(initialData.province, initialData.district || '');
+        await populateDistricts(initialData.province, initialData.district || '');
         if (initialData.district) {
-            populateWards(initialData.province, initialData.district, initialData.ward || '');
+            await populateWards(initialData.province, initialData.district, initialData.ward || '');
         }
     } else {
         districtSelect.disabled = true;
         wardSelect.disabled = true;
     }
 
-    // On Province change
-    provinceSelect.onchange = function () {
-        populateDistricts(this.value);
+    // Event handlers
+    provinceSelect.onchange = async function () {
+        await populateDistricts(this.value);
         if (typeof initialData.onChange === 'function') initialData.onChange();
     };
 
-    // On District change
-    districtSelect.onchange = function () {
-        populateWards(provinceSelect.value, this.value);
+    districtSelect.onchange = async function () {
+        await populateWards(provinceSelect.value, this.value);
         if (typeof initialData.onChange === 'function') initialData.onChange();
     };
 
-    // On Ward change
     wardSelect.onchange = function () {
         if (typeof initialData.onChange === 'function') initialData.onChange();
     };
 }
+
