@@ -62,6 +62,12 @@
                                 </span>
                             </div>
                         </div>
+                        @if ($order->expected_delivery_at)
+                            <div class="col-sm-6">
+                                <span class="text-secondary">Dự kiến giao hàng (GHN):</span>
+                                <div class="fw-bold text-success">{{ $order->expected_delivery_at->format('d/m/Y') }}</div>
+                            </div>
+                        @endif
                         @if ($order->notes)
                             <div class="col-12">
                                 <span class="text-secondary">Ghi chú:</span>
@@ -118,6 +124,19 @@
                         </div>
                     </div>
                 </div>
+
+                @if ($order->payment_status === 'paid')
+                    <!-- Paid Confirmation Box -->
+                    <div class="p-3.5 rounded-3 border mb-4 text-center" style="background: rgba(16, 185, 129, 0.08); border-color: rgba(16, 185, 129, 0.3) !important;">
+                        <div class="d-inline-flex align-items-center gap-1.5 text-success fw-bold fs-6 mb-1">
+                            <i data-lucide="check-circle" style="width: 18px; height: 18px;"></i>
+                            <span>Đã Xác Nhận Thanh Toán Thành Công</span>
+                        </div>
+                        <p class="text-secondary small mb-0">
+                            Đơn hàng đã được thanh toán qua <strong>{{ $order->payment_method_label }}</strong>. Shop sẽ nhanh chóng đóng gói và bàn giao cho đơn vị vận chuyển GHN.
+                        </p>
+                    </div>
+                @endif
 
                 @if ($order->payment_method === 'momo' && $order->payment_status === 'pending')
                     <!-- MoMo QR Box -->

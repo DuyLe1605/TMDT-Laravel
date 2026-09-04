@@ -43,6 +43,22 @@
         <!-- Section: E-Commerce Operations -->
         <div class="sidebar-section-title mt-3">QUẢN LÝ E-COMMERCE</div>
         
+        <!-- Active Orders Module -->
+        <a href="{{ route('admin.orders.index') }}" class="sidebar-nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
+            <div class="d-flex align-items-center">
+                <span class="sidebar-icon-box">
+                    <i data-lucide="shopping-bag" style="width: 18px; height: 18px;"></i>
+                </span>
+                <span>Quản lý Đơn hàng</span>
+            </div>
+            @php
+                $pendingOrdersCount = \App\Models\Order::where('shipping_status', 'pending')->count();
+            @endphp
+            @if($pendingOrdersCount > 0)
+                <span class="badge bg-warning text-dark px-2 py-0.5 rounded-pill fw-bold" style="font-size: 0.72rem;">{{ $pendingOrdersCount }}</span>
+            @endif
+        </a>
+
         <!-- Active Products Module -->
         <a href="{{ route('admin.products.index') }}" class="sidebar-nav-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
             <div class="d-flex align-items-center">

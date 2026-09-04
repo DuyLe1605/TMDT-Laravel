@@ -31,6 +31,7 @@ class ProcessCheckoutRequest extends FormRequest
             'shipping_fee' => ['nullable', 'numeric', 'min:0'],
             'to_district_id' => ['nullable', 'integer'],
             'to_ward_code' => ['nullable', 'string'],
+            'expected_delivery_at' => ['nullable', 'string'],
             'payment_method' => ['required', 'in:cod,bank_transfer,momo'],
             'notes' => ['nullable', 'string', 'max:1000'],
         ];

@@ -9,6 +9,7 @@ use App\Constants\RouteConstants;
 
 // Import Controllers
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\BrandController;
@@ -20,6 +21,7 @@ use App\Http\Controllers\AddressController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\ShippingController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\WebhookController;
 
 // =============================================================================
 // PUBLIC STOREFRONT ROUTES
@@ -130,6 +132,12 @@ Route::middleware('auth')->group(function () {
             ->name('orders');
         Route::get(RouteConstants::PATH_ACCOUNT_ORDER_SHOW, [AccountController::class, 'orderDetail'])
             ->name('orders.show');
+        Route::post('/orders/{order}/cancel', [AccountController::class, 'cancelOrder'])
+            ->name('orders.cancel');
+        Route::post('/orders/{order}/reorder', [AccountController::class, 'reorder'])
+            ->name('orders.reorder');
+        Route::post('/orders/{order}/confirm-delivery', [AccountController::class, 'confirmDelivery'])
+            ->name('orders.confirm_delivery');
         Route::get(RouteConstants::PATH_ACCOUNT_ADDRESSES, [AccountController::class, 'addresses'])
             ->name('addresses');
     });
@@ -146,4 +154,21 @@ Route::middleware(['auth', 'admin'])->prefix(RouteConstants::PREFIX_ADMIN)->name
     Route::resource(RouteConstants::RESOURCE_CATEGORIES, CategoryController::class);
     Route::resource(RouteConstants::RESOURCE_BRANDS, BrandController::class);
     Route::resource(RouteConstants::RESOURCE_USERS, UserController::class);
+
+    // Admin Order Management
+    Route::prefix('orders')->name('orders.')->group(function () {
+        Route::get('/', [AdminOrderController::class, 'index'])->name('index');
+        Route::get('/{order}', [AdminOrderController::class, 'show'])->name('show');
+        Route::patch('/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('update_status');
+        Route::post('/{order}/send-ghn', [AdminOrderController::class, 'sendToGhn'])->name('send_ghn');
+        Route::post('/{order}/cancel', [AdminOrderController::class, 'cancelOrder'])->name('cancel');
+        Route::get('/{order}/print-label', [AdminOrderController::class, 'printLabel'])->name('print_label');
+    });
 });
+
+// =============================================================================
+// WEBHOOK ROUTES — No CSRF, public endpoint for GHN callbacks
+// =============================================================================
+Route::post('/webhook/ghn', [WebhookController::class, 'ghnCallback'])
+    ->name('webhook.ghn')
+    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);

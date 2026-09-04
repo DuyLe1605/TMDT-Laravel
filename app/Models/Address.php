@@ -17,16 +17,21 @@ class Address extends Model
         'province',
         'district',
         'ward',
+        'province_id',
+        'district_id',
+        'ward_code',
         'specific_address',
         'address_type',
         'is_default',
     ];
 
     protected $casts = [
-        'user_id' => 'integer',
-        'is_default' => 'boolean',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
+        'user_id'     => 'integer',
+        'province_id' => 'integer',
+        'district_id' => 'integer',
+        'is_default'  => 'boolean',
+        'created_at'  => 'datetime',
+        'updated_at'  => 'datetime',
     ];
 
     /**

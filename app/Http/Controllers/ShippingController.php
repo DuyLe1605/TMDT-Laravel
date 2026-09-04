@@ -142,6 +142,9 @@ class ShippingController extends Controller
             'is_freeship' => $isFreeshipEligible,
             'discount_freeship' => $isFreeshipEligible ? $fee : 0,
             'leadtime_text' => $result['leadtime_text'] ?? 'Giao hàng sau 2 - 3 ngày',
+            'leadtime_date' => $result['leadtime_date'] ?? null,
+            'district_id' => $toDistrictId,
+            'ward_code' => $toWardCode,
             'is_fallback' => $result['is_fallback'] ?? false,
         ]);
     }

@@ -112,6 +112,12 @@ class RouteConstants
     public const PATH_ACCOUNT_ORDER_SHOW = '/orders/{order}';
     public const NAME_ACCOUNT_ORDER_SHOW = 'account.orders.show';
 
+    public const PATH_ACCOUNT_ORDERS_CANCEL = '/orders/{order}/cancel';
+    public const NAME_ACCOUNT_ORDERS_CANCEL = 'account.orders.cancel';
+
+    public const PATH_ACCOUNT_ORDERS_REORDER = '/orders/{order}/reorder';
+    public const NAME_ACCOUNT_ORDERS_REORDER = 'account.orders.reorder';
+
     public const PATH_ACCOUNT_ADDRESSES = '/addresses';
     public const NAME_ACCOUNT_ADDRESSES = 'account.addresses';
 
@@ -128,6 +134,7 @@ class RouteConstants
     public const RESOURCE_CATEGORIES = 'categories';
     public const RESOURCE_BRANDS = 'brands';
     public const RESOURCE_USERS = 'users';
+    public const RESOURCE_ORDERS = 'orders';
 
     public const NAME_ADMIN_PRODUCTS_INDEX = 'admin.products.index';
     public const NAME_ADMIN_PRODUCTS_CREATE = 'admin.products.create';
@@ -140,4 +147,11 @@ class RouteConstants
     public const NAME_ADMIN_CATEGORIES_INDEX = 'admin.categories.index';
     public const NAME_ADMIN_BRANDS_INDEX = 'admin.brands.index';
     public const NAME_ADMIN_USERS_INDEX = 'admin.users.index';
+
+    public const NAME_ADMIN_ORDERS_INDEX = 'admin.orders.index';
+    public const NAME_ADMIN_ORDERS_SHOW = 'admin.orders.show';
+    public const NAME_ADMIN_ORDERS_UPDATE_STATUS = 'admin.orders.update_status';
+    public const NAME_ADMIN_ORDERS_SEND_GHN = 'admin.orders.send_ghn';
+    public const NAME_ADMIN_ORDERS_CANCEL = 'admin.orders.cancel';
+    public const NAME_ADMIN_ORDERS_PRINT_LABEL = 'admin.orders.print_label';
 }

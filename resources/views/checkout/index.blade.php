@@ -36,6 +36,7 @@
         <input type="hidden" name="shipping_fee" id="hiddenShippingFee" value="{{ $shippingFee }}">
         <input type="hidden" name="to_district_id" id="hiddenToDistrictId" value="">
         <input type="hidden" name="to_ward_code" id="hiddenToWardCode" value="">
+        <input type="hidden" name="expected_delivery_at" id="hiddenExpectedDeliveryAt" value="">
 
         <div class="row g-4">
             <!-- Left Column: Shipping Address & Order Review -->
@@ -836,6 +837,9 @@
                 const hiddenWard = document.getElementById('hiddenToWardCode');
                 if (hiddenWard && data.ward_code) hiddenWard.value = data.ward_code;
 
+                const hiddenExp = document.getElementById('hiddenExpectedDeliveryAt');
+                if (hiddenExp && data.leadtime_date) hiddenExp.value = data.leadtime_date;
+
                 // Update summary displays
                 if (feeEl) {
                     feeEl.textContent = data.formatted_shipping_fee;
@@ -1028,12 +1032,19 @@
             return;
         }
 
+        const provinceId = provEl.options[provEl.selectedIndex]?.dataset?.id || null;
+        const districtId = distEl.options[distEl.selectedIndex]?.dataset?.id || null;
+        const wardCode = wardEl.options[wardEl.selectedIndex]?.dataset?.code || null;
+
         const data = {
             recipient_name: recipientName,
             phone: phone,
             province: province,
+            province_id: provinceId,
             district: district,
+            district_id: districtId,
             ward: ward,
+            ward_code: wardCode,
             specific_address: specificAddress,
             address_type: addressType,
             is_default: isDefault
