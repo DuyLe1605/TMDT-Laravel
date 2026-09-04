@@ -135,6 +135,7 @@ class RouteConstants
     public const RESOURCE_BRANDS = 'brands';
     public const RESOURCE_USERS = 'users';
     public const RESOURCE_ORDERS = 'orders';
+    public const RESOURCE_VOUCHERS = 'vouchers';
 
     public const NAME_ADMIN_PRODUCTS_INDEX = 'admin.products.index';
     public const NAME_ADMIN_PRODUCTS_CREATE = 'admin.products.create';
@@ -154,4 +155,13 @@ class RouteConstants
     public const NAME_ADMIN_ORDERS_SEND_GHN = 'admin.orders.send_ghn';
     public const NAME_ADMIN_ORDERS_CANCEL = 'admin.orders.cancel';
     public const NAME_ADMIN_ORDERS_PRINT_LABEL = 'admin.orders.print_label';
+
+    public const NAME_ADMIN_VOUCHERS_INDEX = 'admin.vouchers.index';
+    public const NAME_ADMIN_VOUCHERS_CREATE = 'admin.vouchers.create';
+    public const NAME_ADMIN_VOUCHERS_STORE = 'admin.vouchers.store';
+    public const NAME_ADMIN_VOUCHERS_SHOW = 'admin.vouchers.show';
+    public const NAME_ADMIN_VOUCHERS_EDIT = 'admin.vouchers.edit';
+    public const NAME_ADMIN_VOUCHERS_UPDATE = 'admin.vouchers.update';
+    public const NAME_ADMIN_VOUCHERS_DESTROY = 'admin.vouchers.destroy';
+    public const NAME_ADMIN_VOUCHERS_TOGGLE = 'admin.vouchers.toggle';
 }

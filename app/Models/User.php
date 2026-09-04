@@ -77,4 +77,12 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Order::class)->latest();
     }
+
+    /**
+     * Get voucher redemption logs for user.
+     */
+    public function voucherUsages()
+    {
+        return $this->hasMany(VoucherUsage::class);
+    }
 }

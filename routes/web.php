@@ -22,6 +22,8 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\ShippingController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WebhookController;
+use App\Http\Controllers\VoucherController;
+use App\Http\Controllers\Admin\AdminVoucherController;
 
 // =============================================================================
 // PUBLIC STOREFRONT ROUTES
@@ -73,6 +75,14 @@ Route::prefix('api/shipping')->name('shipping.')->group(function () {
     Route::get('/districts', [ShippingController::class, 'getDistricts'])->name('districts');
     Route::get('/wards', [ShippingController::class, 'getWards'])->name('wards');
     Route::post('/calculate-fee', [ShippingController::class, 'calculateFee'])->name('calculate_fee');
+});
+
+// =============================================================================
+// VOUCHER API ROUTES (Checkout & Cart)
+// =============================================================================
+Route::prefix('api/vouchers')->name('vouchers.')->group(function () {
+    Route::post('/apply', [VoucherController::class, 'apply'])->name('apply');
+    Route::get('/available', [VoucherController::class, 'available'])->name('available');
 });
 
 // =============================================================================
@@ -164,6 +174,10 @@ Route::middleware(['auth', 'admin'])->prefix(RouteConstants::PREFIX_ADMIN)->name
         Route::post('/{order}/cancel', [AdminOrderController::class, 'cancelOrder'])->name('cancel');
         Route::get('/{order}/print-label', [AdminOrderController::class, 'printLabel'])->name('print_label');
     });
+
+    // Admin Voucher Management
+    Route::resource(RouteConstants::RESOURCE_VOUCHERS, AdminVoucherController::class);
+    Route::post('/vouchers/{voucher}/toggle', [AdminVoucherController::class, 'toggleStatus'])->name('vouchers.toggle');
 });
 
 // =============================================================================

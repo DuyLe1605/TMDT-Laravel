@@ -424,6 +424,48 @@
                         </div>
                     </div>
 
+                    <!-- Aurelia Voucher Section (Shopee Style) -->
+                    <div class="p-3 rounded-3 mb-3" style="background: var(--bg-surface-subtle); border: 1px dashed var(--brand-500);">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="rounded-2 d-flex align-items-center justify-content-center" style="width: 28px; height: 28px; background: #fff3e0; color: #e65100;">
+                                    <i data-lucide="ticket" style="width: 16px; height: 16px;"></i>
+                                </div>
+                                <span class="fw-bold text-dark small">Aurelia Voucher</span>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-link text-primary p-0 text-decoration-none fw-semibold small d-flex align-items-center gap-1" onclick="openVoucherModal()">
+                                <span>Chọn mã ưu đãi</span>
+                                <i data-lucide="chevron-right" style="width: 14px; height: 14px;"></i>
+                            </button>
+                        </div>
+
+                        <!-- Quick input field -->
+                        <div class="input-group input-group-sm mb-1" id="voucherQuickInputContainer">
+                            <input type="text" id="quickVoucherInput" class="form-control text-uppercase font-monospace" placeholder="Nhập mã ưu đãi..." style="letter-spacing: 0.05em;">
+                            <button type="button" class="btn btn-dark fw-bold px-3" onclick="applyVoucherFromInput()">
+                                Áp Dụng
+                            </button>
+                        </div>
+
+                        <!-- Applied voucher tag banner -->
+                        <div id="appliedVoucherBanner" class="p-2.5 rounded-2 d-none mt-2" style="background: #e8f5e9; border: 1px solid #c8e6c9;">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center gap-2 min-w-0">
+                                    <span class="badge bg-success font-monospace" id="appliedVoucherCodeBadge">AURELIA20</span>
+                                    <span class="text-success fw-bold small text-truncate" id="appliedVoucherText">-15.000 ₫</span>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-link text-danger p-0 text-decoration-none" onclick="removeVoucher()" title="Gỡ bỏ mã">
+                                    <i data-lucide="x" style="width: 16px; height: 16px;"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="voucherErrorMessage" class="text-danger small mt-1 d-none" style="font-size: 0.76rem;"></div>
+                    </div>
+
+                    <!-- Hidden voucher code field for backend order processing -->
+                    <input type="hidden" name="voucher_code" id="hiddenVoucherCode" value="">
+
                     <div class="d-flex flex-column gap-2.5 mb-3 text-secondary small">
                         <div class="d-flex justify-content-between">
                             <span>Tổng tiền hàng ({{ $summary['total_quantity'] }} chiếc):</span>
@@ -444,6 +486,14 @@
                                 <span>Ưu đãi Freeship:</span>
                             </span>
                             <span id="freeshipDiscountAmount">-30.000 ₫</span>
+                        </div>
+                        <!-- Dynamic Voucher Discount Row -->
+                        <div class="d-flex justify-content-between text-success d-none" id="voucherDiscountRow">
+                            <span class="d-inline-flex align-items-center gap-1">
+                                <i data-lucide="ticket" style="width: 14px; height: 14px;"></i>
+                                <span>Giảm giá Voucher (<strong id="summaryVoucherCode" class="font-monospace"></strong>):</span>
+                            </span>
+                            <span class="fw-bold" id="summaryVoucherDiscount">-0 ₫</span>
                         </div>
                     </div>
 
@@ -626,18 +676,161 @@
             </form>
         </div>
     </div>
+<!-- ========================================================================= -->
+<!-- SHOPEE-STYLE VOUCHER SELECTION MODAL -->
+<!-- ========================================================================= -->
+<div class="modal fade" id="voucherSelectModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" style="max-width: 620px;">
+        <div class="modal-content modal-content-modern border-0 shadow-lg">
+            <div class="modal-header border-bottom p-3.5 bg-white">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="p-1.5 rounded-2 bg-warning-subtle text-warning">
+                        <i data-lucide="ticket" style="width: 22px; height: 22px;"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold text-dark fs-6 mb-0">Chọn Aurelia Voucher</h5>
+                        <div class="text-secondary" style="font-size: 0.75rem;">Chọn 1 mã giảm giá để nhận ưu đãi tốt nhất cho đơn hàng</div>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body p-3.5 bg-light-subtle">
+                <!-- Manual Code Input Bar -->
+                <div class="card p-3 mb-3 border shadow-sm rounded-3 bg-white">
+                    <label class="form-label text-dark fw-bold small mb-1.5 d-flex align-items-center gap-1">
+                        <i data-lucide="tag" style="width: 14px; height: 14px;" class="text-primary"></i>
+                        <span>Nhập mã ưu đãi của bạn</span>
+                    </label>
+                    <div class="input-group">
+                        <input type="text" id="modalVoucherInput" class="form-control font-monospace text-uppercase" placeholder="VD: AURELIA20, FREESHIP, MOMO50K...">
+                        <button type="button" class="btn btn-dark fw-bold px-3" onclick="applyModalVoucherInput()">
+                            Áp Dụng
+                        </button>
+                    </div>
+                    <div id="modalVoucherInputError" class="text-danger small mt-1.5 d-none" style="font-size: 0.78rem;"></div>
+                </div>
+
+                <!-- Section 1: Eligible Vouchers -->
+                <div class="mb-4">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <h6 class="fw-bold text-dark small mb-0 text-uppercase d-flex align-items-center gap-1.5" style="letter-spacing: 0.05em;">
+                            <i data-lucide="check-circle-2" class="text-success" style="width: 16px; height: 16px;"></i>
+                            <span>Mã Giảm Giá Khả Dụng</span>
+                        </h6>
+                        <span class="badge bg-success-subtle text-success small fw-bold" id="eligibleVouchersCountBadge">0 mã</span>
+                    </div>
+                    <div class="d-flex flex-column gap-2.5" id="eligibleVouchersList">
+                        <div class="text-center py-4 text-secondary small">
+                            <span class="spinner-border spinner-border-sm text-primary"></span>
+                            <span class="ms-1">Đang tải danh sách voucher...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Ineligible Vouchers -->
+                <div>
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <h6 class="fw-bold text-secondary small mb-0 text-uppercase d-flex align-items-center gap-1.5" style="letter-spacing: 0.05em;">
+                            <i data-lucide="alert-circle" class="text-secondary" style="width: 16px; height: 16px;"></i>
+                            <span>Chưa Đủ Điều Kiện Áp Dụng</span>
+                        </h6>
+                        <span class="badge bg-secondary-subtle text-secondary small" id="ineligibleVouchersCountBadge">0 mã</span>
+                    </div>
+                    <div class="d-flex flex-column gap-2.5" id="ineligibleVouchersList">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer border-top p-3 d-flex justify-content-between align-items-center bg-white">
+                <div class="text-secondary small">
+                    Đang chọn: <strong class="text-primary font-monospace fs-6" id="modalSelectedVoucherCode">Chưa chọn mã nào</strong>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-surface px-3" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-brand-primary px-4 fw-bold shadow-sm" onclick="confirmModalVoucherSelection()">
+                        Đồng Ý Áp Dụng
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<style>
+/* Shopee Style Voucher Ticket Styles */
+.shopee-ticket-card {
+    display: flex;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+.shopee-ticket-card:hover {
+    border-color: #d4af37;
+    box-shadow: 0 3px 10px rgba(212, 175, 55, 0.15);
+}
+.shopee-ticket-card.selected {
+    border-color: #d4af37;
+    background: #fffdf5;
+}
+.shopee-ticket-left {
+    width: 115px;
+    min-width: 115px;
+    background: linear-gradient(135deg, #2b2b2b, #1a1a1a);
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 8px;
+    text-align: center;
+    position: relative;
+    border-right: 1px dashed #d4af37;
+}
+.shopee-ticket-left.shipping-ticket {
+    background: linear-gradient(135deg, #00897b, #004d40);
+    border-right-color: #80cbc4;
+}
+.shopee-ticket-right {
+    flex: 1;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.shopee-ticket-card.ineligible {
+    opacity: 0.65;
+    background: #fdfdfd;
+    cursor: not-allowed;
+}
+.shopee-ticket-card.ineligible .shopee-ticket-left {
+    background: #757575;
+    border-right-color: #bdbdbd;
+}
+.shopee-ticket-card.ineligible:hover {
+    border-color: #e0e0e0;
+    box-shadow: none;
+}
+</style>
 @endsection
 
 @section('scripts')
 <script>
     let addressSelectModalInstance = null;
     let addNewAddressModalInstance = null;
+    let voucherSelectModalInstance = null;
 
     const subtotalAmount = {{ (float) $summary['total_amount'] }};
     const selectedItemIds = [{{ $selectedItems->pluck('id')->implode(',') }}];
     let currentShippingFee = {{ (float) $shippingFee }};
     let currentShippingMethod = 'standard';
+    let currentPaymentMethod = 'cod';
     let currentLocationData = {
         province: '{{ $defaultAddress->province ?? "" }}',
         district: '{{ $defaultAddress->district ?? "" }}',
@@ -645,9 +838,21 @@
         district_id: null,
         ward_code: null
     };
+    let currentVoucher = null;
+    let currentVoucherDiscount = 0;
+    let tempSelectedVoucher = null;
+    let availableVouchersData = null;
 
     function formatCurrency(amount) {
         return new Intl.NumberFormat('vi-VN').format(Math.max(0, amount)) + ' ₫';
+    }
+
+    function recalculateGrandTotal() {
+        const finalTotal = Math.max(0, subtotalAmount + currentShippingFee - currentVoucherDiscount);
+        const grandTotalEl = document.getElementById('displayGrandTotal');
+        if (grandTotalEl) {
+            grandTotalEl.textContent = formatCurrency(finalTotal);
+        }
     }
 
     /**
@@ -845,9 +1050,12 @@
                     feeEl.textContent = data.formatted_shipping_fee;
                 }
 
-                const grandTotalEl = document.getElementById('displayGrandTotal');
-                if (grandTotalEl) {
-                    grandTotalEl.textContent = formatCurrency(subtotalAmount + currentShippingFee);
+                // Update grand total with voucher discount factored in
+                recalculateGrandTotal();
+
+                // If currently applied voucher is a shipping discount, recalculate it
+                if (currentVoucher && currentVoucher.discount_type === 'shipping_discount') {
+                    applyVoucherAjax(currentVoucher.code);
                 }
 
                 // Update leadtime
@@ -943,7 +1151,10 @@
             currentShippingFee = fee;
             document.getElementById('hiddenShippingFee').value = fee;
             document.getElementById('displayShippingFee').textContent = fee > 0 ? formatCurrency(fee) : 'Miễn phí';
-            document.getElementById('displayGrandTotal').textContent = formatCurrency(subtotalAmount + fee);
+            recalculateGrandTotal();
+            if (currentVoucher && currentVoucher.discount_type === 'shipping_discount') {
+                applyVoucherAjax(currentVoucher.code);
+            }
         }
     }
 
@@ -1116,6 +1327,7 @@
     }
 
     function togglePaymentDetail(type) {
+        currentPaymentMethod = type;
         const bankBox = document.getElementById('bankTransferBox');
         const momoBox = document.getElementById('momoInstructionBox');
         
@@ -1134,6 +1346,304 @@
                 momoBox.classList.add('d-none');
             }
         }
+
+        // Validate applied voucher compatibility with newly selected payment method
+        if (currentVoucher) {
+            checkVoucherCompatibilityWithPaymentMethod(type);
+        }
+    }
+
+    // =========================================================================
+    // SHOPEE-STYLE VOUCHER LOGIC & MODAL
+    // =========================================================================
+
+    function openVoucherModal() {
+        const modalEl = document.getElementById('voucherSelectModal');
+        if (modalEl) {
+            if (!voucherSelectModalInstance) {
+                voucherSelectModalInstance = new bootstrap.Modal(modalEl);
+            }
+            voucherSelectModalInstance.show();
+            loadAvailableVouchers();
+            setTimeout(() => { if (typeof lucide !== 'undefined') lucide.createIcons(); }, 150);
+        }
+    }
+
+    async function loadAvailableVouchers() {
+        const eligibleList = document.getElementById('eligibleVouchersList');
+        const ineligibleList = document.getElementById('ineligibleVouchersList');
+        const eligibleBadge = document.getElementById('eligibleVouchersCountBadge');
+        const ineligibleBadge = document.getElementById('ineligibleVouchersCountBadge');
+
+        eligibleList.innerHTML = `
+            <div class="text-center py-4 text-secondary small">
+                <span class="spinner-border spinner-border-sm text-primary"></span>
+                <span class="ms-1">Đang tải danh sách ưu đãi...</span>
+            </div>
+        `;
+        ineligibleList.innerHTML = '';
+
+        try {
+            const res = await fetch(`/api/vouchers/available?subtotal=${subtotalAmount}&shipping_fee=${currentShippingFee}&payment_method=${currentPaymentMethod}`);
+            const json = await res.json();
+
+            if (json.success) {
+                availableVouchersData = json;
+                renderVouchersModal(json);
+            }
+        } catch (e) {
+            eligibleList.innerHTML = '<div class="alert alert-danger py-2 small">Không thể tải danh sách voucher. Vui lòng thử lại.</div>';
+        }
+    }
+
+    function renderVouchersModal(data) {
+        const eligibleList = document.getElementById('eligibleVouchersList');
+        const ineligibleList = document.getElementById('ineligibleVouchersList');
+        const eligibleBadge = document.getElementById('eligibleVouchersCountBadge');
+        const ineligibleBadge = document.getElementById('ineligibleVouchersCountBadge');
+
+        const eligible = data.eligible || [];
+        const ineligible = data.ineligible || [];
+
+        eligibleBadge.textContent = `${eligible.length} mã khả dụng`;
+        ineligibleBadge.textContent = `${ineligible.length} mã`;
+
+        // Render eligible
+        if (eligible.length === 0) {
+            eligibleList.innerHTML = `
+                <div class="p-3 bg-white rounded-3 border text-center text-secondary small">
+                    Hiện chưa có mã ưu đãi phù hợp với giỏ hàng hiện tại.
+                </div>
+            `;
+        } else {
+            eligibleList.innerHTML = eligible.map(v => {
+                const isCurrent = currentVoucher && currentVoucher.code === v.code;
+                const isSelected = tempSelectedVoucher ? tempSelectedVoucher.code === v.code : isCurrent;
+                const isShipping = v.discount_type === 'shipping_discount';
+
+                let discountBadgeText = v.discount_type === 'percentage' 
+                    ? `GIẢM ${v.discount_value}%` 
+                    : (isShipping ? 'FREESHIP' : 'GIẢM TIỀN');
+
+                return `
+                    <div class="shopee-ticket-card ${isSelected ? 'selected' : ''}" onclick="selectModalVoucher('${v.code}')" id="ticket-${v.code}">
+                        <div class="shopee-ticket-left ${isShipping ? 'shipping-ticket' : ''}">
+                            <i data-lucide="${isShipping ? 'truck' : 'ticket'}" style="width: 22px; height: 22px;" class="mb-1"></i>
+                            <div class="fw-extrabold" style="font-size: 0.72rem; line-height: 1.2;">${discountBadgeText}</div>
+                            <div style="font-size: 0.65rem; opacity: 0.85;">AURELIA</div>
+                        </div>
+                        <div class="shopee-ticket-right">
+                            <div class="d-flex justify-content-between align-items-start gap-2">
+                                <div class="min-w-0">
+                                    <div class="fw-bold text-dark small mb-0.5">${v.name}</div>
+                                    <div class="text-secondary small" style="font-size: 0.76rem;">${v.formatted_min_order}</div>
+                                </div>
+                                <input type="radio" name="modal_voucher_choice" value="${v.code}" class="form-check-input mt-1 flex-shrink-0" ${isSelected ? 'checked' : ''}>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center pt-2 mt-2 border-top" style="font-size: 0.72rem;">
+                                <span class="text-secondary">${v.expires_at ? 'HSD: ' + v.expires_at : 'Hạn dùng: Dài hạn'}</span>
+                                <span class="text-success fw-bold">Tiết kiệm ${v.formatted_discount_amount}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Render ineligible
+        if (ineligible.length === 0) {
+            ineligibleList.innerHTML = `
+                <div class="p-2.5 bg-white rounded-3 border text-center text-secondary small" style="font-size: 0.78rem;">
+                    Không có mã nào trong danh mục này.
+                </div>
+            `;
+        } else {
+            ineligibleList.innerHTML = ineligible.map(v => {
+                const isShipping = v.discount_type === 'shipping_discount';
+                return `
+                    <div class="shopee-ticket-card ineligible">
+                        <div class="shopee-ticket-left ${isShipping ? 'shipping-ticket' : ''}">
+                            <i data-lucide="${isShipping ? 'truck' : 'ticket'}" style="width: 22px; height: 22px;" class="mb-1"></i>
+                            <div class="fw-bold" style="font-size: 0.72rem;">${v.discount_type === 'percentage' ? 'GIẢM ' + v.discount_value + '%' : (isShipping ? 'FREESHIP' : 'GIẢM TIỀN')}</div>
+                        </div>
+                        <div class="shopee-ticket-right">
+                            <div class="fw-bold text-dark small">${v.name}</div>
+                            <div class="text-secondary small" style="font-size: 0.75rem;">${v.formatted_min_order}</div>
+                            <div class="text-danger fw-medium pt-1 mt-1 border-top" style="font-size: 0.74rem;">
+                                <i data-lucide="alert-circle" style="width: 12px; height: 12px;" class="inline-block me-1"></i>
+                                ${v.reason}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        setTimeout(() => { if (typeof lucide !== 'undefined') lucide.createIcons(); }, 100);
+    }
+
+    function selectModalVoucher(code) {
+        if (!availableVouchersData) return;
+        const voucherItem = availableVouchersData.eligible.find(v => v.code === code);
+        if (!voucherItem) return;
+
+        tempSelectedVoucher = voucherItem;
+        document.getElementById('modalSelectedVoucherCode').textContent = `${voucherItem.code} (${voucherItem.formatted_discount_amount})`;
+
+        document.querySelectorAll('.shopee-ticket-card').forEach(c => c.classList.remove('selected'));
+        const activeCard = document.getElementById(`ticket-${code}`);
+        if (activeCard) {
+            activeCard.classList.add('selected');
+            const radio = activeCard.querySelector('input[type="radio"]');
+            if (radio) radio.checked = true;
+        }
+    }
+
+    function confirmModalVoucherSelection() {
+        if (!tempSelectedVoucher) {
+            alert('Vui lòng chọn một mã giảm giá khả dụng hoặc đóng cửa sổ.');
+            return;
+        }
+
+        applyVoucherAjax(tempSelectedVoucher.code);
+        if (voucherSelectModalInstance) voucherSelectModalInstance.hide();
+    }
+
+    function applyModalVoucherInput() {
+        const input = document.getElementById('modalVoucherInput');
+        const errEl = document.getElementById('modalVoucherInputError');
+        const code = (input.value || '').trim();
+
+        if (!code) {
+            errEl.textContent = 'Vui lòng nhập mã ưu đãi.';
+            errEl.classList.remove('d-none');
+            return;
+        }
+        errEl.classList.add('d-none');
+
+        applyVoucherAjax(code, {
+            onSuccess: () => {
+                if (voucherSelectModalInstance) voucherSelectModalInstance.hide();
+            },
+            onError: (msg) => {
+                errEl.textContent = msg;
+                errEl.classList.remove('d-none');
+            }
+        });
+    }
+
+    function applyVoucherFromInput() {
+        const input = document.getElementById('quickVoucherInput');
+        const code = (input.value || '').trim();
+        if (!code) {
+            showVoucherError('Vui lòng nhập mã giảm giá.');
+            return;
+        }
+        applyVoucherAjax(code);
+    }
+
+    async function applyVoucherAjax(code, callbacks = {}) {
+        hideVoucherError();
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+        try {
+            const res = await fetch('/api/vouchers/apply', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({
+                    code: code,
+                    subtotal: subtotalAmount,
+                    shipping_fee: currentShippingFee,
+                    payment_method: currentPaymentMethod
+                })
+            });
+
+            const data = await res.json();
+
+            if (res.ok && data.success) {
+                currentVoucher = data.voucher;
+                currentVoucherDiscount = data.discount_amount;
+                tempSelectedVoucher = data.voucher;
+
+                // Update UI state
+                document.getElementById('hiddenVoucherCode').value = data.voucher.code;
+                document.getElementById('quickVoucherInput').value = data.voucher.code;
+
+                // Show applied banner
+                document.getElementById('appliedVoucherCodeBadge').textContent = data.voucher.code;
+                document.getElementById('appliedVoucherText').textContent = data.voucher.formatted_discount;
+                document.getElementById('appliedVoucherBanner').classList.remove('d-none');
+                document.getElementById('voucherQuickInputContainer').classList.add('d-none');
+
+                // Update summary discount line
+                document.getElementById('summaryVoucherCode').textContent = data.voucher.code;
+                document.getElementById('summaryVoucherDiscount').textContent = data.voucher.formatted_discount;
+                document.getElementById('voucherDiscountRow').classList.remove('d-none');
+
+                // Recalculate grand total
+                recalculateGrandTotal();
+
+                if (callbacks.onSuccess) callbacks.onSuccess();
+                if (window.showToast) {
+                    window.showToast(data.message, 'success');
+                }
+            } else {
+                const msg = data.message || 'Mã giảm giá không hợp lệ hoặc không đủ điều kiện.';
+                showVoucherError(msg);
+                if (callbacks.onError) callbacks.onError(msg);
+            }
+        } catch (err) {
+            const msg = 'Lỗi kết nối khi áp dụng voucher. Vui lòng thử lại.';
+            showVoucherError(msg);
+            if (callbacks.onError) callbacks.onError(msg);
+        }
+    }
+
+    function removeVoucher() {
+        currentVoucher = null;
+        currentVoucherDiscount = 0;
+        tempSelectedVoucher = null;
+
+        document.getElementById('hiddenVoucherCode').value = '';
+        document.getElementById('quickVoucherInput').value = '';
+        document.getElementById('appliedVoucherBanner').classList.add('d-none');
+        document.getElementById('voucherQuickInputContainer').classList.remove('d-none');
+        document.getElementById('voucherDiscountRow').classList.add('d-none');
+        hideVoucherError();
+
+        recalculateGrandTotal();
+        if (window.showToast) window.showToast('Đã gỡ bỏ mã giảm giá.', 'info');
+    }
+
+    function showVoucherError(msg) {
+        const err = document.getElementById('voucherErrorMessage');
+        if (err) {
+            err.textContent = msg;
+            err.classList.remove('d-none');
+        }
+    }
+
+    function hideVoucherError() {
+        const err = document.getElementById('voucherErrorMessage');
+        if (err) {
+            err.textContent = '';
+            err.classList.add('d-none');
+        }
+    }
+
+    function checkVoucherCompatibilityWithPaymentMethod(paymentMethod) {
+        if (!currentVoucher) return;
+        // Re-validate voucher with new payment method
+        applyVoucherAjax(currentVoucher.code, {
+            onError: (msg) => {
+                alert(`Mã giảm giá ${currentVoucher.code} không áp dụng cho hình thức thanh toán vừa chọn (${msg}). Mã giảm giá đã được gỡ bỏ.`);
+                removeVoucher();
+            }
+        });
     }
 
     document.addEventListener('DOMContentLoaded', function () {

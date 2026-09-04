@@ -17,7 +17,8 @@ use Exception;
 class OrderService
 {
     public function __construct(
-        protected GhnShippingService $ghnService
+        protected GhnShippingService $ghnService,
+        protected VoucherService $voucherService
     ) {}
 
     /**
@@ -97,11 +98,35 @@ class OrderService
 
             $shippingFee = ($subtotal >= 500000 && $shippingMethod === 'standard') ? 0 : $baseShippingFee;
 
-            $discountAmount = 0.0;
-            $totalAmount = $subtotal + $shippingFee - $discountAmount;
-
-            // 3. Determine payment status based on payment method
+            // 3. Voucher calculation
             $paymentMethod = $orderData['payment_method'] ?? 'cod';
+            $voucherId = null;
+            $voucherCode = null;
+            $discountAmount = 0.0;
+            $appliedVoucher = null;
+
+            if (!empty($orderData['voucher_code'])) {
+                $voucherResult = $this->voucherService->validateVoucher(
+                    $orderData['voucher_code'],
+                    $subtotal,
+                    $shippingFee,
+                    $paymentMethod,
+                    $user
+                );
+
+                if ($voucherResult['success']) {
+                    $discountAmount = (float) $voucherResult['discount_amount'];
+                    $appliedVoucher = $voucherResult['voucher'];
+                    $voucherId = $appliedVoucher->id;
+                    $voucherCode = $appliedVoucher->code;
+                } else {
+                    throw new Exception($voucherResult['message']);
+                }
+            }
+
+            $totalAmount = max(0, $subtotal + $shippingFee - $discountAmount);
+
+            // 4. Determine payment status based on payment method
             $paymentStatus = Order::PAYMENT_PENDING;
             $paidAt = null;
 
@@ -111,7 +136,7 @@ class OrderService
                 $paidAt = now();
             }
 
-            // 4. Parse expected delivery from GHN if available
+            // 5. Parse expected delivery from GHN if available
             $expectedDeliveryAt = null;
             if (!empty($orderData['expected_delivery_at'])) {
                 try {
@@ -121,7 +146,7 @@ class OrderService
                 }
             }
 
-            // 5. Create Order
+            // 6. Create Order
             $order = Order::create([
                 'user_id'              => $user?->id,
                 'order_code'           => $this->generateOrderCode(),
@@ -137,11 +162,18 @@ class OrderService
                 'shipping_status'      => Order::STATUS_PENDING,
                 'subtotal'             => $subtotal,
                 'shipping_fee'         => $shippingFee,
+                'voucher_id'           => $voucherId,
+                'voucher_code'         => $voucherCode,
                 'discount_amount'      => $discountAmount,
                 'total_amount'         => $totalAmount,
                 'notes'                => $orderData['notes'] ?? null,
                 'paid_at'              => $paidAt,
             ]);
+
+            // Record voucher redemption log
+            if ($appliedVoucher && $discountAmount > 0) {
+                $this->voucherService->recordUsage($appliedVoucher, $order, $user, $discountAmount);
+            }
 
             // 6. Create Order Items and decrement stock
             foreach ($cartItems as $cartItem) {
@@ -336,6 +368,11 @@ class OrderService
                 if ($item->product_id) {
                     Product::where('id', $item->product_id)->increment('stock', $item->quantity);
                 }
+            }
+
+            // Restore voucher usage if applied
+            if ($order->voucher_id) {
+                $this->voucherService->restoreUsage($order);
             }
 
             // Determine payment status after cancellation

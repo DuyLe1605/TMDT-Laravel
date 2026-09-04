@@ -90,6 +90,22 @@
             </div>
         </a>
 
+        <!-- Vouchers & Promotion Module -->
+        <a href="{{ route('admin.vouchers.index') }}" class="sidebar-nav-link {{ request()->routeIs('admin.vouchers.*') ? 'active' : '' }}">
+            <div class="d-flex align-items-center">
+                <span class="sidebar-icon-box">
+                    <i data-lucide="ticket" style="width: 18px; height: 18px;"></i>
+                </span>
+                <span>Mã giảm giá (Voucher)</span>
+            </div>
+            @php
+                $activeVouchersCount = \App\Models\Voucher::active()->count();
+            @endphp
+            @if($activeVouchersCount > 0)
+                <span class="badge bg-success bg-opacity-20 text-success px-2 py-0.5 rounded-pill fw-bold" style="font-size: 0.72rem;">{{ $activeVouchersCount }} đang chạy</span>
+            @endif
+        </a>
+
         <!-- Section: System & Users -->
         <div class="sidebar-section-title mt-3">HỆ THỐNG & TÀI KHOẢN</div>
 

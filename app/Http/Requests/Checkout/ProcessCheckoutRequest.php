@@ -33,6 +33,7 @@ class ProcessCheckoutRequest extends FormRequest
             'to_ward_code' => ['nullable', 'string'],
             'expected_delivery_at' => ['nullable', 'string'],
             'payment_method' => ['required', 'in:cod,bank_transfer,momo'],
+            'voucher_code' => ['nullable', 'string', 'max:50'],
             'notes' => ['nullable', 'string', 'max:1000'],
         ];
     }

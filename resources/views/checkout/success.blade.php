@@ -118,6 +118,15 @@
                             <span>Phí vận chuyển:</span>
                             <span class="fw-bold text-dark">{{ $order->formatted_shipping_fee }}</span>
                         </div>
+                        @if ($order->discount_amount > 0 || $order->voucher_code)
+                            <div class="d-flex justify-content-between text-success">
+                                <span class="d-flex align-items-center gap-1">
+                                    <i data-lucide="ticket" style="width: 14px; height: 14px;"></i>
+                                    <span>Voucher ưu đãi {{ $order->voucher_code ? "({$order->voucher_code})" : '' }}:</span>
+                                </span>
+                                <span class="fw-bold">-{{ number_format($order->discount_amount, 0, ',', '.') }} ₫</span>
+                            </div>
+                        @endif
                         <div class="d-flex justify-content-between align-items-baseline pt-2 border-top">
                             <span class="fw-bold text-dark fs-6">Tổng thanh toán:</span>
                             <span class="fw-extrabold text-primary fs-5">{{ $order->formatted_total_amount }}</span>

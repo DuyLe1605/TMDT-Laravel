@@ -48,6 +48,8 @@ class Order extends Model
         'shipping_status',
         'subtotal',
         'shipping_fee',
+        'voucher_id',
+        'voucher_code',
         'discount_amount',
         'total_amount',
         'notes',
@@ -58,6 +60,7 @@ class Order extends Model
 
     protected $casts = [
         'user_id'               => 'integer',
+        'voucher_id'            => 'integer',
         'to_district_id'        => 'integer',
         'total_weight'          => 'integer',
         'subtotal'              => 'decimal:2',
@@ -89,6 +92,11 @@ class Order extends Model
     public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function voucher(): BelongsTo
+    {
+        return $this->belongsTo(Voucher::class);
     }
 
     // =========================================================================

@@ -352,9 +352,15 @@
                     <span>Phí vận chuyển GHN:</span>
                     <span class="fw-bold text-dark">{{ $order->formatted_shipping_fee }}</span>
                 </div>
-                @if ($order->discount_amount > 0)
-                    <div class="d-flex justify-content-between text-success">
-                        <span>Giảm giá:</span>
+                @if ($order->discount_amount > 0 || $order->voucher_code)
+                    <div class="d-flex justify-content-between text-success align-items-center">
+                        <span class="d-flex align-items-center gap-1">
+                            <i data-lucide="ticket" style="width: 14px; height: 14px;"></i>
+                            <span>Voucher ưu đãi:</span>
+                            @if($order->voucher_code)
+                                <span class="badge bg-success-subtle text-success border border-success-subtle px-1.5 py-0.5 font-monospace fw-bold">{{ $order->voucher_code }}</span>
+                            @endif
+                        </span>
                         <span class="fw-bold">-{{ number_format($order->discount_amount, 0, ',', '.') }} ₫</span>
                     </div>
                 @endif
