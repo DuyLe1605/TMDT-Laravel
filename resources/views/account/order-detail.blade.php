@@ -162,7 +162,7 @@
                             <i data-lucide="truck" class="text-primary" style="width: 20px; height: 20px;"></i>
                             <h6 class="fw-bold text-dark mb-0">Theo Dõi Vận Chuyển GHN</h6>
                         </div>
-                        <a href="https://donhang.ghn.vn/?order_code={{ $order->ghn_order_code }}" target="_blank" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1">
+                        <a href="{{ route('account.orders.track_ghn', $order) }}" target="_blank" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1">
                             <span>Tra cứu trên GHN</span>
                             <i data-lucide="external-link" style="width: 13px; height: 13px;"></i>
                         </a>

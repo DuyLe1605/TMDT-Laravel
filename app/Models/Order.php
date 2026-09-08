@@ -248,6 +248,28 @@ class Order extends Model
     // =========================================================================
 
     /**
+     * Dynamic GHN tracking URL configured via .env (GHN_TRACKING_URL).
+     */
+    public function getGhnTrackingUrlAttribute(): string
+    {
+        $baseUrl = config('services.ghn.tracking_url', 'https://5sao.ghn.dev/order');
+
+        if (empty($this->ghn_order_code)) {
+            return $baseUrl;
+        }
+
+        if (str_contains($baseUrl, '{order_code}')) {
+            return str_replace('{order_code}', (string) $this->ghn_order_code, $baseUrl);
+        }
+
+        if (str_ends_with($baseUrl, '=') || str_contains($baseUrl, 'order_code=')) {
+            return $baseUrl . $this->ghn_order_code;
+        }
+
+        return $baseUrl;
+    }
+
+    /**
      * Formatted total amount string.
      */
     public function getFormattedTotalAmountAttribute(): string

@@ -360,6 +360,24 @@ Hoặc tra cứu bằng mã nội bộ của website:
 * **Endpoint:** `/v2/shift/date`
 * **Mục đích:** Biết shipper sẽ đến lấy hàng vào buổi sáng hay buổi chiều.
 
+#### 3.6. Lấy Token & Đường dẫn Tra cứu bưu tá (Order Tracking URL)
+* **Method:** `POST` hoặc `GET`
+* **Endpoint:** `/v2/order-tracking/gen-token`
+* **Payload Request / Query:** `{"order_code": "L8KP9G"}`
+* **Response Mẫu (200 OK):**
+```json
+{
+  "code": 200,
+  "message": "Success",
+  "data": {
+    "token": "763bbd5c-a83c-11f1-bfaf-c26b7d65c1ea"
+  }
+}
+```
+* **Cổng hiển thị chi tiết hành trình GHN:**
+  * Môi trường Test (Dev): `https://tracking.ghn.dev/verify?token={token}&order_code={order_code}`
+  * Môi trường Thật (Prod): `https://donhang.ghn.vn/?order_code={order_code}`
+
 ---
 
 ### NHÓM 4: CỬA HÀNG & BƯU CỤC (STORE & STATION)

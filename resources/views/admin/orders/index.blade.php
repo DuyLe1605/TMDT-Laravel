@@ -243,7 +243,7 @@
                                 </a>
                                 @if ($order->ghn_order_code)
                                     <div class="mt-1">
-                                        <a href="https://donhang.ghn.vn/?order_code={{ $order->ghn_order_code }}" target="_blank" class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle d-inline-flex align-items-center gap-1 text-decoration-none" style="font-size: 0.7rem;" title="Nhấn để tra cứu hành trình trên GHN Portal">
+                                        <a href="{{ route('admin.orders.track_ghn', $order) }}" target="_blank" class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle d-inline-flex align-items-center gap-1 text-decoration-none" style="font-size: 0.7rem;" title="Nhấn để tra cứu hành trình trên GHN Portal">
                                             <i data-lucide="truck" style="width: 11px; height: 11px;"></i>
                                             <span>{{ $order->ghn_order_code }}</span>
                                             <i data-lucide="external-link" style="width: 9px; height: 9px;"></i>
@@ -362,7 +362,7 @@
 
                                     <!-- Quick GHN Link & Print Label if has GHN code -->
                                     @if ($order->isGhnOrder())
-                                        <a href="https://donhang.ghn.vn/?order_code={{ $order->ghn_order_code }}" target="_blank" class="btn btn-sm btn-surface p-1.5 px-2 text-primary" title="Tra cứu trên GHN Portal">
+                                        <a href="{{ route('admin.orders.track_ghn', $order) }}" target="_blank" class="btn btn-sm btn-surface p-1.5 px-2 text-primary" title="Tra cứu trên GHN Portal">
                                             <i data-lucide="external-link" style="width: 15px; height: 15px;"></i>
                                         </a>
                                         <a href="{{ route('admin.orders.print_label', $order) }}" target="_blank" class="btn btn-sm btn-surface p-1.5 px-2" title="In vận đơn GHN (A5)">

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Services\AddressService;
 use App\Services\OrderService;
+use App\Services\Shipping\GhnShippingService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -130,5 +131,22 @@ class AccountController extends Controller
         $addresses = $this->addressService->getUserAddresses(Auth::id());
 
         return view('account.addresses', compact('addresses'));
+    }
+
+    /**
+     * Customer: Track GHN shipping timeline and detail.
+     */
+    public function trackGhnOrder(Order $order, GhnShippingService $ghnService): RedirectResponse
+    {
+        if ($order->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        if (!$order->isGhnOrder()) {
+            return redirect()->back()->with('error', 'Đơn hàng chưa được gửi sang GHN, chưa có mã vận đơn để tra cứu.');
+        }
+
+        $trackingUrl = $ghnService->getTrackingUrl($order->ghn_order_code);
+        return redirect()->away($trackingUrl);
     }
 }

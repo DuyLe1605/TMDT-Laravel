@@ -42,6 +42,7 @@ return [
         'origin_province_id' => (int) env('GHN_ORIGIN_PROVINCE_ID', 201),
         'origin_district_id' => (int) env('GHN_ORIGIN_DISTRICT_ID', 1492),
         'origin_ward_code' => (string) env('GHN_ORIGIN_WARD_CODE', '1A0501'),
+        'tracking_url' => env('GHN_TRACKING_URL', 'https://5sao.ghn.dev/order'),
     ],
 
 ];

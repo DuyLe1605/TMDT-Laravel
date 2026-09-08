@@ -143,7 +143,7 @@
                                 </div>
                                 <div class="d-flex flex-wrap align-items-center gap-2">
                                     @if ($order->ghn_order_code)
-                                        <a href="https://donhang.ghn.vn/?order_code={{ $order->ghn_order_code }}" target="_blank" class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle d-inline-flex align-items-center gap-1 small text-decoration-none" title="Nhấn để tra cứu trên GHN Portal">
+                                        <a href="{{ route('account.orders.track_ghn', $order) }}" target="_blank" class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle d-inline-flex align-items-center gap-1 small text-decoration-none" title="Nhấn để tra cứu trên GHN Portal">
                                             <i data-lucide="truck" style="width: 12px; height: 12px;"></i>
                                             <span>GHN: {{ $order->ghn_order_code }}</span>
                                             <i data-lucide="external-link" style="width: 10px; height: 10px;"></i>
@@ -171,7 +171,7 @@
                                                 Dự kiến giao: {{ $order->expected_delivery_at->format('d/m/Y') }}
                                             </div>
                                         @endif
-                                        <a href="https://donhang.ghn.vn/?order_code={{ $order->ghn_order_code }}" target="_blank" class="btn btn-sm btn-primary py-0.5 px-2.5 d-inline-flex align-items-center gap-1" style="font-size: 0.76rem;">
+                                        <a href="{{ route('account.orders.track_ghn', $order) }}" target="_blank" class="btn btn-sm btn-primary py-0.5 px-2.5 d-inline-flex align-items-center gap-1" style="font-size: 0.76rem;">
                                             <span>Tra cứu bưu tá GHN</span>
                                             <i data-lucide="external-link" style="width: 11px; height: 11px;"></i>
                                         </a>

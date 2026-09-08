@@ -578,6 +578,60 @@ class GhnShippingService
     }
 
     /**
+     * Generate GHN Tracking Token from /v2/order-tracking/gen-token.
+     */
+    public function getTrackingToken(string $ghnOrderCode): ?string
+    {
+        try {
+            if (empty($this->apiToken)) {
+                return null;
+            }
+
+            $response = Http::withHeaders([
+                'Token' => $this->apiToken,
+                'ShopId' => (string) $this->shopId,
+                'Content-Type' => 'application/json',
+            ])->timeout(5)->post("{$this->apiUrl}/v2/order-tracking/gen-token", [
+                'order_code' => $ghnOrderCode,
+            ]);
+
+            if ($response->successful()) {
+                $json = $response->json();
+                if (($json['code'] ?? 0) === 200 && !empty($json['data']['token'])) {
+                    return $json['data']['token'];
+                }
+            }
+
+            return null;
+        } catch (Exception $e) {
+            Log::warning("GHN getTrackingToken error: {$e->getMessage()}");
+            return null;
+        }
+    }
+
+    /**
+     * Get real GHN tracking URL.
+     * In Sandbox/Dev: calls /v2/order-tracking/gen-token and redirects to https://tracking.ghn.dev/verify?token=...&order_code=...
+     * In Production: redirects to https://donhang.ghn.vn/?order_code=...
+     */
+    public function getTrackingUrl(string $ghnOrderCode): string
+    {
+        $customConfig = config('services.ghn.tracking_url');
+        if (!empty($customConfig) && str_contains($customConfig, 'donhang.ghn.vn')) {
+            return "https://donhang.ghn.vn/?order_code={$ghnOrderCode}";
+        }
+
+        // On Dev / Sandbox:
+        $trackingToken = $this->getTrackingToken($ghnOrderCode);
+        if ($trackingToken) {
+            return "https://tracking.ghn.dev/verify?token={$trackingToken}&order_code={$ghnOrderCode}";
+        }
+
+        // Fallback:
+        return "https://5sao.ghn.dev/order";
+    }
+
+    /**
      * Map GHN webhook status to internal shipping_status.
      */
     public static function mapGhnStatusToInternal(string $ghnStatus): string

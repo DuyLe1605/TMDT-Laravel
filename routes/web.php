@@ -148,6 +148,8 @@ Route::middleware('auth')->group(function () {
             ->name('orders');
         Route::get(RouteConstants::PATH_ACCOUNT_ORDER_SHOW, [AccountController::class, 'orderDetail'])
             ->name('orders.show');
+        Route::get('/orders/{order}/track-ghn', [AccountController::class, 'trackGhnOrder'])
+            ->name('orders.track_ghn');
         Route::post('/orders/{order}/cancel', [AccountController::class, 'cancelOrder'])
             ->name('orders.cancel');
         Route::post('/orders/{order}/reorder', [AccountController::class, 'reorder'])
@@ -187,6 +189,7 @@ Route::middleware(['auth', 'admin'])->prefix(RouteConstants::PREFIX_ADMIN)->name
         Route::post('/{order}/send-ghn', [AdminOrderController::class, 'sendToGhn'])->name('send_ghn');
         Route::post('/{order}/cancel', [AdminOrderController::class, 'cancelOrder'])->name('cancel');
         Route::get('/{order}/print-label', [AdminOrderController::class, 'printLabel'])->name('print_label');
+        Route::get('/{order}/track-ghn', [AdminOrderController::class, 'trackOrder'])->name('track_ghn');
     });
 
     // Admin Voucher Management

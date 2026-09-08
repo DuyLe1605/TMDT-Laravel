@@ -135,7 +135,7 @@
 
                 @if ($order->ghn_order_code)
                     <div class="d-flex align-items-center gap-2">
-                        <a href="https://donhang.ghn.vn/?order_code={{ $order->ghn_order_code }}" target="_blank" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1">
+                        <a href="{{ route('admin.orders.track_ghn', $order) }}" target="_blank" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1">
                             <i data-lucide="external-link" style="width: 14px; height: 14px;"></i>
                             <span>Tra cứu trên GHN Portal</span>
                         </a>

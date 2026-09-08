@@ -157,4 +157,17 @@ class AdminOrderController extends Controller
 
         return redirect()->away($printUrl);
     }
+
+    /**
+     * Admin: Track GHN shipping timeline and detail.
+     */
+    public function trackOrder(Order $order): RedirectResponse
+    {
+        if (!$order->isGhnOrder()) {
+            return redirect()->back()->with('error', 'Đơn hàng chưa được gửi sang GHN, chưa có mã vận đơn để tra cứu.');
+        }
+
+        $trackingUrl = $this->ghnService->getTrackingUrl($order->ghn_order_code);
+        return redirect()->away($trackingUrl);
+    }
 }
