@@ -28,6 +28,8 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\CoinController;
 use App\Http\Controllers\Admin\AdminReviewController;
 
+use App\Http\Controllers\MomoPaymentController;
+
 // =============================================================================
 // PUBLIC STOREFRONT ROUTES
 // =============================================================================
@@ -203,8 +205,47 @@ Route::middleware(['auth', 'admin'])->prefix(RouteConstants::PREFIX_ADMIN)->name
 });
 
 // =============================================================================
-// WEBHOOK ROUTES — No CSRF, public endpoint for GHN callbacks
+// MOMO PAYMENT ROUTES
+// =============================================================================
+
+// MoMo redirect callback (user returns from MoMo payment page)
+Route::get('/payment/momo/callback', [MomoPaymentController::class, 'callback'])
+    ->name('payment.momo.callback');
+Route::get('/user/payment/momo/callback', [MomoPaymentController::class, 'callback'])
+    ->name('user.payment.momo.callback');
+
+// MoMo query transaction status (authenticated users)
+Route::post('/payment/momo/query/{order}', [MomoPaymentController::class, 'queryStatus'])
+    ->name('payment.momo.query')
+    ->middleware('auth');
+
+// MoMo Pay Again & Start payment for existing orders (User must be logged in)
+Route::middleware('auth')->group(function () {
+    Route::get('/orders/{order}/pay/momo', [MomoPaymentController::class, 'payAgain'])
+        ->name('orders.momo.pay');
+    Route::get('/user/orders/{order}/pay/momo', [MomoPaymentController::class, 'payAgain'])
+        ->name('user.orders.momo.pay');
+    Route::get('/orders/{order}/start-momo', [MomoPaymentController::class, 'start'])
+        ->name('orders.momo.start');
+    Route::get('/user/orders/{order}/start-momo', [MomoPaymentController::class, 'start'])
+        ->name('user.orders.momo.start');
+});
+
+// =============================================================================
+// WEBHOOK & IPN ROUTES — No CSRF, public endpoint for GHN & MoMo
 // =============================================================================
 Route::post('/webhook/ghn', [WebhookController::class, 'ghnCallback'])
     ->name('webhook.ghn')
+    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+
+Route::post('/ghn/webhook', [WebhookController::class, 'ghnCallback'])
+    ->name('ghn.webhook')
+    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+
+Route::post('/webhook/momo', [MomoPaymentController::class, 'ipn'])
+    ->name('webhook.momo')
+    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+
+Route::post('/payment/momo/ipn', [MomoPaymentController::class, 'ipn'])
+    ->name('payment.momo.ipn')
     ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);

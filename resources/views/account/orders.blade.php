@@ -256,6 +256,14 @@
                                         @endif
                                     @endif
 
+                                    <!-- Retry MoMo Payment button if pending -->
+                                    @if ($order->canPayAgain())
+                                        <a href="{{ route('orders.momo.pay', $order) }}" class="btn btn-sm text-white fw-semibold d-inline-flex align-items-center gap-1 shadow-sm" style="background: #a50064; border-color: #a50064;" title="Thanh toán lại đơn hàng này qua cổng MoMo">
+                                            <i data-lucide="credit-card" style="width: 13px; height: 13px;"></i>
+                                            <span>Thanh toán lại</span>
+                                        </a>
+                                    @endif
+
                                     <!-- Detail button -->
                                     <a href="{{ route('account.orders.show', $order) }}" class="btn btn-sm btn-surface text-decoration-none fw-semibold">
                                         <span>Xem chi tiết</span>

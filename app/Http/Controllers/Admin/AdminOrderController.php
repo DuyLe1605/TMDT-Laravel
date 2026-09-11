@@ -66,7 +66,7 @@ class AdminOrderController extends Controller
      */
     public function show(Order $order): View
     {
-        $order->load(['items.product', 'items.variant', 'user']);
+        $order->load(['items.product', 'items.variant', 'user', 'paymentTransactions']);
 
         // Fetch GHN detail if order has been sent
         $ghnDetail = null;

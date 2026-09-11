@@ -338,6 +338,35 @@
                 </div>
 
                 <div class="d-flex flex-column gap-2 pt-2 border-top">
+                    <!-- Retry MoMo Payment if pending -->
+                    @if ($order->canPayAgain())
+                        <div class="p-3 rounded-3 mb-2 border text-center" style="background: rgba(165, 0, 100, 0.05); border-color: rgba(165, 0, 100, 0.25) !important;">
+                            <div class="fw-bold small mb-1" style="color: #a50064;">
+                                <i data-lucide="alert-circle" style="width: 15px; height: 15px; display: inline-block; vertical-align: text-bottom;"></i>
+                                Đơn hàng chưa thanh toán MoMo
+                            </div>
+                            <p class="text-secondary small mb-2" style="font-size: 0.76rem;">
+                                Chọn một trong các kênh thanh toán MoMo dưới đây để hoàn tất đơn hàng:
+                            </p>
+                            <div class="d-flex flex-column gap-1.5">
+                                <a href="{{ route('orders.momo.pay', [$order, 'method' => 'payWithATM']) }}" class="btn btn-sm text-white fw-bold w-100 py-1.5 d-flex align-items-center justify-content-center gap-1.5 shadow-sm" style="background: #a50064; border-color: #a50064;">
+                                    <i data-lucide="credit-card" style="width: 14px; height: 14px;"></i>
+                                    <span>Thẻ ATM Nội Địa (Napas)</span>
+                                </a>
+                                <div class="d-flex gap-1.5">
+                                    <a href="{{ route('orders.momo.pay', [$order, 'method' => 'captureWallet']) }}" class="btn btn-sm btn-outline-danger fw-semibold w-50 py-1.5 d-flex align-items-center justify-content-center gap-1" style="color: #a50064; border-color: #a50064; font-size: 0.75rem;">
+                                        <i data-lucide="qr-code" style="width: 13px; height: 13px;"></i>
+                                        <span>Quét Mã QR</span>
+                                    </a>
+                                    <a href="{{ route('orders.momo.pay', [$order, 'method' => 'payWithCC']) }}" class="btn btn-sm btn-outline-success fw-semibold w-50 py-1.5 d-flex align-items-center justify-content-center gap-1" style="font-size: 0.75rem;">
+                                        <i data-lucide="globe" style="width: 13px; height: 13px;"></i>
+                                        <span>Thẻ Quốc Tế</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
                     <!-- Review incentive in summary card if delivered -->
                     @if ($order->shipping_status === 'delivered')
                         @php

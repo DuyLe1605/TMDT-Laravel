@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Services\AddressService;
 use App\Services\CartService;
 use App\Services\OrderService;
+use App\Services\Payment\MomoPaymentService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,7 +20,8 @@ class CheckoutController extends Controller
     public function __construct(
         protected CartService $cartService,
         protected AddressService $addressService,
-        protected OrderService $orderService
+        protected OrderService $orderService,
+        protected MomoPaymentService $momoService
     ) {}
 
     /**
@@ -68,6 +70,7 @@ class CheckoutController extends Controller
 
     /**
      * Process checkout and create order.
+     * If payment method is MoMo, redirect to MoMo payment page.
      */
     public function process(ProcessCheckoutRequest $request): RedirectResponse
     {
@@ -84,6 +87,21 @@ class CheckoutController extends Controller
                 $selectedItems,
                 Auth::user()
             );
+
+            // If payment method is MoMo: create MoMo payment and redirect to MoMo
+            if ($order->payment_method === 'momo') {
+                $order->load('items');
+                $momoMethod = $request->input('momo_method'); // captureWallet, payWithATM, payWithCC
+                $momoResult = $this->momoService->createPayment($order, $momoMethod);
+
+                if ($momoResult['success'] && !empty($momoResult['payUrl'])) {
+                    return redirect()->away($momoResult['payUrl']);
+                }
+
+                // MoMo payment creation failed: redirect to success page with warning
+                return redirect()->route('checkout.success', $order->order_code)
+                    ->with('warning', 'Không thể kết nối MoMo lúc này. Đơn hàng đã được tạo, vui lòng thử thanh toán lại.');
+            }
 
             return redirect()->route('checkout.success', $order->order_code)
                 ->with('success', "Đặt hàng thành công! Mã đơn hàng của bạn là {$order->order_code}.");

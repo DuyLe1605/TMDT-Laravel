@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Builder;
 
 class Order extends Model
@@ -108,6 +109,22 @@ class Order extends Model
         return $this->hasMany(Review::class);
     }
 
+    /**
+     * Get all payment transactions for the order.
+     */
+    public function paymentTransactions(): HasMany
+    {
+        return $this->hasMany(PaymentTransaction::class);
+    }
+
+    /**
+     * Get the latest payment transaction for the order.
+     */
+    public function latestPaymentTransaction(): HasOne
+    {
+        return $this->hasOne(PaymentTransaction::class)->latestOfMany();
+    }
+
     // =========================================================================
     // SCOPE QUERIES (for filtering/searching)
     // =========================================================================
@@ -200,12 +217,23 @@ class Order extends Model
 
     /**
      * Check if order can be sent to GHN for delivery.
-     * Must be 'processing' and NOT already sent.
+     * Can be sent if pending or processing, and NOT already sent to GHN.
      */
     public function canBeSentToGhn(): bool
     {
-        return $this->shipping_status === self::STATUS_PROCESSING
+        return in_array($this->shipping_status, [self::STATUS_PENDING, self::STATUS_PROCESSING])
             && empty($this->ghn_order_code);
+    }
+
+    /**
+     * Check if customer can pay again via online gateway (e.g. MoMo).
+     * Order must be MoMo, payment pending, and not cancelled.
+     */
+    public function canPayAgain(): bool
+    {
+        return $this->payment_method === 'momo'
+            && $this->payment_status === self::PAYMENT_PENDING
+            && $this->shipping_status !== self::STATUS_CANCELLED;
     }
 
     /**

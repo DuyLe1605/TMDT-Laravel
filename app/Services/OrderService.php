@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\PaymentTransaction;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\User;
@@ -183,6 +184,20 @@ class OrderService
                 'notes'                 => $orderData['notes'] ?? null,
                 'paid_at'               => $paidAt,
             ]);
+
+            // Create initial PaymentTransaction record for COD
+            if ($paymentMethod === 'cod') {
+                PaymentTransaction::create([
+                    'order_id'         => $order->id,
+                    'gateway'          => PaymentTransaction::GATEWAY_COD,
+                    'transaction_type' => PaymentTransaction::TYPE_PAYMENT,
+                    'request_id'       => 'COD-' . $order->order_code . '-' . time(),
+                    'momo_order_id'    => 'COD-' . $order->order_code,
+                    'amount'           => (int) $totalAmount,
+                    'status'           => PaymentTransaction::STATUS_PENDING,
+                    'message'          => 'Thanh toán khi nhận hàng (COD)',
+                ]);
+            }
 
             // Record voucher redemption log
             if ($appliedVoucher && $discountAmount > 0) {

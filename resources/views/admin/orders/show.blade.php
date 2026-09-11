@@ -461,6 +461,69 @@
             @endif
         </div>
 
+        {{-- Payment Transactions History (MoMo / Online Payments) --}}
+        @if ($order->paymentTransactions->count() > 0)
+            <div class="card-modern p-4 mb-4 shadow-sm border">
+                <h6 class="fw-bold text-dark mb-3 pb-2 border-bottom d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center gap-2">
+                        <i data-lucide="receipt" class="text-primary" style="width: 18px; height: 18px;"></i>
+                        <span>Lịch Sử Thanh Toán Online</span>
+                    </div>
+                    @if ($order->payment_method === 'momo')
+                        <button type="button" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1" id="btnQueryMomo" onclick="queryMomoStatus({{ $order->id }})">
+                            <i data-lucide="refresh-cw" style="width: 13px; height: 13px;"></i>
+                            <span>Kiểm tra MoMo</span>
+                        </button>
+                    @endif
+                </h6>
+
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle mb-0 small">
+                        <thead class="bg-light-subtle text-secondary">
+                            <tr>
+                                <th class="ps-2 py-2">Thời gian</th>
+                                <th class="py-2">Gateway</th>
+                                <th class="py-2">Request ID</th>
+                                <th class="py-2 text-center">Số tiền</th>
+                                <th class="py-2 text-center">Trạng thái</th>
+                                <th class="py-2">MoMo Trans ID</th>
+                                <th class="py-2">Loại TT</th>
+                                <th class="pe-2 py-2">Ghi chú</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($order->paymentTransactions->sortByDesc('created_at') as $txn)
+                                <tr>
+                                    <td class="ps-2 py-2 text-nowrap">{{ $txn->created_at->format('d/m/Y H:i') }}</td>
+                                    <td class="py-2">
+                                        <span class="badge bg-secondary-subtle text-secondary border px-2">{{ $txn->gateway_label }}</span>
+                                    </td>
+                                    <td class="py-2 font-monospace text-truncate" style="max-width: 140px;" title="{{ $txn->request_id }}">
+                                        {{ Str::limit($txn->request_id, 20) }}
+                                    </td>
+                                    <td class="py-2 text-center fw-bold">{{ $txn->formatted_amount }}</td>
+                                    <td class="py-2 text-center">
+                                        <span class="badge {{ $txn->status_badge['class'] }} px-2">
+                                            {{ $txn->status_badge['label'] }}
+                                        </span>
+                                    </td>
+                                    <td class="py-2 font-monospace">
+                                        {{ $txn->momo_trans_id ?? '—' }}
+                                    </td>
+                                    <td class="py-2">{{ $txn->pay_type_label }}</td>
+                                    <td class="pe-2 py-2 text-truncate" style="max-width: 160px;" title="{{ $txn->message }}">
+                                        {{ $txn->message ?? '—' }}
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="momoQueryResult" class="mt-3" style="display: none;"></div>
+            </div>
+        @endif
+
         <!-- Cancellation Details Card (if cancelled) -->
         @if ($order->shipping_status === 'cancelled')
             <div class="card-modern p-4 shadow-sm border border-danger-subtle bg-danger-subtle bg-opacity-25">
@@ -532,4 +595,61 @@
         </div>
     </div>
 @endif
+@endsection
+
+@section('scripts')
+<script>
+    function queryMomoStatus(orderId) {
+        const btn = document.getElementById('btnQueryMomo');
+        const resultDiv = document.getElementById('momoQueryResult');
+
+        if (!btn || !resultDiv) return;
+
+        btn.disabled = true;
+        btn.innerHTML = '<i data-lucide="loader" style="width: 13px; height: 13px;" class="spin"></i> <span>Đang kiểm tra...</span>';
+
+        fetch(`/payment/momo/query/${orderId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                'Accept': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            resultDiv.style.display = 'block';
+
+            if (data.success && data.resultCode === 0) {
+                resultDiv.innerHTML = `
+                    <div class="alert alert-success py-2 px-3 small mb-0 d-flex align-items-center gap-2">
+                        <i data-lucide="check-circle" style="width: 16px; height: 16px;"></i>
+                        <span><strong>MoMo xác nhận:</strong> ${data.message}. Trang sẽ tải lại...</span>
+                    </div>`;
+                setTimeout(() => window.location.reload(), 1500);
+            } else {
+                resultDiv.innerHTML = `
+                    <div class="alert alert-warning py-2 px-3 small mb-0 d-flex align-items-center gap-2">
+                        <i data-lucide="alert-triangle" style="width: 16px; height: 16px;"></i>
+                        <span><strong>Kết quả:</strong> ${data.message} (resultCode: ${data.resultCode ?? 'N/A'})</span>
+                    </div>`;
+            }
+
+            // Re-initialize Lucide icons in the new content
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        })
+        .catch(error => {
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `
+                <div class="alert alert-danger py-2 px-3 small mb-0">
+                    <strong>Lỗi:</strong> Không thể kết nối. ${error.message}
+                </div>`;
+        })
+        .finally(() => {
+            btn.disabled = false;
+            btn.innerHTML = '<i data-lucide="refresh-cw" style="width: 13px; height: 13px;"></i> <span>Kiểm tra MoMo</span>';
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        });
+    }
+</script>
 @endsection
