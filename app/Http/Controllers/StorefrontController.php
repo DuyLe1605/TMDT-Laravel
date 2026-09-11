@@ -173,4 +173,58 @@ class StorefrontController extends Controller
 
         return view('storefront.show', compact('product', 'relatedProducts', 'reviewSummary', 'reviews'));
     }
+
+    /**
+     * Lấy dữ liệu nhanh của sản phẩm (bao gồm thuộc tính và các biến thể) cho Quick Add Modal.
+     */
+    public function quickData(Product $product): \Illuminate\Http\JsonResponse
+    {
+        $product->load([
+            'category:id,name',
+            'attributes.values',
+            'variants' => function ($q) {
+                $q->where('is_active', true);
+            }
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'product' => [
+                'id' => $product->id,
+                'name' => $product->name,
+                'slug' => $product->slug,
+                'image' => $product->image,
+                'price' => (float) $product->price,
+                'sale_price' => $product->sale_price ? (float) $product->sale_price : null,
+                'effective_price' => (float) ($product->sale_price ?? $product->price),
+                'has_discount' => $product->has_discount,
+                'has_variants' => (bool) $product->has_variants,
+                'stock' => (int) $product->stock,
+                'category_name' => $product->category?->name ?? 'Túi xách',
+                'detail_url' => route('shop.show', $product),
+                'attributes' => $product->attributes->map(function ($attr) {
+                    return [
+                        'id' => $attr->id,
+                        'name' => $attr->name,
+                        'values' => $attr->values->pluck('value')->values(),
+                    ];
+                }),
+                'variants' => $product->variants->map(function ($v) {
+                    return [
+                        'id' => $v->id,
+                        'sku' => $v->sku,
+                        'variant_title' => $v->variant_title,
+                        'price' => (float) $v->price,
+                        'sale_price' => $v->sale_price ? (float) $v->sale_price : null,
+                        'effective_price' => (float) ($v->sale_price ?? $v->price),
+                        'stock' => (int) $v->stock,
+                        'image' => $v->image,
+                        'option1_value' => $v->option1_value,
+                        'option2_value' => $v->option2_value,
+                        'option3_value' => $v->option3_value,
+                    ];
+                }),
+            ],
+        ]);
+    }
 }

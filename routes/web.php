@@ -45,6 +45,9 @@ Route::get(RouteConstants::PATH_SHOP_SHOW, [StorefrontController::class, 'show']
 Route::get('/products/{product}/reviews', [ReviewController::class, 'getReviewsJson'])
     ->name('products.reviews.filter');
 
+Route::get('/products/{product}/quick-data', [StorefrontController::class, 'quickData'])
+    ->name('products.quick-data');
+
 // =============================================================================
 // CART ROUTES (Khách vãng lai & Thành viên)
 // =============================================================================

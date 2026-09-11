@@ -268,7 +268,7 @@
                                         <button 
                                             type="button" 
                                             class="btn-card-action" 
-                                            title="Thêm vào giỏ hàng" 
+                                            title="{{ $product->has_variants ? 'Chọn phân loại & thêm nhanh' : 'Thêm vào giỏ hàng' }}" 
                                             onclick="openQuickAddModal({
                                                 id: {{ $product->id }},
                                                 name: '{{ addslashes($product->name) }}',
@@ -276,10 +276,13 @@
                                                 original_price: {{ $product->has_discount ? (float) $product->price : 'null' }},
                                                 image: '{{ $product->image ?? '' }}',
                                                 category_name: '{{ addslashes($product->category?->name ?? 'Túi xách') }}',
-                                                stock: {{ $product->stock }}
+                                                stock: {{ $product->stock }},
+                                                sku: '{{ $product->sku }}',
+                                                has_variants: {{ $product->has_variants ? 'true' : 'false' }},
+                                                detail_url: '{{ route('shop.show', $product) }}'
                                             })"
                                         >
-                                            <i data-lucide="shopping-bag" style="width: 16px; height: 16px;"></i>
+                                            <i data-lucide="{{ $product->has_variants ? 'layers' : 'shopping-bag' }}" style="width: 16px; height: 16px;"></i>
                                         </button>
                                         <a href="{{ route('shop.show', $product) }}" class="btn-card-action" title="Xem chi tiết sản phẩm">
                                             <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
