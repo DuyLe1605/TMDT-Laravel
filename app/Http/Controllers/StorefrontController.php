@@ -8,7 +8,9 @@ use App\Services\BrandService;
 use App\Services\CategoryService;
 use App\Services\ProductService;
 use App\Services\ReviewService;
+use App\Services\WishlistService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class StorefrontController extends Controller
@@ -20,7 +22,8 @@ class StorefrontController extends Controller
         protected ProductService $productService,
         protected CategoryService $categoryService,
         protected BrandService $brandService,
-        protected ReviewService $reviewService
+        protected ReviewService $reviewService,
+        protected WishlistService $wishlistService
     ) {}
 
     /**
@@ -43,8 +46,9 @@ class StorefrontController extends Controller
 
         $categories = $this->categoryService->getCategoryTree();
         $brands = $this->brandService->getAllActiveBrands();
+        $wishlistedIds = Auth::check() ? $this->wishlistService->getWishlistedProductIds(Auth::id()) : [];
 
-        return view('storefront.index', compact('featuredProducts', 'latestProducts', 'categories', 'brands'));
+        return view('storefront.index', compact('featuredProducts', 'latestProducts', 'categories', 'brands', 'wishlistedIds'));
     }
 
     /**
@@ -120,6 +124,7 @@ class StorefrontController extends Controller
         $products = $query->paginate(12)->withQueryString();
         $categories = $this->categoryService->getAllCategories();
         $brands = $this->brandService->getAllActiveBrands();
+        $wishlistedIds = Auth::check() ? $this->wishlistService->getWishlistedProductIds(Auth::id()) : [];
 
         return view('storefront.shop', compact(
             'products', 
@@ -131,7 +136,8 @@ class StorefrontController extends Controller
             'sort',
             'minPrice',
             'maxPrice',
-            'inStock'
+            'inStock',
+            'wishlistedIds'
         ));
     }
 
@@ -170,8 +176,9 @@ class StorefrontController extends Controller
         // Đánh giá sản phẩm và tổng hợp số sao (Shopee-style)
         $reviewSummary = $this->reviewService->getProductReviewsSummary($product);
         $reviews = $this->reviewService->getFilteredReviews($product, [], 5);
+        $isWishlisted = Auth::check() ? $this->wishlistService->isWishlisted(Auth::id(), $product->id) : false;
 
-        return view('storefront.show', compact('product', 'relatedProducts', 'reviewSummary', 'reviews'));
+        return view('storefront.show', compact('product', 'relatedProducts', 'reviewSummary', 'reviews', 'isWishlisted'));
     }
 
     /**

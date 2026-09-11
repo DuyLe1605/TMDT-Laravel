@@ -184,4 +184,57 @@ class RouteConstants
     public const NAME_ADMIN_REVIEWS_INDEX = 'admin.reviews.index';
     public const NAME_ADMIN_REVIEWS_REPLY = 'admin.reviews.reply';
     public const NAME_ADMIN_REVIEWS_TOGGLE = 'admin.reviews.toggle';
+
+    // =========================================================================
+    // WISHLIST ROUTES
+    // =========================================================================
+    public const PREFIX_WISHLIST = 'wishlist';
+    public const NAME_WISHLIST_GROUP = 'wishlist.';
+
+    public const PATH_WISHLIST_INDEX = '/account/wishlist';
+    public const NAME_WISHLIST_INDEX = 'account.wishlist';
+
+    public const PATH_WISHLIST_TOGGLE = '/wishlist/toggle/{product}';
+    public const NAME_WISHLIST_TOGGLE = 'wishlist.toggle';
+
+    public const PATH_WISHLIST_REMOVE = '/wishlist/{product}';
+    public const NAME_WISHLIST_REMOVE = 'wishlist.remove';
+
+    // =========================================================================
+    // USER PROFILE ROUTES
+    // =========================================================================
+    public const PATH_ACCOUNT_PROFILE = '/profile';
+    public const NAME_ACCOUNT_PROFILE = 'account.profile';
+
+    public const PATH_ACCOUNT_PROFILE_UPDATE = '/profile';
+    public const NAME_ACCOUNT_PROFILE_UPDATE = 'account.profile.update';
+
+    public const PATH_ACCOUNT_PASSWORD = '/password';
+    public const NAME_ACCOUNT_PASSWORD = 'account.password.update';
+
+    // =========================================================================
+    // STATIC PAGES ROUTES
+    // =========================================================================
+    public const PATH_ABOUT = '/ve-chung-toi';
+    public const NAME_ABOUT = 'about';
+
+    public const PATH_CONTACT = '/lien-he';
+    public const NAME_CONTACT = 'contact';
+    public const NAME_CONTACT_SEND = 'contact.send';
+
+    public const PATH_POLICY_WARRANTY = '/chinh-sach-bao-hanh';
+    public const NAME_POLICY_WARRANTY = 'policy.warranty';
+
+    public const PATH_POLICY_RETURNS = '/chinh-sach-doi-tra';
+    public const NAME_POLICY_RETURNS = 'policy.returns';
+
+    public const PATH_POLICY_SHIPPING = '/chinh-sach-van-chuyen';
+    public const NAME_POLICY_SHIPPING = 'policy.shipping';
+
+    // =========================================================================
+    // ORDER LOOKUP (GUEST)
+    // =========================================================================
+    public const PATH_ORDER_LOOKUP = '/tra-cuu-don-hang';
+    public const NAME_ORDER_LOOKUP = 'order.lookup';
+    public const NAME_ORDER_LOOKUP_SEARCH = 'order.lookup.search';
 }

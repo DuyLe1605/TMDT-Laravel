@@ -27,6 +27,7 @@ use App\Http\Controllers\Admin\AdminVoucherController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\CoinController;
 use App\Http\Controllers\Admin\AdminReviewController;
+use App\Http\Controllers\WishlistController;
 
 use App\Http\Controllers\MomoPaymentController;
 
@@ -172,6 +173,14 @@ Route::middleware('auth')->group(function () {
         ->name('reviews.store');
     Route::post('/checkout/calculate-coins', [CoinController::class, 'calculateRedeemable'])
         ->name('checkout.calculate_coins');
+
+    // Wishlist Routes
+    Route::get(RouteConstants::PATH_WISHLIST_INDEX, [WishlistController::class, 'index'])
+        ->name(RouteConstants::NAME_WISHLIST_INDEX);
+    Route::post(RouteConstants::PATH_WISHLIST_TOGGLE, [WishlistController::class, 'toggle'])
+        ->name(RouteConstants::NAME_WISHLIST_TOGGLE);
+    Route::delete(RouteConstants::PATH_WISHLIST_REMOVE, [WishlistController::class, 'remove'])
+        ->name(RouteConstants::NAME_WISHLIST_REMOVE);
 });
 
 // =============================================================================

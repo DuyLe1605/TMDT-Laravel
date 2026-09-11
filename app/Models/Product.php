@@ -239,6 +239,14 @@ class Product extends Model
     }
 
     /**
+     * Wishlist entries for this product.
+     */
+    public function wishlists(): HasMany
+    {
+        return $this->hasMany(Wishlist::class);
+    }
+
+    /**
      * Recalculate and update cached rating stats on product.
      */
     public function recalculateRatingStats(): void

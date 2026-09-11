@@ -104,6 +104,22 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Get wishlist items for user.
+     */
+    public function wishlists()
+    {
+        return $this->hasMany(Wishlist::class)->latest();
+    }
+
+    /**
+     * Check if user has wishlisted a specific product.
+     */
+    public function hasWishlisted(Product $product): bool
+    {
+        return $this->wishlists()->where('product_id', $product->id)->exists();
+    }
+
+    /**
      * Formatted coins balance string.
      */
     public function getFormattedCoinsBalanceAttribute(): string

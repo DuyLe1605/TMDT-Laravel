@@ -212,7 +212,7 @@
                                 <div class="position-absolute top-0 start-0 p-2.5 d-flex flex-column gap-1.5" style="z-index: 2;">
                                     @if ($product->has_discount)
                                         <span class="badge-discount-luxury">
-                                            -{{ round((($product->price - $product->sale_price) / $product->price) * 100) }}%
+                                            -{{ round(($product->price - $product->sale_price) / $product->price * 100) }}%
                                         </span>
                                     @endif
                                     @if ($product->is_featured)
@@ -222,6 +222,18 @@
                                         </span>
                                     @endif
                                 </div>
+
+                                <!-- Wishlist Heart Toggle -->
+                                @auth
+                                <button type="button"
+                                    class="btn wishlist-heart-btn position-absolute top-0 end-0 m-2 p-0 border-0 d-flex align-items-center justify-content-center rounded-circle shadow-sm {{ in_array($product->id, $wishlistedIds ?? []) ? 'wishlisted' : '' }}"
+                                    style="width: 34px; height: 34px; background: rgba(255,255,255,0.92); z-index: 3; backdrop-filter: blur(4px);"
+                                    title="Yêu thích"
+                                    onclick="toggleWishlist({{ $product->id }}, this)"
+                                >
+                                    <i data-lucide="heart" style="width: 17px; height: 17px;" class="{{ in_array($product->id, $wishlistedIds ?? []) ? 'text-danger' : 'text-secondary' }}"></i>
+                                </button>
+                                @endauth
                             </div>
 
                             <!-- Content Area -->
@@ -328,5 +340,43 @@
         if (maxInput) maxInput.value = max || '';
         form.submit();
     }
+
+    /**
+     * Toggle wishlist via AJAX (add/remove heart).
+     */
+    async function toggleWishlist(productId, btnEl) {
+        try {
+            const res = await fetch(`/wishlist/toggle/${productId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json',
+                },
+            });
+            const data = await res.json();
+            if (data.success) {
+                const icon = btnEl.querySelector('i, svg');
+                if (data.added) {
+                    btnEl.classList.add('wishlisted');
+                    if (icon) { icon.classList.remove('text-secondary'); icon.classList.add('text-danger'); }
+                } else {
+                    btnEl.classList.remove('wishlisted');
+                    if (icon) { icon.classList.remove('text-danger'); icon.classList.add('text-secondary'); }
+                }
+                // Update wishlist badge count in header
+                const badges = document.querySelectorAll('.wishlist-badge-count');
+                badges.forEach(b => {
+                    b.textContent = data.count;
+                    b.style.display = data.count > 0 ? 'inline-flex' : 'none';
+                });
+                // Re-render lucide icons
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            }
+        } catch (err) {
+            console.error('Wishlist toggle error:', err);
+        }
+    }
 </script>
 @endsection
+

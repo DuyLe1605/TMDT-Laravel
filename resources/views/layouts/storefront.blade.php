@@ -88,6 +88,16 @@
                     </span>
                 </a>
 
+                @auth
+                <!-- Wishlist Heart Button -->
+                <a href="{{ route('account.wishlist') }}" class="btn-surface position-relative p-2 d-inline-flex align-items-center justify-content-center text-decoration-none" title="Danh sách yêu thích" aria-label="Yêu thích">
+                    <i data-lucide="heart" style="width: 19px; height: 19px;"></i>
+                    <span class="wishlist-badge-count position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.68rem; padding: 0.25em 0.5em; display: none;">
+                        0
+                    </span>
+                </a>
+                @endauth
+
                 <!-- Theme Toggle Button -->
                 <button type="button" class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Chuyển đổi Sáng / Tối" aria-label="Toggle Dark Mode">
                     <i data-lucide="sun" id="themeIconSun" style="width: 17px; height: 17px; display: none;"></i>
@@ -154,6 +164,12 @@
                                     <span class="badge bg-warning-subtle text-dark fw-bold rounded-pill" style="font-size: 0.72rem;">
                                         {{ number_format(Auth::user()->coins_balance) }} Xu
                                     </span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('account.wishlist') }}" class="dropdown-item-modern d-flex align-items-center gap-2">
+                                    <i data-lucide="heart" style="width: 16px; height: 16px; margin-right: 0.5rem;" class="text-danger"></i>
+                                    <span>Danh sách yêu thích</span>
                                 </a>
                             </li>
                             <li><hr class="dropdown-divider-modern"></li>
