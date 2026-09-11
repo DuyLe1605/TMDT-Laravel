@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Account\ChangePasswordRequest;
+use App\Http\Requests\Account\UpdateProfileRequest;
 use App\Models\Order;
 use App\Services\AddressService;
 use App\Services\OrderService;
@@ -9,6 +11,8 @@ use App\Services\Shipping\GhnShippingService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Exception;
 
@@ -148,5 +152,54 @@ class AccountController extends Controller
 
         $trackingUrl = $ghnService->getTrackingUrl($order->ghn_order_code);
         return redirect()->away($trackingUrl);
+    }
+
+    /**
+     * Display user profile management page.
+     */
+    public function profile(): View
+    {
+        $user = Auth::user();
+        return view('account.profile', compact('user'));
+    }
+
+    /**
+     * Update user profile information, including real avatar image upload.
+     */
+    public function updateProfile(UpdateProfileRequest $request): RedirectResponse
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        $validated = $request->validated();
+
+        if ($request->hasFile('avatar')) {
+            // Delete old avatar from storage if exists and not external URL
+            if ($user->avatar && !str_starts_with($user->avatar, 'http://') && !str_starts_with($user->avatar, 'https://')) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+            $path = $request->file('avatar')->store('avatars', 'public');
+            $validated['avatar'] = $path;
+        } else {
+            unset($validated['avatar']);
+        }
+
+        $user->update($validated);
+
+        return redirect()->back()->with('success', 'Cập nhật thông tin tài khoản thành công!');
+    }
+
+    /**
+     * Change account password.
+     */
+    public function changePassword(ChangePasswordRequest $request): RedirectResponse
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        $user->update([
+            'password' => Hash::make($request->validated('password')),
+        ]);
+
+        return redirect()->back()->with('success', 'Đổi mật khẩu thành công!');
     }
 }

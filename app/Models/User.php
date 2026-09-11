@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'role', 'coins_balance'])]
+#[Fillable(['name', 'email', 'password', 'role', 'phone', 'birthday', 'avatar', 'coins_balance'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -28,6 +28,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'coins_balance' => 'integer',
+            'birthday' => 'date',
         ];
     }
 
@@ -125,5 +126,20 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getFormattedCoinsBalanceAttribute(): string
     {
         return number_format((int) $this->coins_balance, 0, ',', '.') . ' Xu';
+    }
+
+    /**
+     * Get avatar URL (storage file, external URL, or UI-Avatars fallback).
+     */
+    public function getAvatarUrlAttribute(): string
+    {
+        if (!empty($this->avatar)) {
+            if (str_starts_with($this->avatar, 'http://') || str_starts_with($this->avatar, 'https://')) {
+                return $this->avatar;
+            }
+            return asset('storage/' . $this->avatar);
+        }
+
+        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name ?? 'User') . '&background=ffe4e6&color=e11d48&bold=true';
     }
 }

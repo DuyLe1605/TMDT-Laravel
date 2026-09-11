@@ -166,6 +166,12 @@ Route::middleware('auth')->group(function () {
             ->name('addresses');
         Route::get(RouteConstants::PATH_ACCOUNT_COINS, [CoinController::class, 'index'])
             ->name('coins');
+        Route::get(RouteConstants::PATH_ACCOUNT_PROFILE, [AccountController::class, 'profile'])
+            ->name('profile');
+        Route::put(RouteConstants::PATH_ACCOUNT_PROFILE_UPDATE, [AccountController::class, 'updateProfile'])
+            ->name('profile.update');
+        Route::put(RouteConstants::PATH_ACCOUNT_PASSWORD, [AccountController::class, 'changePassword'])
+            ->name('password.update');
     });
 
     // Reviews & Coins Actions
