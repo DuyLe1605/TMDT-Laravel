@@ -7,8 +7,8 @@
     <div class="row justify-content-center">
         <div class="col-lg-8">
             <!-- Main Success Card -->
-            <div class="card-modern p-4 p-md-5 shadow-sm border text-center mb-4">
-                <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3.5" style="width: 76px; height: 76px; background: var(--success-50, #ecfdf5); color: var(--success-600, #059669); border: 2px solid #a7f3d0;">
+            <div class="card-modern receipt-card p-4 p-md-5 shadow-sm text-center mb-4">
+                <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3.5" style="width: 76px; height: 76px; background: rgba(16, 185, 129, 0.12); color: #10b981; border: 2px solid rgba(16, 185, 129, 0.35);">
                     <i data-lucide="check" style="width: 40px; height: 40px; stroke-width: 2.5;"></i>
                 </div>
 
@@ -20,7 +20,7 @@
                 </p>
 
                 <!-- Order Code Badge Box -->
-                <div class="d-inline-flex flex-wrap align-items-center justify-content-center gap-2 p-2.5 px-4 rounded-pill border mb-4" style="background: var(--bg-surface-subtle);">
+                <div class="d-inline-flex flex-wrap align-items-center justify-content-center gap-2 p-2.5 px-4 rounded-pill border mb-4" style="background: var(--bg-surface-elevated); border-color: var(--border-default) !important;">
                     <span class="text-secondary small">Mã đơn hàng:</span>
                     <span class="fw-extrabold text-primary font-monospace fs-6" id="orderCodeText">{{ $order->order_code }}</span>
                     <button type="button" class="btn btn-sm btn-link text-primary p-0 text-decoration-none" onclick="copyOrderCode('{{ $order->order_code }}')" title="Sao chép mã đơn">
@@ -29,7 +29,7 @@
                 </div>
 
                 <!-- Order Details Receipt -->
-                <div class="text-start p-4 rounded-3 mb-4" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-default);">
+                <div class="text-start p-4 rounded-3 mb-4" style="background: var(--bg-surface-elevated); border: 1px solid var(--border-default);">
                     <h6 class="fw-bold text-dark mb-3 pb-2 border-bottom d-flex align-items-center justify-content-between">
                         <span>Thông Tin Giao Nhận</span>
                         <span class="badge {{ $order->shipping_status_badge['class'] }} small">
@@ -80,14 +80,14 @@
                     <h6 class="fw-bold text-dark mb-2.5 pb-2 border-bottom">Sản Phẩm Đã Đặt</h6>
                     <div class="d-flex flex-column gap-2 mb-3">
                         @foreach ($order->items as $item)
-                            <div class="d-flex align-items-center justify-content-between gap-3 py-1.5 border-bottom border-light">
+                            <div class="d-flex align-items-center justify-content-between gap-3 py-2 border-bottom" style="border-color: var(--border-default) !important;">
                                 <div class="d-flex align-items-center gap-2.5 min-w-0">
-                                    <div class="rounded-2 border overflow-hidden flex-shrink-0" style="width: 44px; height: 44px;">
+                                    <div class="rounded-2 border overflow-hidden flex-shrink-0" style="width: 44px; height: 44px; background: var(--bg-surface-subtle); border-color: var(--border-default) !important;">
                                         @if ($item->product_image)
                                             <img src="{{ $item->product_image }}" alt="{{ $item->product_name }}" class="w-100 h-100 object-fit-cover">
                                         @else
-                                            <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-light">
-                                                <i data-lucide="shopping-bag" style="width: 16px; height: 16px;"></i>
+                                            <div class="w-100 h-100 d-flex align-items-center justify-content-center">
+                                                <i data-lucide="shopping-bag" style="width: 16px; height: 16px;" class="text-secondary"></i>
                                             </div>
                                         @endif
                                     </div>
@@ -129,7 +129,7 @@
                         @endif
                         <div class="d-flex justify-content-between align-items-baseline pt-2 border-top">
                             <span class="fw-bold text-dark fs-6">Tổng thanh toán:</span>
-                            <span class="fw-extrabold text-primary fs-5">{{ $order->formatted_total_amount }}</span>
+                            <span class="fs-4 text-luxury-gradient">{{ $order->formatted_total_amount }}</span>
                         </div>
                     </div>
                 </div>
@@ -148,32 +148,63 @@
                 @endif
 
                 @if ($order->payment_method === 'momo' && $order->payment_status === 'pending')
-                    <!-- MoMo QR Box -->
+                    {{-- MoMo Payment Pending – Retry Button --}}
                     <div class="p-4 rounded-3 border mb-4 text-center" style="background: rgba(165, 0, 100, 0.05); border-color: rgba(165, 0, 100, 0.3) !important;">
                         <div class="d-inline-flex align-items-center gap-2 mb-2 px-3 py-1 rounded-pill" style="background: #a50064; color: #fff; font-size: 0.8rem; font-weight: 700;">
                             <span>MOMO E-WALLET</span>
                         </div>
-                        <h6 class="fw-bold mb-2" style="color: #a50064;">Quét Mã MoMo Để Thanh Toán</h6>
+                        <h6 class="fw-bold mb-2" style="color: #a50064;">Chưa Thanh Toán Qua MoMo</h6>
                         <p class="text-secondary small mb-3">
-                            Mở ứng dụng <strong>Ví MoMo</strong> trên điện thoại và quét mã QR bên dưới để thanh toán đơn hàng:
+                            Đơn hàng của bạn đã được tạo nhưng chưa thanh toán qua <strong>Ví MoMo</strong>.
+                            Nhấn nút bên dưới để mở lại trang thanh toán MoMo:
                         </p>
-                        <div class="d-inline-block p-3 bg-white rounded-3 shadow-sm border mb-3">
-                            <!-- MoMo QR Code (Using standardized VietQR MoMo NAPAS or quick pay QR) -->
-                            <img 
-                                src="https://api.vietqr.io/image/970422-999988886666-compact2.jpg?amount={{ (int)$order->total_amount }}&addInfo=MOMO_{{ $order->order_code }}&accountName=AURELIA%20MOMO" 
-                                alt="MoMo Payment QR" 
-                                class="img-fluid" 
-                                style="max-width: 230px;"
-                            >
+
+                        @php
+                            $latestTransaction = $order->paymentTransactions()
+                                ->where('gateway', 'momo')
+                                ->where('status', 'pending')
+                                ->latest()
+                                ->first();
+                        @endphp
+
+                        <div class="d-flex flex-wrap justify-content-center gap-2 mb-3">
+                            <a href="{{ route('orders.momo.pay', [$order, 'method' => 'payWithATM']) }}" class="btn text-white fw-semibold d-inline-flex align-items-center gap-1.5 shadow-sm" style="background: #a50064; border-color: #a50064;">
+                                <i data-lucide="credit-card" style="width: 16px; height: 16px;"></i>
+                                <span>Thẻ ATM Nội Địa</span>
+                            </a>
+                            <a href="{{ route('orders.momo.pay', [$order, 'method' => 'captureWallet']) }}" class="btn btn-surface fw-semibold d-inline-flex align-items-center gap-1.5 shadow-sm" style="color: #a50064; border-color: #a50064;">
+                                <i data-lucide="qr-code" style="width: 16px; height: 16px;"></i>
+                                <span>Quét Mã QR MoMo</span>
+                            </a>
+                            <a href="{{ route('orders.momo.pay', [$order, 'method' => 'payWithCC']) }}" class="btn btn-surface fw-semibold d-inline-flex align-items-center gap-1.5 shadow-sm" style="color: #10b981; border-color: #10b981;">
+                                <i data-lucide="globe" style="width: 16px; height: 16px;"></i>
+                                <span>Thẻ Quốc Tế (Visa/Master)</span>
+                            </a>
                         </div>
+
                         <div class="small text-secondary">
-                            Số Ví MoMo: <strong style="color: #a50064;">0988 889 999</strong> &bull; Chủ tài khoản: <strong>AURELIA STORE</strong> &bull; Lời nhắn: <strong class="text-dark">{{ $order->order_code }}</strong>
+                            <i data-lucide="info" style="width: 13px; height: 13px;"></i>
+                            Đơn hàng sẽ được xác nhận tự động sau khi thanh toán MoMo thành công.
                         </div>
                     </div>
+                @elseif ($order->payment_method === 'momo' && $order->payment_status === 'failed')
+                    {{-- MoMo Payment Failed --}}
+                    <div class="p-4 rounded-3 border mb-4 text-center" style="background: rgba(220, 53, 69, 0.05); border-color: rgba(220, 53, 69, 0.3) !important;">
+                        <div class="d-inline-flex align-items-center gap-1.5 text-danger fw-bold fs-6 mb-2">
+                            <i data-lucide="x-circle" style="width: 20px; height: 20px;"></i>
+                            <span>Thanh Toán MoMo Thất Bại</span>
+                        </div>
+                        <p class="text-secondary small mb-3">
+                            Giao dịch thanh toán qua MoMo không thành công. Vui lòng liên hệ shop để được hỗ trợ hoặc thử đặt hàng mới.
+                        </p>
+                    </div>
                 @elseif ($order->payment_method === 'bank_transfer' && $order->payment_status === 'pending')
-                    <!-- Bank QR Box -->
-                    <div class="p-4 rounded-3 border mb-4 text-center" style="background: var(--brand-50, #fdf4f0); border-color: var(--brand-200) !important;">
-                        <h6 class="fw-bold text-primary mb-2">Quét Mã QR Chuyển Khoản Ngay</h6>
+                    {{-- Bank QR Box --}}
+                    <div class="p-4 rounded-3 border mb-4 text-center" style="background: var(--bg-surface-elevated); border-color: var(--brand-300) !important;">
+                        <div class="d-inline-flex align-items-center gap-1.5 text-primary fw-bold mb-2">
+                            <i data-lucide="qr-code" style="width: 20px; height: 20px;"></i>
+                            <span>Quét Mã QR Chuyển Khoản Ngay</span>
+                        </div>
                         <p class="text-secondary small mb-3">
                             Mở ứng dụng ngân hàng và quét mã QR bên dưới để thanh toán tự động đúng số tiền và cú pháp
                         </p>
@@ -181,12 +212,12 @@
                             <img 
                                 src="https://api.vietqr.io/image/970422-999988886666-compact2.jpg?amount={{ (int)$order->total_amount }}&addInfo={{ $order->order_code }}&accountName=AURELIA%20BAGS" 
                                 alt="VietQR Payment Code" 
-                                class="img-fluid" 
+                                class="img-fluid rounded-2" 
                                 style="max-width: 240px;"
                             >
                         </div>
                         <div class="small text-secondary">
-                            Số tài khoản: <strong>999988886666</strong> &bull; MB Bank &bull; Nội dung: <strong class="text-primary">{{ $order->order_code }}</strong>
+                            Số tài khoản: <strong class="text-dark">999988886666</strong> &bull; MB Bank &bull; Nội dung: <strong class="text-primary">{{ $order->order_code }}</strong>
                         </div>
                     </div>
                 @endif

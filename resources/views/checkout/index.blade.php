@@ -356,16 +356,135 @@
                             </div>
                         </div>
 
-                        <!-- MoMo Instruction Box -->
-                        <div id="momoInstructionBox" class="p-3 mt-3 rounded-3 border d-none" style="background: rgba(165, 0, 100, 0.05); border-color: rgba(165, 0, 100, 0.3) !important;">
-                            <div class="d-flex align-items-center gap-2 fw-bold small mb-2" style="color: #a50064;">
-                                <i data-lucide="smartphone" style="width: 16px; height: 16px;"></i>
-                                <span>Thông tin thanh toán qua Ví MoMo:</span>
+                        <!-- MoMo Instruction Box with Multi-Method Selector (QR, ATM, Credit Card) -->
+                        <div id="momoInstructionBox" class="p-3 mt-3 rounded-3 border d-none" style="background: rgba(165, 0, 100, 0.04); border-color: rgba(165, 0, 100, 0.25) !important;">
+                            <div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom border-secondary border-opacity-10">
+                                <div class="d-flex align-items-center gap-2 fw-bold small" style="color: #a50064;">
+                                    <i data-lucide="smartphone" style="width: 16px; height: 16px;"></i>
+                                    <span>Chọn Kênh Thanh Toán MoMo:</span>
+                                </div>
+                                <span class="badge bg-danger-subtle text-danger fw-semibold" style="font-size: 0.68rem;">MoMo Sandbox Gateway</span>
                             </div>
-                            <div class="row g-2 small text-secondary">
-                                <div class="col-sm-6"><strong>Số ví MoMo:</strong> <span class="fw-bold" style="color: #a50064;">0988 889 999</span></div>
-                                <div class="col-sm-6"><strong>Chủ ví:</strong> <span class="fw-bold text-dark">AURELIA LUXURY STORE</span></div>
-                                <div class="col-12"><strong>Nội dung CK:</strong> <span class="badge bg-dark-subtle text-dark">Hệ thống tạo mã đơn hàng sau khi xác nhận</span></div>
+
+                            <!-- 3 MoMo Method Radio Buttons -->
+                            <div class="row g-2 mb-3">
+                                <div class="col-4">
+                                    <label class="p-2.5 rounded-2 border w-100 d-flex flex-column align-items-center text-center cursor-pointer momo-sub-card active" id="cardMomo_payWithATM" onclick="switchMomoMethod('payWithATM')">
+                                        <input type="radio" name="momo_method" value="payWithATM" class="d-none" checked>
+                                        <i data-lucide="credit-card" class="mb-1 text-primary" style="width: 20px; height: 20px;"></i>
+                                        <span class="fw-bold small text-dark" style="font-size: 0.76rem;">Thẻ ATM Nội Địa</span>
+                                        <span class="text-secondary" style="font-size: 0.65rem;">Napas (30+ Ngân hàng)</span>
+                                    </label>
+                                </div>
+                                <div class="col-4">
+                                    <label class="p-2.5 rounded-2 border w-100 d-flex flex-column align-items-center text-center cursor-pointer momo-sub-card" id="cardMomo_captureWallet" onclick="switchMomoMethod('captureWallet')">
+                                        <input type="radio" name="momo_method" value="captureWallet" class="d-none">
+                                        <i data-lucide="qr-code" class="mb-1" style="color: #a50064; width: 20px; height: 20px;"></i>
+                                        <span class="fw-bold small text-dark" style="font-size: 0.76rem;">Quét Mã QR MoMo</span>
+                                        <span class="text-secondary" style="font-size: 0.65rem;">Ứng dụng Ví MoMo</span>
+                                    </label>
+                                </div>
+                                <div class="col-4">
+                                    <label class="p-2.5 rounded-2 border w-100 d-flex flex-column align-items-center text-center cursor-pointer momo-sub-card" id="cardMomo_payWithCC" onclick="switchMomoMethod('payWithCC')">
+                                        <input type="radio" name="momo_method" value="payWithCC" class="d-none">
+                                        <i data-lucide="globe" class="mb-1 text-success" style="width: 20px; height: 20px;"></i>
+                                        <span class="fw-bold small text-dark" style="font-size: 0.76rem;">Thẻ Quốc Tế</span>
+                                        <span class="text-secondary" style="font-size: 0.65rem;">Visa, Master, JCB</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Panel 1: ATM Nội Địa -->
+                            <div id="panelMomo_payWithATM">
+                                <p class="text-secondary small mb-2" style="font-size: 0.78rem;">
+                                    Chuyển hướng đến cổng thanh toán liên ngân hàng Napas qua MoMo. Sử dụng 1 trong 4 tài khoản test dưới đây:
+                                </p>
+                                <div class="table-responsive rounded-2 border mb-2 shadow-xs">
+                                    <table class="table table-sm momo-adaptive-table table-bordered text-center align-middle mb-0" style="font-size: 0.74rem;">
+                                        <thead>
+                                            <tr>
+                                                <th class="py-1.5 text-secondary">Tên chủ thẻ</th>
+                                                <th class="py-1.5 text-secondary">Số thẻ ATM Test</th>
+                                                <th class="py-1.5 text-secondary">Hạn thẻ</th>
+                                                <th class="py-1.5 text-secondary">OTP</th>
+                                                <th class="py-1.5 text-secondary">Kết quả</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="fw-semibold">NGUYEN VAN A</td>
+                                                <td><code class="text-primary fw-bold">9704 0000 0000 0018</code></td>
+                                                <td>12/30</td>
+                                                <td>Bất kỳ</td>
+                                                <td><span class="badge bg-success-subtle text-success">Thành công</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="fw-semibold">NGUYEN VAN A</td>
+                                                <td><code class="text-danger fw-bold">9704 0000 0000 0026</code></td>
+                                                <td>12/30</td>
+                                                <td>Bất kỳ</td>
+                                                <td><span class="badge bg-danger-subtle text-danger">Thẻ khóa</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="fw-semibold">NGUYEN VAN A</td>
+                                                <td><code class="text-warning-emphasis fw-bold">9704 0000 0000 0034</code></td>
+                                                <td>12/30</td>
+                                                <td>Bất kỳ</td>
+                                                <td><span class="badge bg-warning-subtle text-warning-emphasis">Không đủ tiền</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="fw-semibold">NGUYEN VAN A</td>
+                                                <td><code class="text-secondary fw-bold">9704 0000 0000 0042</code></td>
+                                                <td>12/30</td>
+                                                <td>Bất kỳ</td>
+                                                <td><span class="badge bg-secondary-subtle text-secondary">Hạn mức thẻ</span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Panel 2: Quét Mã QR MoMo -->
+                            <div id="panelMomo_captureWallet" class="d-none">
+                                <div class="p-3.5 rounded-3 border mb-2 text-center" style="background: var(--bg-surface-elevated); border-color: var(--border-default) !important;">
+                                    <div class="d-inline-flex align-items-center justify-content-center p-2.5 rounded-circle mb-2" style="background: rgba(165, 0, 100, 0.12); color: #a50064;">
+                                        <i data-lucide="qr-code" style="width: 28px; height: 28px;"></i>
+                                    </div>
+                                    <h6 class="fw-bold mb-1 text-dark" style="font-size: 0.85rem;">Quét Mã Bằng Ứng Dụng MoMo</h6>
+                                    <p class="text-secondary small mb-2" style="font-size: 0.76rem;">
+                                        Sau khi bấm "Xác Nhận Đặt Hàng", MoMo sẽ hiển thị mã QR động để bạn mở App MoMo quét mã xác nhận thanh toán tức thì.
+                                    </p>
+                                    <span class="badge bg-info-subtle text-info small" style="font-size: 0.7rem;">Hỗ trợ ví điện tử MoMo & Ví trả sau</span>
+                                </div>
+                            </div>
+
+                            <!-- Panel 3: Thẻ Quốc Tế Visa/Mastercard/JCB -->
+                            <div id="panelMomo_payWithCC" class="d-none">
+                                <div class="p-3.5 rounded-3 border mb-2" style="background: var(--bg-surface-elevated); border-color: var(--border-default) !important;">
+                                    <div class="d-flex align-items-center gap-2 mb-2 text-success fw-bold small">
+                                        <i data-lucide="credit-card" style="width: 16px; height: 16px;"></i>
+                                        <span>Thanh Toán Thẻ Quốc Tế (Visa / MasterCard / JCB) qua MoMo</span>
+                                    </div>
+                                    <p class="text-secondary small mb-2" style="font-size: 0.76rem;">
+                                        Cổng thanh toán hỗ trợ giao thức bảo mật 3D Secure quốc tế. Thẻ test môi trường Sandbox:
+                                    </p>
+                                    <div class="row g-2 small font-monospace">
+                                        <div class="col-sm-6">
+                                            <span class="text-secondary">Số thẻ Visa test:</span> <strong class="text-primary">4111 1111 1111 1111</strong>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <span class="text-secondary">Hạn:</span> <strong>12/28</strong>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <span class="text-secondary">CVV:</span> <strong>123</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-muted small" style="font-size: 0.72rem;">
+                                <i data-lucide="info" style="width: 12px; height: 12px; display: inline-block; vertical-align: text-bottom;"></i>
+                                Nếu thanh toán thất bại hoặc hủy ngang, đơn hàng vẫn được lưu và bạn có thể bấm <strong>"Thanh toán lại"</strong> bất cứ lúc nào từ Lịch sử đơn hàng.
                             </div>
                         </div>
                     </div>
@@ -444,13 +563,13 @@
                         <!-- Quick input field -->
                         <div class="input-group input-group-sm mb-1" id="voucherQuickInputContainer">
                             <input type="text" id="quickVoucherInput" class="form-control text-uppercase font-monospace" placeholder="Nhập mã ưu đãi..." style="letter-spacing: 0.05em;">
-                            <button type="button" class="btn btn-dark fw-bold px-3" onclick="applyVoucherFromInput()">
+                            <button type="button" class="btn btn-brand-primary fw-bold px-3" onclick="applyVoucherFromInput()">
                                 Áp Dụng
                             </button>
                         </div>
 
                         <!-- Applied voucher tag banner -->
-                        <div id="appliedVoucherBanner" class="p-2.5 rounded-2 d-none mt-2" style="background: #e8f5e9; border: 1px solid #c8e6c9;">
+                        <div id="appliedVoucherBanner" class="p-2.5 rounded-2 d-none mt-2" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3);">
                             <div class="d-flex align-items-center justify-content-between">
                                 <div class="d-flex align-items-center gap-2 min-w-0">
                                     <span class="badge bg-success font-monospace" id="appliedVoucherCodeBadge">AURELIA20</span>
@@ -473,7 +592,7 @@
                         @php
                             $userCoins = auth()->user()->coins_balance;
                         @endphp
-                        <div class="p-3 rounded-3 mb-3 checkout-coin-box">
+                        <div class="p-3 rounded-3 mb-3 checkout-coin-box" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-default);">
                             <div class="d-flex align-items-center justify-content-between">
                                 <div class="d-flex align-items-center gap-2">
                                     <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background: rgba(245, 158, 11, 0.18); color: #d97706;">
@@ -543,25 +662,43 @@
                         </div>
                     </div>
 
-                    <div class="p-3 rounded-3 mb-4" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-default);">
+                    <div class="p-3.5 rounded-3 mb-4" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-default);">
                         <div class="d-flex justify-content-between align-items-baseline mb-1">
-                            <span class="fw-bold text-dark">Tổng cộng:</span>
-                            <span class="fw-extrabold text-primary fs-3" id="displayGrandTotal">
+                            <span class="fw-bold text-dark fs-6">Tổng cộng:</span>
+                            <span class="fs-3 text-luxury-gradient" id="displayGrandTotal">
                                 {{ number_format($grandTotal, 0, ',', '.') }} ₫
                             </span>
                         </div>
                         <div class="text-secondary" style="font-size: 0.75rem;">
-                            Đã bao gồm thuế và chi phí giao nhận
+                            (Đã bao gồm thuế GTGT & cước vận chuyển giao hàng)
                         </div>
                     </div>
 
                     <!-- Place Order Button -->
-                    <button type="submit" id="placeOrderBtn" class="btn-brand-primary w-100 py-3 justify-content-center fw-bold fs-6 shadow-sm">
-                        <i data-lucide="check-circle" style="width: 18px; height: 18px; margin-right: 0.45rem;"></i>
+                    <button type="submit" id="placeOrderBtn" class="btn-brand-primary w-100 py-3 justify-content-center fw-bold shadow-sm d-flex align-items-center" style="font-size: 1.05rem; letter-spacing: 0.01em;">
+                        <i data-lucide="shield-check" style="width: 20px; height: 20px; margin-right: 0.5rem;"></i>
                         <span>Xác Nhận Đặt Hàng</span>
                     </button>
 
-                    <div class="mt-3 text-center text-secondary small" style="font-size: 0.75rem; line-height: 1.5;">
+                    <!-- Trust Badges -->
+                    <div class="d-flex align-items-center justify-content-center gap-3 pt-3 mt-2 border-top text-secondary" style="font-size: 0.73rem;">
+                        <span class="d-inline-flex align-items-center gap-1">
+                            <i data-lucide="lock" class="text-success" style="width: 13px; height: 13px;"></i>
+                            Bảo mật 100%
+                        </span>
+                        <span>&bull;</span>
+                        <span class="d-inline-flex align-items-center gap-1">
+                            <i data-lucide="refresh-cw" class="text-primary" style="width: 13px; height: 13px;"></i>
+                            Đổi trả 30 ngày
+                        </span>
+                        <span>&bull;</span>
+                        <span class="d-inline-flex align-items-center gap-1">
+                            <i data-lucide="award" class="text-warning" style="width: 13px; height: 13px;"></i>
+                            Chính hãng 100%
+                        </span>
+                    </div>
+
+                    <div class="mt-2 text-center text-secondary small" style="font-size: 0.72rem; line-height: 1.5;">
                         Nhấn "Xác Nhận Đặt Hàng" đồng nghĩa với việc bạn đồng ý tuân theo <a href="#" class="text-primary text-decoration-none">Điều khoản dịch vụ</a> của Aurelia Luxury.
                     </div>
                 </div>
@@ -1435,10 +1572,19 @@
     }
 
     function togglePaymentDetail(type) {
-        currentPaymentMethod = type;
+        currentPaymentMethod = (type === 'bank') ? 'bank_transfer' : type;
         const bankBox = document.getElementById('bankTransferBox');
         const momoBox = document.getElementById('momoInstructionBox');
         
+        // Update active class on payment cards
+        const payCodCard = document.getElementById('labelPayCod');
+        const payBankCard = document.getElementById('labelPayBank');
+        const payMomoCard = document.getElementById('labelPayMomo');
+
+        if (payCodCard) payCodCard.classList.toggle('active', type === 'cod');
+        if (payBankCard) payBankCard.classList.toggle('active', type === 'bank' || type === 'bank_transfer');
+        if (payMomoCard) payMomoCard.classList.toggle('active', type === 'momo');
+
         if (bankBox) {
             if (type === 'bank' || type === 'bank_transfer') {
                 bankBox.classList.remove('d-none');
@@ -1457,8 +1603,39 @@
 
         // Validate applied voucher compatibility with newly selected payment method
         if (currentVoucher) {
-            checkVoucherCompatibilityWithPaymentMethod(type);
+            checkVoucherCompatibilityWithPaymentMethod(currentPaymentMethod);
         }
+    }
+
+    function switchMomoMethod(type) {
+        // Toggle active border style on sub-cards
+        const allCards = document.querySelectorAll('.momo-sub-card');
+        allCards.forEach(c => {
+            c.style.borderColor = '';
+            c.classList.remove('active', 'shadow-xs');
+        });
+
+        const activeCard = document.getElementById('cardMomo_' + type);
+        if (activeCard) {
+            activeCard.classList.add('active', 'shadow-xs');
+            const radio = activeCard.querySelector('input[type="radio"]');
+            if (radio) radio.checked = true;
+        }
+
+        // Show/hide sub-panels
+        const panels = ['payWithATM', 'captureWallet', 'payWithCC'];
+        panels.forEach(p => {
+            const panel = document.getElementById('panelMomo_' + p);
+            if (panel) {
+                if (p === type) {
+                    panel.classList.remove('d-none');
+                } else {
+                    panel.classList.add('d-none');
+                }
+            }
+        });
+
+        if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 
     // =========================================================================

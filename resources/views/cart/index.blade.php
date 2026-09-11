@@ -232,37 +232,46 @@
                             </div>
                         </div>
 
-                        <div class="p-3.5 rounded-3 mb-4" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-default);">
+                        <div class="p-3.5 rounded-3 mb-3" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-default);">
                             <div class="d-flex justify-content-between align-items-baseline mb-1">
-                                <span class="fw-bold text-dark">Tổng thanh toán:</span>
-                                <span class="fw-extrabold text-primary fs-4" id="displayTotalPrice">0 ₫</span>
+                                <span class="fw-bold text-dark fs-6">Tổng thanh toán:</span>
+                                <span class="fs-3 text-luxury-gradient" id="displayTotalPrice">0 ₫</span>
                             </div>
                             <div class="text-secondary" style="font-size: 0.75rem;">
-                                (Đã bao gồm VAT nếu có)
+                                (Đã bao gồm VAT &bull; Áp dụng mã giảm giá ở bước kế tiếp)
                             </div>
                         </div>
 
                         <!-- Notice message when no item is selected -->
-                        <div id="noSelectionNotice" class="d-flex align-items-center gap-2 p-3 rounded-3 mb-3 small">
-                            <i data-lucide="info" style="width: 16px; height: 16px; flex-shrink: 0;"></i>
-                            <span>Vui lòng tích chọn ít nhất 1 sản phẩm để thanh toán hoặc xóa.</span>
+                        <div id="noSelectionNotice" class="d-flex align-items-center gap-2.5 p-3 rounded-3 mb-3 small" style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); color: #f59e0b;">
+                            <i data-lucide="info" style="width: 18px; height: 18px; flex-shrink: 0;"></i>
+                            <span class="fw-medium">Vui lòng tích chọn ít nhất 1 sản phẩm để thanh toán hoặc xóa.</span>
                         </div>
 
                         <!-- Checkout Submit Button: Dimmed / Disabled if 0 items checked -->
                         <button 
                             type="submit" 
                             id="checkoutSubmitBtn" 
-                            class="btn-brand-primary w-100 py-3 justify-content-center fw-bold fs-6 opacity-50 pointer-events-none transition-all shadow-sm"
+                            class="btn-brand-primary w-100 py-3 justify-content-center fw-bold fs-6 opacity-50 pointer-events-none transition-all shadow-md rounded-3"
                         >
                             <i data-lucide="credit-card" style="width: 18px; height: 18px; margin-right: 0.45rem;"></i>
                             <span id="checkoutBtnLabel">Mua Hàng (0)</span>
                         </button>
 
-                        <div class="mt-3 text-center">
-                            <span class="text-secondary small d-inline-flex align-items-center gap-1.5" style="font-size: 0.75rem;">
-                                <i data-lucide="shield-check" class="text-success" style="width: 14px; height: 14px;"></i>
-                                <span>Thanh toán an toàn 100% &bull; Bảo mật thông tin</span>
-                            </span>
+                        <!-- Luxury Store Trust Badges -->
+                        <div class="mt-4 pt-3 border-top d-flex flex-column gap-2 text-secondary" style="font-size: 0.78rem;">
+                            <div class="d-flex align-items-center gap-2">
+                                <i data-lucide="truck" class="text-primary" style="width: 15px; height: 15px; flex-shrink: 0;"></i>
+                                <span>Giao hàng nhanh toàn quốc qua bưu tá GHN</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <i data-lucide="shield-check" class="text-success" style="width: 15px; height: 15px; flex-shrink: 0;"></i>
+                                <span>100% Da cao cấp tuyển chọn &bull; Bảo hành 12 tháng</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <i data-lucide="refresh-cw" class="text-info" style="width: 15px; height: 15px; flex-shrink: 0;"></i>
+                                <span>Đổi trả linh hoạt trong 30 ngày nếu không ưng ý</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -336,10 +345,14 @@
         let totalCheckedPrice = 0;
 
         checkboxes.forEach(chk => {
+            const row = document.getElementById(`cart-item-row-${chk.getAttribute('data-id')}`);
             if (chk.checked) {
                 checkedCount++;
                 const subtotal = parseFloat(chk.getAttribute('data-subtotal')) || 0;
                 totalCheckedPrice += subtotal;
+                if (row) row.classList.add('is-selected');
+            } else {
+                if (row) row.classList.remove('is-selected');
             }
         });
 
