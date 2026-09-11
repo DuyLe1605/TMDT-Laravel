@@ -33,9 +33,7 @@
         <div class="col-lg-3">
             <div class="card-modern p-3 shadow-sm border sticky-top" style="top: 85px;">
                 <div class="d-flex align-items-center gap-3 p-2 mb-3 border-bottom">
-                    <div class="sidebar-user-avatar" style="width: 44px; height: 44px; font-size: 1rem;">
-                        {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
-                    </div>
+                    <img src="{{ Auth::user()->avatar_url }}" alt="{{ Auth::user()->name }}" class="rounded-circle object-fit-cover shadow-sm border flex-shrink-0" style="width: 44px; height: 44px;">
                     <div class="min-w-0">
                         <div class="fw-bold text-dark text-truncate">{{ Auth::user()->name }}</div>
                         <div class="text-secondary small text-truncate">{{ Auth::user()->email }}</div>
@@ -43,6 +41,10 @@
                 </div>
 
                 <div class="d-flex flex-column gap-1">
+                    <a href="{{ route('account.profile') }}" class="btn-surface w-100 text-start py-2 px-3 text-decoration-none d-flex align-items-center gap-2">
+                        <i data-lucide="user" style="width: 16px; height: 16px;"></i>
+                        <span>Thông tin tài khoản</span>
+                    </a>
                     <a href="{{ route('account.orders') }}" class="btn-surface w-100 text-start py-2 px-3 text-decoration-none d-flex align-items-center gap-2">
                         <i data-lucide="package" style="width: 16px; height: 16px;"></i>
                         <span>Đơn hàng của tôi</span>
@@ -50,6 +52,10 @@
                     <a href="{{ route('account.addresses') }}" class="btn-brand-primary w-100 text-start py-2 px-3 text-decoration-none d-flex align-items-center gap-2">
                         <i data-lucide="map-pin" style="width: 16px; height: 16px;"></i>
                         <span>Sổ địa chỉ nhận hàng</span>
+                    </a>
+                    <a href="{{ route('account.wishlist') }}" class="btn-surface w-100 text-start py-2 px-3 text-decoration-none d-flex align-items-center gap-2">
+                        <i data-lucide="heart" style="width: 16px; height: 16px;"></i>
+                        <span>Danh sách yêu thích</span>
                     </a>
                     <a href="{{ route('account.coins') }}" class="btn-surface w-100 text-start py-2 px-3 text-decoration-none d-flex align-items-center justify-content-between">
                         <div class="d-flex align-items-center gap-2">
@@ -113,7 +119,7 @@
                                             </button>
                                         </form>
 
-                                        <form action="{{ route('addresses.destroy', $address) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa địa chỉ này?');">
+                                        <form action="{{ route('addresses.destroy', $address) }}" method="POST" class="d-inline" data-confirm="Bạn có chắc chắn muốn xóa địa chỉ này?" data-confirm-title="Xóa địa chỉ nhận hàng">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-outline-danger">

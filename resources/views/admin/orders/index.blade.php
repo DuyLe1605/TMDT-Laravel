@@ -330,7 +330,7 @@
                                     <!-- Quick Confirm if pending -->
                                     @if ($order->canBeConfirmed())
                                         <!-- 1-Click Confirm & Send to GHN -->
-                                        <form action="{{ route('admin.orders.update_status', $order) }}" method="POST" class="d-inline" onsubmit="return confirm('Xác nhận đơn và đẩy thông tin sang GHN ngay?');">
+                                        <form action="{{ route('admin.orders.update_status', $order) }}" method="POST" class="d-inline" data-confirm="Xác nhận đơn và đẩy thông tin sang GHN ngay?" data-confirm-title="Xác nhận & Gửi GHN">
                                             @csrf
                                             @method('PATCH')
                                             <input type="hidden" name="action" value="confirm_and_ghn">
@@ -352,7 +352,7 @@
 
                                     <!-- Quick Send GHN if processing -->
                                     @if ($order->canBeSentToGhn())
-                                        <form action="{{ route('admin.orders.send_ghn', $order) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn gửi đơn hàng này sang GHN để lấy hàng?');">
+                                        <form action="{{ route('admin.orders.send_ghn', $order) }}" method="POST" class="d-inline" data-confirm="Bạn có chắc chắn muốn gửi đơn hàng này sang GHN để lấy hàng?" data-confirm-title="Gửi đơn sang GHN">
                                             @csrf
                                             <button type="submit" class="btn btn-sm btn-success p-1.5 px-2" title="Gửi đơn hàng sang GHN (Lấy mã bưu tá)">
                                                 <i data-lucide="send" style="width: 15px; height: 15px;"></i>

@@ -197,7 +197,7 @@
                     <div class="col-6 col-md-4 d-flex">
                         <div class="product-store-card w-100 d-flex flex-column">
                             <!-- Thumbnail with Luxury Badges -->
-                            <div class="product-store-img-box">
+                            <div class="product-store-img-box position-relative">
                                 <a href="{{ route('shop.show', $product) }}" class="d-block w-100 h-100">
                                     @if ($product->image)
                                         <img src="{{ $product->image }}" alt="{{ $product->name }}" class="product-store-img" loading="lazy">
@@ -223,17 +223,16 @@
                                     @endif
                                 </div>
 
-                                <!-- Wishlist Heart Toggle -->
-                                @auth
+                                <!-- Wishlist Heart Toggle (Top-Right on Image) -->
                                 <button type="button"
-                                    class="btn wishlist-heart-btn position-absolute top-0 end-0 m-2 p-0 border-0 d-flex align-items-center justify-content-center rounded-circle shadow-sm {{ in_array($product->id, $wishlistedIds ?? []) ? 'wishlisted' : '' }}"
-                                    style="width: 34px; height: 34px; background: rgba(255,255,255,0.92); z-index: 3; backdrop-filter: blur(4px);"
-                                    title="Yêu thích"
+                                    class="wishlist-heart-btn position-absolute top-0 end-0 m-2.5 shadow-sm {{ in_array($product->id, $wishlistedIds ?? []) ? 'wishlisted active' : '' }}"
+                                    data-wishlist-id="{{ $product->id }}"
+                                    title="{{ in_array($product->id, $wishlistedIds ?? []) ? 'Bỏ yêu thích' : 'Thêm vào yêu thích' }}"
+                                    aria-label="Yêu thích"
                                     onclick="toggleWishlist({{ $product->id }}, this)"
                                 >
-                                    <i data-lucide="heart" style="width: 17px; height: 17px;" class="{{ in_array($product->id, $wishlistedIds ?? []) ? 'text-danger' : 'text-secondary' }}"></i>
+                                    <i data-lucide="heart" style="{{ in_array($product->id, $wishlistedIds ?? []) ? 'fill: currentColor;' : '' }}" class="{{ in_array($product->id, $wishlistedIds ?? []) ? 'text-danger' : 'text-secondary' }}"></i>
                                 </button>
-                                @endauth
                             </div>
 
                             <!-- Content Area -->
@@ -276,7 +275,7 @@
                                             </div>
                                         @endif
                                     </div>
-                                    <div class="d-flex align-items-center gap-2 flex-shrink-0">
+                                    <div class="d-flex align-items-center gap-1.5 flex-shrink-0">
                                         <button 
                                             type="button" 
                                             class="btn-card-action" 
@@ -295,6 +294,15 @@
                                             })"
                                         >
                                             <i data-lucide="{{ $product->has_variants ? 'layers' : 'shopping-bag' }}" style="width: 16px; height: 16px;"></i>
+                                        </button>
+                                        <button 
+                                            type="button" 
+                                            class="btn-card-action {{ in_array($product->id, $wishlistedIds ?? []) ? 'active text-danger' : '' }}" 
+                                            data-wishlist-id="{{ $product->id }}"
+                                            title="{{ in_array($product->id, $wishlistedIds ?? []) ? 'Bỏ yêu thích' : 'Thêm vào yêu thích' }}"
+                                            onclick="toggleWishlist({{ $product->id }}, this)"
+                                        >
+                                            <i data-lucide="heart" style="width: 16px; height: 16px; {{ in_array($product->id, $wishlistedIds ?? []) ? 'fill: currentColor;' : '' }}" class="{{ in_array($product->id, $wishlistedIds ?? []) ? 'text-danger' : 'text-secondary' }}"></i>
                                         </button>
                                         <a href="{{ route('shop.show', $product) }}" class="btn-card-action" title="Xem chi tiết sản phẩm">
                                             <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
@@ -339,43 +347,6 @@
         if (minInput) minInput.value = min || '';
         if (maxInput) maxInput.value = max || '';
         form.submit();
-    }
-
-    /**
-     * Toggle wishlist via AJAX (add/remove heart).
-     */
-    async function toggleWishlist(productId, btnEl) {
-        try {
-            const res = await fetch(`/wishlist/toggle/${productId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    'Accept': 'application/json',
-                },
-            });
-            const data = await res.json();
-            if (data.success) {
-                const icon = btnEl.querySelector('i, svg');
-                if (data.added) {
-                    btnEl.classList.add('wishlisted');
-                    if (icon) { icon.classList.remove('text-secondary'); icon.classList.add('text-danger'); }
-                } else {
-                    btnEl.classList.remove('wishlisted');
-                    if (icon) { icon.classList.remove('text-danger'); icon.classList.add('text-secondary'); }
-                }
-                // Update wishlist badge count in header
-                const badges = document.querySelectorAll('.wishlist-badge-count');
-                badges.forEach(b => {
-                    b.textContent = data.count;
-                    b.style.display = data.count > 0 ? 'inline-flex' : 'none';
-                });
-                // Re-render lucide icons
-                if (typeof lucide !== 'undefined') lucide.createIcons();
-            }
-        } catch (err) {
-            console.error('Wishlist toggle error:', err);
-        }
     }
 </script>
 @endsection

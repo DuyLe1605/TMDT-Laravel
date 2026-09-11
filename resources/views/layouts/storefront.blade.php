@@ -26,6 +26,9 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
+    <!-- SweetAlert2 Modern Dialogs -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <!-- Bespoke Design System Stylesheet -->
     <link rel="stylesheet" href="{{ asset('css/custom.css') }}?v={{ filemtime(public_path('css/custom.css')) }}">
     @yield('styles')
@@ -79,29 +82,34 @@
             </nav>
 
             <!-- Header Right Actions (Search / Cart / Theme / Auth) -->
-            <div class="d-flex align-items-center gap-2.5">
+            <div class="d-flex align-items-center gap-2">
                 <!-- Shopping Cart Button with Dynamic Live Badge -->
-                <a href="{{ route('cart.index') }}" class="btn-surface position-relative p-2 d-inline-flex align-items-center justify-content-center text-decoration-none" title="Giỏ hàng của bạn" aria-label="Giỏ hàng">
-                    <i data-lucide="shopping-cart" style="width: 19px; height: 19px;"></i>
-                    <span class="cart-badge-count position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.68rem; padding: 0.25em 0.5em; display: none;">
+                <a href="{{ route('cart.index') }}" class="header-icon-btn" title="Giỏ hàng của bạn" aria-label="Giỏ hàng">
+                    <i data-lucide="shopping-cart"></i>
+                    <span class="header-icon-badge cart-badge-count" style="display: none;">
                         0
                     </span>
                 </a>
 
-                @auth
                 <!-- Wishlist Heart Button -->
-                <a href="{{ route('account.wishlist') }}" class="btn-surface position-relative p-2 d-inline-flex align-items-center justify-content-center text-decoration-none" title="Danh sách yêu thích" aria-label="Yêu thích">
-                    <i data-lucide="heart" style="width: 19px; height: 19px;"></i>
-                    <span class="wishlist-badge-count position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.68rem; padding: 0.25em 0.5em; display: none;">
-                        0
+                @auth
+                <a href="{{ route('account.wishlist') }}" class="header-icon-btn" title="Danh sách yêu thích" aria-label="Yêu thích">
+                    <i data-lucide="heart"></i>
+                    @php $wCount = Auth::user()->wishlists()->count(); @endphp
+                    <span class="header-icon-badge wishlist-badge-count" style="{{ $wCount > 0 ? '' : 'display: none;' }}">
+                        {{ $wCount }}
                     </span>
+                </a>
+                @else
+                <a href="{{ route('login') }}" class="header-icon-btn" title="Danh sách yêu thích (Yêu cầu đăng nhập)" aria-label="Yêu thích">
+                    <i data-lucide="heart"></i>
                 </a>
                 @endauth
 
                 <!-- Theme Toggle Button -->
-                <button type="button" class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Chuyển đổi Sáng / Tối" aria-label="Toggle Dark Mode">
-                    <i data-lucide="sun" id="themeIconSun" style="width: 17px; height: 17px; display: none;"></i>
-                    <i data-lucide="moon" id="themeIconMoon" style="width: 17px; height: 17px; display: none;"></i>
+                <button type="button" class="header-icon-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Chuyển đổi Sáng / Tối" aria-label="Toggle Dark Mode">
+                    <i data-lucide="sun" id="themeIconSun" style="display: none;"></i>
+                    <i data-lucide="moon" id="themeIconMoon" style="display: none;"></i>
                 </button>
 
                 <!-- Auth Navigation Buttons -->
@@ -117,15 +125,13 @@
                 @else
                     <!-- Logged in User Dropdown -->
                     <div class="dropdown">
-                        <button class="btn-surface py-1.5 px-2.5 d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <div class="sidebar-user-avatar" style="width: 32px; height: 32px; font-size: 0.82rem;">
-                                {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
-                            </div>
+                        <button class="header-user-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="{{ Auth::user()->avatar_url }}" alt="{{ Auth::user()->name }}" class="rounded-circle object-fit-cover border shadow-sm flex-shrink-0" style="width: 28px; height: 28px;">
                             <div class="text-start d-none d-sm-block">
                                 <div class="fw-bold text-dark small leading-tight">{{ Auth::user()->name }}</div>
                                 <div class="text-secondary" style="font-size: 0.72rem;">
                                     @if (Auth::user()->isAdmin())
-                                        <span class="badge bg-danger-subtle text-danger p-0">Quản trị viên</span>
+                                        <span class="badge bg-danger-subtle text-danger px-1.5 py-0.5 rounded-pill fw-semibold" style="font-size: 0.65rem;">Quản trị viên</span>
                                     @else
                                         <span>Khách hàng</span>
                                     @endif
@@ -134,42 +140,58 @@
                             <i data-lucide="chevron-down" style="width: 15px; height: 15px;" class="text-secondary"></i>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-modern dropdown-menu-end shadow">
+                            <!-- User Mini Header in Dropdown -->
+                            <li class="px-3 py-2.5 mb-1 border-bottom d-flex align-items-center gap-2.5">
+                                <img src="{{ Auth::user()->avatar_url }}" alt="{{ Auth::user()->name }}" class="rounded-circle object-fit-cover border shadow-sm flex-shrink-0" style="width: 38px; height: 38px;">
+                                <div class="min-w-0 flex-grow-1">
+                                    <div class="fw-bold text-dark text-truncate" style="font-size: 0.88rem;">{{ Auth::user()->name }}</div>
+                                    <div class="text-secondary text-truncate" style="font-size: 0.72rem;">{{ Auth::user()->email }}</div>
+                                </div>
+                            </li>
+
                             @if (Auth::user()->isAdmin())
                                 <li>
-                                    <a href="{{ route('admin.dashboard') }}" class="dropdown-item-modern text-primary fw-semibold">
-                                        <i data-lucide="layout-dashboard" style="width: 16px; height: 16px; margin-right: 0.5rem;"></i>
+                                    <a href="{{ route('admin.dashboard') }}" class="dropdown-item-modern text-primary fw-semibold" style="background: rgba(99, 102, 241, 0.08);">
+                                        <i data-lucide="layout-dashboard" style="width: 16px; height: 16px; margin-right: 0.65rem;" class="text-primary"></i>
                                         <span>Vào trang Quản trị (Admin)</span>
                                     </a>
                                 </li>
                                 <li><hr class="dropdown-divider-modern"></li>
                             @endif
+
+                            <li>
+                                <a href="{{ route('account.profile') }}" class="dropdown-item-modern">
+                                    <i data-lucide="user" style="width: 16px; height: 16px; margin-right: 0.65rem;" class="text-secondary"></i>
+                                    <span>Thông tin tài khoản</span>
+                                </a>
+                            </li>
                             <li>
                                 <a href="{{ route('account.orders') }}" class="dropdown-item-modern">
-                                    <i data-lucide="package" style="width: 16px; height: 16px; margin-right: 0.5rem;"></i>
+                                    <i data-lucide="package" style="width: 16px; height: 16px; margin-right: 0.65rem;" class="text-secondary"></i>
                                     <span>Đơn hàng của tôi</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="{{ route('account.addresses') }}" class="dropdown-item-modern">
-                                    <i data-lucide="map-pin" style="width: 16px; height: 16px; margin-right: 0.5rem;"></i>
+                                    <i data-lucide="map-pin" style="width: 16px; height: 16px; margin-right: 0.65rem;" class="text-secondary"></i>
                                     <span>Sổ địa chỉ nhận hàng</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('account.wishlist') }}" class="dropdown-item-modern">
+                                    <i data-lucide="heart" style="width: 16px; height: 16px; margin-right: 0.65rem;" class="text-danger"></i>
+                                    <span>Danh sách yêu thích</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="{{ route('account.coins') }}" class="dropdown-item-modern d-flex align-items-center justify-content-between">
                                     <div class="d-flex align-items-center">
-                                        <i class="bi bi-coin text-warning me-2" style="font-size: 1rem;"></i>
+                                        <i data-lucide="coins" style="width: 16px; height: 16px; margin-right: 0.65rem;" class="text-warning"></i>
                                         <span>Ví Xu Aurelia</span>
                                     </div>
-                                    <span class="badge bg-warning-subtle text-dark fw-bold rounded-pill" style="font-size: 0.72rem;">
+                                    <span class="badge bg-warning-subtle text-dark fw-bold rounded-pill px-2" style="font-size: 0.72rem;">
                                         {{ number_format(Auth::user()->coins_balance) }} Xu
                                     </span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('account.wishlist') }}" class="dropdown-item-modern d-flex align-items-center gap-2">
-                                    <i data-lucide="heart" style="width: 16px; height: 16px; margin-right: 0.5rem;" class="text-danger"></i>
-                                    <span>Danh sách yêu thích</span>
                                 </a>
                             </li>
                             <li><hr class="dropdown-divider-modern"></li>
@@ -177,7 +199,7 @@
                                 <form action="{{ route('logout') }}" method="POST">
                                     @csrf
                                     <button type="submit" class="dropdown-item-modern item-danger w-100 border-0 bg-transparent text-start">
-                                        <i data-lucide="log-out" style="width: 16px; height: 16px; margin-right: 0.5rem;"></i>
+                                        <i data-lucide="log-out" style="width: 16px; height: 16px; margin-right: 0.65rem;"></i>
                                         <span>Đăng xuất</span>
                                     </button>
                                 </form>
@@ -319,11 +341,179 @@
             } catch (e) {}
         }
 
+        /**
+         * Global AJAX toggle wishlist for product cards and details with SweetAlert2.
+         */
+        async function toggleWishlist(productId, btnEl) {
+            @guest
+                Swal.fire({
+                    title: 'Đăng nhập để yêu thích',
+                    text: 'Vui lòng đăng nhập để lưu sản phẩm vào danh sách yêu thích của bạn.',
+                    icon: 'info',
+                    showCancelButton: true,
+                    confirmButtonColor: '#e11d48',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: 'Đăng nhập ngay',
+                    cancelButtonText: 'Để sau',
+                    customClass: { popup: 'rounded-4 shadow-lg' }
+                }).then((res) => {
+                    if (res.isConfirmed) {
+                        window.location.href = "{{ route('login') }}";
+                    }
+                });
+                return;
+            @endguest
+
+            try {
+                const res = await fetch(`/wishlist/toggle/${productId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                    },
+                });
+
+                if (res.status === 401) {
+                    window.location.href = "{{ route('login') }}";
+                    return;
+                }
+
+                const data = await res.json();
+                if (data.success) {
+                    // Update all buttons for this productId across current page
+                    const buttons = document.querySelectorAll(`[data-wishlist-id="${productId}"]`);
+                    buttons.forEach(btn => {
+                        const icon = btn.querySelector('i, svg');
+                        if (data.added) {
+                            btn.classList.add('wishlisted', 'active');
+                            if (icon) {
+                                icon.classList.remove('text-secondary');
+                                icon.classList.add('text-danger');
+                                icon.style.fill = 'currentColor';
+                            }
+                        } else {
+                            btn.classList.remove('wishlisted', 'active');
+                            if (icon) {
+                                icon.classList.remove('text-danger');
+                                icon.classList.add('text-secondary');
+                                icon.style.fill = 'none';
+                            }
+                        }
+                    });
+
+                    // Update wishlist badge in header
+                    const badges = document.querySelectorAll('.wishlist-badge-count');
+                    badges.forEach(b => {
+                        b.textContent = data.count;
+                        b.style.display = data.count > 0 ? 'inline-flex' : 'none';
+                    });
+
+                    // Modern Toast notification
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 2500,
+                        timerProgressBar: true
+                    });
+                    Toast.fire({
+                        icon: data.added ? 'success' : 'info',
+                        title: data.message
+                    });
+
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                }
+            } catch (err) {
+                console.error('Wishlist toggle error:', err);
+            }
+        }
+
+        // Global Dialog Helpers replacing window.alert / window.confirm
+        window.showToast = function(message, icon = 'success') {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true
+            });
+            Toast.fire({ icon: icon, title: message });
+        };
+
+        window.showModalAlert = function(title, message, icon = 'info') {
+            Swal.fire({
+                title: title,
+                text: message,
+                icon: icon,
+                confirmButtonColor: '#e11d48',
+                customClass: { popup: 'rounded-4 shadow-lg' }
+            });
+        };
+
+        window.showConfirmDialog = function(arg1, arg2, arg3) {
+            let title = 'Xác nhận';
+            let text = '';
+            let icon = 'question';
+            let confirmText = 'Đồng ý';
+            let cancelText = 'Hủy bỏ';
+            let onConfirm = null;
+
+            if (typeof arg1 === 'object' && arg1 !== null) {
+                title = arg1.title || title;
+                text = arg1.text || '';
+                icon = arg1.icon || icon;
+                confirmText = arg1.confirmText || confirmText;
+                cancelText = arg1.cancelText || cancelText;
+                onConfirm = arg1.onConfirm;
+            } else {
+                text = arg1 || '';
+                onConfirm = arg2;
+                if (arg3) title = arg3;
+            }
+
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: title,
+                    text: text,
+                    icon: icon,
+                    showCancelButton: true,
+                    confirmButtonColor: '#e11d48',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: confirmText,
+                    cancelButtonText: cancelText,
+                    customClass: { popup: 'rounded-4 shadow-lg' }
+                }).then((res) => {
+                    if (res.isConfirmed && typeof onConfirm === 'function') {
+                        onConfirm();
+                    }
+                });
+            } else if (confirm(text)) {
+                if (typeof onConfirm === 'function') onConfirm();
+            }
+        };
+
         document.addEventListener('DOMContentLoaded', function () {
             const initialTheme = document.documentElement.getAttribute('data-theme') || 'light';
             updateThemeIcon(initialTheme);
             if (typeof lucide !== 'undefined') lucide.createIcons();
             refreshCartBadge();
+
+            // Intercept data-confirm forms
+            document.addEventListener('submit', function(e) {
+                const form = e.target;
+                if (form && form.dataset && form.dataset.confirm) {
+                    e.preventDefault();
+                    const msg = form.dataset.confirm;
+                    const title = form.dataset.confirmTitle || 'Xác nhận thao tác';
+                    window.showConfirmDialog(msg, () => {
+                        const savedMsg = form.dataset.confirm;
+                        delete form.dataset.confirm;
+                        form.submit();
+                        form.dataset.confirm = savedMsg;
+                    }, title);
+                }
+            });
         });
     </script>
     

@@ -41,7 +41,7 @@
 
             <!-- Confirm Delivery button if shipping -->
             @if ($order->shipping_status === 'shipping')
-                <form action="{{ route('account.orders.confirm_delivery', $order) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn xác nhận đã nhận đầy đủ hàng và hài lòng với kiện hàng này?');">
+                <form action="{{ route('account.orders.confirm_delivery', $order) }}" method="POST" class="d-inline" data-confirm="Bạn xác nhận đã nhận đầy đủ hàng và hài lòng với kiện hàng này?" data-confirm-title="Xác nhận đã nhận hàng">
                     @csrf
                     <button type="submit" class="btn btn-success py-2 px-3.5 d-inline-flex align-items-center gap-1.5 fw-semibold">
                         <i data-lucide="check-check" style="width: 16px; height: 16px;"></i>

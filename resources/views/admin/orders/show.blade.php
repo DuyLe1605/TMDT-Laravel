@@ -42,7 +42,7 @@
             <!-- Confirm Order Options (pending) -->
             @if ($order->canBeConfirmed())
                 <!-- 1-Click Confirm & Send to GHN -->
-                <form action="{{ route('admin.orders.update_status', $order) }}" method="POST" class="d-inline" onsubmit="return confirm('Xác nhận đơn hàng và đẩy thông tin sang GHN để tài xế đến lấy hàng ngay?');">
+                <form action="{{ route('admin.orders.update_status', $order) }}" method="POST" class="d-inline" data-confirm="Xác nhận đơn hàng và đẩy thông tin sang GHN để tài xế đến lấy hàng ngay?" data-confirm-title="Xác nhận & Gửi GHN">
                     @csrf
                     @method('PATCH')
                     <input type="hidden" name="action" value="confirm_and_ghn">
@@ -66,7 +66,7 @@
 
             <!-- Send to GHN Button (processing -> shipping) -->
             @if ($order->canBeSentToGhn())
-                <form action="{{ route('admin.orders.send_ghn', $order) }}" method="POST" class="d-inline" onsubmit="return confirm('Xác nhận gửi thông tin kiện hàng lên GHN để tài xế đến lấy hàng?');">
+                <form action="{{ route('admin.orders.send_ghn', $order) }}" method="POST" class="d-inline" data-confirm="Xác nhận gửi thông tin kiện hàng lên GHN để tài xế đến lấy hàng?" data-confirm-title="Gửi đơn sang GHN">
                     @csrf
                     <button type="submit" class="btn btn-success d-inline-flex align-items-center shadow-sm">
                         <i data-lucide="send" style="width: 16px; height: 16px; margin-right: 0.4rem;"></i>
@@ -85,7 +85,7 @@
 
             <!-- Mark Delivered Button (shipping -> delivered) -->
             @if ($order->shipping_status === 'shipping')
-                <form action="{{ route('admin.orders.update_status', $order) }}" method="POST" class="d-inline" onsubmit="return confirm('Xác nhận đơn hàng này đã được giao thành công đến khách hàng?');">
+                <form action="{{ route('admin.orders.update_status', $order) }}" method="POST" class="d-inline" data-confirm="Xác nhận đơn hàng này đã được giao thành công đến khách hàng?" data-confirm-title="Đánh dấu Đã Giao">
                     @csrf
                     @method('PATCH')
                     <input type="hidden" name="action" value="mark_delivered">
@@ -98,7 +98,7 @@
 
             <!-- Mark Payment as Paid Button (if still pending) -->
             @if ($order->payment_status !== 'paid')
-                <form action="{{ route('admin.orders.update_status', $order) }}" method="POST" class="d-inline" onsubmit="return confirm('Xác nhận đơn hàng đã thanh toán thành công?');">
+                <form action="{{ route('admin.orders.update_status', $order) }}" method="POST" class="d-inline" data-confirm="Xác nhận đơn hàng đã thanh toán thành công?" data-confirm-title="Xác nhận Đã Thu Tiền">
                     @csrf
                     @method('PATCH')
                     <input type="hidden" name="action" value="mark_paid">
@@ -200,7 +200,7 @@
                         </div>
                     </div>
                     <div class="d-flex flex-wrap align-items-center gap-2 mt-2 pt-2 border-top border-warning border-opacity-25">
-                        <form action="{{ route('admin.orders.update_status', $order) }}" method="POST" class="d-inline" onsubmit="return confirm('Xác nhận đơn hàng và đẩy thông tin sang GHN để tài xế đến lấy hàng ngay?');">
+                        <form action="{{ route('admin.orders.update_status', $order) }}" method="POST" class="d-inline" data-confirm="Xác nhận đơn hàng và đẩy thông tin sang GHN để tài xế đến lấy hàng ngay?" data-confirm-title="Xác nhận & Gửi GHN">
                             @csrf
                             @method('PATCH')
                             <input type="hidden" name="action" value="confirm_and_ghn">
@@ -230,7 +230,7 @@
                         </div>
                     </div>
                     <div class="mt-2 pt-2 border-top border-info border-opacity-25 d-flex justify-content-end">
-                        <form action="{{ route('admin.orders.send_ghn', $order) }}" method="POST" class="d-inline" onsubmit="return confirm('Xác nhận gửi thông tin kiện hàng lên GHN để tài xế đến lấy hàng?');">
+                        <form action="{{ route('admin.orders.send_ghn', $order) }}" method="POST" class="d-inline" data-confirm="Xác nhận gửi thông tin kiện hàng lên GHN để tài xế đến lấy hàng?" data-confirm-title="Gửi đơn sang GHN">
                             @csrf
                             <button type="submit" class="btn btn-sm btn-success d-inline-flex align-items-center gap-1 shadow-sm px-3">
                                 <i data-lucide="send" style="width: 14px; height: 14px;"></i>

@@ -209,27 +209,37 @@
                         </div>
                     </div>
 
-                    <!-- Action CTAs: Add to Cart & Buy Now -->
-                    <div class="d-flex flex-wrap gap-3 mb-4">
+                    <!-- Action CTAs: Add to Cart, Buy Now & Wishlist Cluster -->
+                    <div class="product-detail-actions">
                         <button 
                             type="button" 
                             id="detailAddToCartBtn" 
-                            class="btn-surface py-2.5 px-4 fs-6 fw-semibold d-inline-flex align-items-center justify-content-center text-primary"
-                            style="border-color: var(--brand-400) !important;"
+                            class="btn-detail-cart"
                             onclick="handleDetailAddToCart(false)"
                         >
-                            <i data-lucide="shopping-bag" style="width: 18px; height: 18px; margin-right: 0.5rem;"></i>
+                            <i data-lucide="shopping-bag" style="width: 18px; height: 18px;"></i>
                             <span>Thêm Vào Giỏ Hàng</span>
                         </button>
 
                         <button 
                             type="button" 
                             id="detailBuyNowBtn" 
-                            class="btn-brand-primary py-2.5 px-4 fs-6 fw-semibold d-inline-flex align-items-center justify-content-center shadow-sm"
+                            class="btn-detail-buynow"
                             onclick="handleDetailAddToCart(true)"
                         >
-                            <i data-lucide="zap" style="width: 18px; height: 18px; margin-right: 0.5rem;"></i>
+                            <i data-lucide="zap" style="width: 18px; height: 18px;"></i>
                             <span>Mua Ngay</span>
+                        </button>
+
+                        <button 
+                            type="button" 
+                            class="btn-detail-wishlist {{ $isWishlisted ? 'wishlisted active' : '' }}"
+                            data-wishlist-id="{{ $product->id }}"
+                            onclick="toggleWishlist({{ $product->id }}, this)"
+                            title="{{ $isWishlisted ? 'Xóa khỏi danh sách yêu thích' : 'Thêm vào danh sách yêu thích' }}"
+                            aria-label="Yêu thích"
+                        >
+                            <i data-lucide="heart" style="width: 20px; height: 20px; {{ $isWishlisted ? 'fill: currentColor;' : '' }}"></i>
                         </button>
                     </div>
                 </div>
@@ -381,10 +391,20 @@
                                     @endif
                                 </a>
                                 @if ($relProduct->brand)
-                                    <span class="badge bg-dark text-white position-absolute top-0 start-0 m-2 px-2 py-0.5 rounded-pill" style="font-size: 0.68rem;">
+                                    <span class="badge bg-dark text-white position-absolute top-0 start-0 m-2 px-2 py-0.5 rounded-pill" style="font-size: 0.68rem; z-index: 2;">
                                         {{ $relProduct->brand->name }}
                                     </span>
                                 @endif
+
+                                <!-- Wishlist Heart Button for Related Product -->
+                                <button type="button"
+                                    class="wishlist-heart-btn position-absolute top-0 end-0 m-2.5 shadow-sm {{ in_array($relProduct->id, $wishlistedIds ?? []) ? 'wishlisted active' : '' }}"
+                                    data-wishlist-id="{{ $relProduct->id }}"
+                                    title="Yêu thích"
+                                    onclick="toggleWishlist({{ $relProduct->id }}, this)"
+                                >
+                                    <i data-lucide="heart" style="{{ in_array($relProduct->id, $wishlistedIds ?? []) ? 'fill: currentColor;' : '' }}" class="{{ in_array($relProduct->id, $wishlistedIds ?? []) ? 'text-danger' : 'text-secondary' }}"></i>
+                                </button>
                             </div>
                             <div class="product-store-content p-3 d-flex flex-column flex-grow-1">
                                 <h6 class="fw-bold mb-1">
@@ -708,12 +728,26 @@
             } else {
                 if (window.showToast) {
                     window.showToast(result.message || 'Không thể thêm vào giỏ hàng.', 'error');
-                } else {
-                    alert(result.message || 'Lỗi khi thêm vào giỏ hàng.');
+                } else if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Thông báo',
+                        text: result.message || 'Lỗi khi thêm vào giỏ hàng.',
+                        confirmButtonColor: '#e11d48'
+                    });
                 }
             }
         } catch (e) {
-            alert('Lỗi kết nối máy chủ. Vui lòng thử lại.');
+            if (window.showToast) {
+                window.showToast('Lỗi kết nối máy chủ. Vui lòng thử lại.', 'error');
+            } else if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi kết nối',
+                    text: 'Lỗi kết nối máy chủ. Vui lòng thử lại.',
+                    confirmButtonColor: '#e11d48'
+                });
+            }
         } finally {
             if (addBtn) {
                 addBtn.disabled = false;

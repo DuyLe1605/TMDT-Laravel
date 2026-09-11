@@ -1483,7 +1483,16 @@
         const isDefault = document.getElementById('newIsDefault') ? (document.getElementById('newIsDefault').checked ? 1 : 0) : 1;
 
         if (!province || !district || !ward) {
-            alert('Vui lòng chọn đầy đủ Tỉnh/Thành phố, Quận/Huyện và Phường/Xã.');
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Thiếu thông tin',
+                    text: 'Vui lòng chọn đầy đủ Tỉnh/Thành phố, Quận/Huyện và Phường/Xã.',
+                    confirmButtonText: 'Đã hiểu',
+                    confirmButtonColor: '#e11d48',
+                    customClass: { popup: 'rounded-4 shadow-lg' }
+                });
+            }
             submitBtn.disabled = false;
             return;
         }
@@ -1531,7 +1540,16 @@
                     errEl.classList.remove('d-none');
                 }
             } catch (e) {
-                alert('Lỗi kết nối. Vui lòng thử lại.');
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi kết nối',
+                        text: 'Lỗi kết nối máy chủ. Vui lòng thử lại.',
+                        confirmButtonText: 'Đóng',
+                        confirmButtonColor: '#e11d48',
+                        customClass: { popup: 'rounded-4 shadow-lg' }
+                    });
+                }
             } finally {
                 submitBtn.disabled = false;
             }
@@ -1786,7 +1804,16 @@
 
     function confirmModalVoucherSelection() {
         if (!tempSelectedVoucher) {
-            alert('Vui lòng chọn một mã giảm giá khả dụng hoặc đóng cửa sổ.');
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Chưa chọn voucher',
+                    text: 'Vui lòng chọn một mã giảm giá khả dụng hoặc đóng cửa sổ.',
+                    confirmButtonText: 'Đã hiểu',
+                    confirmButtonColor: '#e11d48',
+                    customClass: { popup: 'rounded-4 shadow-lg' }
+                });
+            }
             return;
         }
 
@@ -1925,7 +1952,16 @@
         // Re-validate voucher with new payment method
         applyVoucherAjax(currentVoucher.code, {
             onError: (msg) => {
-                alert(`Mã giảm giá ${currentVoucher.code} không áp dụng cho hình thức thanh toán vừa chọn (${msg}). Mã giảm giá đã được gỡ bỏ.`);
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Voucher không áp dụng',
+                        text: `Mã giảm giá ${currentVoucher.code} không áp dụng cho hình thức thanh toán vừa chọn (${msg}). Mã giảm giá đã được gỡ bỏ.`,
+                        confirmButtonText: 'Đã hiểu',
+                        confirmButtonColor: '#e11d48',
+                        customClass: { popup: 'rounded-4 shadow-lg' }
+                    });
+                }
                 removeVoucher();
             }
         });

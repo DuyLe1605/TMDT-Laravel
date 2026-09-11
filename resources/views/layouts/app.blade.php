@@ -26,6 +26,9 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
+    <!-- SweetAlert2 Modern Dialogs -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <!-- Bespoke Design System Stylesheet -->
     <link rel="stylesheet" href="{{ asset('css/custom.css') }}?v={{ filemtime(public_path('css/custom.css')) }}">
     @yield('styles')
@@ -167,10 +170,65 @@
             }
         }
 
+        // Global Admin Confirm Dialog
+        window.showConfirmDialog = function(message, onConfirm, title = 'Xác nhận thao tác') {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: title,
+                    text: message,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Đồng ý',
+                    cancelButtonText: 'Hủy bỏ',
+                    confirmButtonColor: '#e11d48',
+                    cancelButtonColor: '#64748b',
+                    customClass: { popup: 'rounded-4 shadow-lg' }
+                }).then((result) => {
+                    if (result.isConfirmed && typeof onConfirm === 'function') {
+                        onConfirm();
+                    }
+                });
+            } else if (confirm(message)) {
+                if (typeof onConfirm === 'function') onConfirm();
+            }
+        };
+
+        window.showToast = function(message, icon = 'success') {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: icon,
+                    title: message,
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+            } else {
+                console.log(message);
+            }
+        };
+
         document.addEventListener('DOMContentLoaded', function () {
             // Setup correct initial theme icon
             const initialTheme = document.documentElement.getAttribute('data-theme') || 'light';
             updateThemeIcon(initialTheme);
+
+            // Intercept data-confirm forms
+            document.addEventListener('submit', function(e) {
+                const form = e.target;
+                if (form && form.dataset && form.dataset.confirm) {
+                    e.preventDefault();
+                    const msg = form.dataset.confirm;
+                    const title = form.dataset.confirmTitle || 'Xác nhận thao tác';
+                    window.showConfirmDialog(msg, () => {
+                        const savedMsg = form.dataset.confirm;
+                        delete form.dataset.confirm;
+                        form.submit();
+                        form.dataset.confirm = savedMsg;
+                    }, title);
+                }
+            });
 
             // Initialize Lucide Icons
             if (typeof lucide !== 'undefined') {

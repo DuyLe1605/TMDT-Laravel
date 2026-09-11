@@ -152,6 +152,16 @@
                                     </span>
                                 @endif
                             </div>
+
+                            <!-- Wishlist Heart Toggle Button -->
+                            <button type="button"
+                                class="wishlist-heart-btn position-absolute top-0 end-0 m-2.5 shadow-sm {{ in_array($product->id, $wishlistedIds ?? []) ? 'wishlisted active' : '' }}"
+                                data-wishlist-id="{{ $product->id }}"
+                                title="{{ in_array($product->id, $wishlistedIds ?? []) ? 'Bỏ yêu thích' : 'Thêm vào yêu thích' }}"
+                                onclick="toggleWishlist({{ $product->id }}, this)"
+                            >
+                                <i data-lucide="heart" style="{{ in_array($product->id, $wishlistedIds ?? []) ? 'fill: currentColor;' : '' }}" class="{{ in_array($product->id, $wishlistedIds ?? []) ? 'text-danger' : 'text-secondary' }}"></i>
+                            </button>
                         </div>
 
                         <!-- Card Body -->
@@ -185,7 +195,7 @@
                                         </div>
                                     @endif
                                 </div>
-                                <div class="d-flex align-items-center gap-2 flex-shrink-0">
+                                <div class="d-flex align-items-center gap-1.5 flex-shrink-0">
                                     <button 
                                         type="button" 
                                         class="btn-card-action" 
@@ -204,6 +214,15 @@
                                         })"
                                     >
                                         <i data-lucide="{{ $product->has_variants ? 'layers' : 'shopping-bag' }}" style="width: 16px; height: 16px;"></i>
+                                    </button>
+                                    <button 
+                                        type="button" 
+                                        class="btn-card-action {{ in_array($product->id, $wishlistedIds ?? []) ? 'active text-danger' : '' }}" 
+                                        data-wishlist-id="{{ $product->id }}"
+                                        title="{{ in_array($product->id, $wishlistedIds ?? []) ? 'Bỏ yêu thích' : 'Thêm vào yêu thích' }}"
+                                        onclick="toggleWishlist({{ $product->id }}, this)"
+                                    >
+                                        <i data-lucide="heart" style="width: 16px; height: 16px; {{ in_array($product->id, $wishlistedIds ?? []) ? 'fill: currentColor;' : '' }}" class="{{ in_array($product->id, $wishlistedIds ?? []) ? 'text-danger' : 'text-secondary' }}"></i>
                                     </button>
                                     <a href="{{ route('shop.show', $product) }}" class="btn-card-action flex-shrink-0" title="Xem chi tiết sản phẩm">
                                         <i data-lucide="eye" style="width: 16px; height: 16px;"></i>

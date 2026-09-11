@@ -159,7 +159,7 @@
                                 <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2.5 py-1.5 font-monospace fw-bold fs-6">
                                     {{ $voucher->code }}
                                 </span>
-                                <button type="button" class="btn btn-sm btn-link text-secondary p-0 copy-btn" onclick="navigator.clipboard.writeText('{{ $voucher->code }}'); alert('Đã copy mã: {{ $voucher->code }}');" title="Sao chép mã">
+                                <button type="button" class="btn btn-sm btn-link text-secondary p-0 copy-btn" onclick="navigator.clipboard.writeText('{{ $voucher->code }}'); window.showToast('Đã sao chép mã: {{ $voucher->code }}');" title="Sao chép mã">
                                     <i data-lucide="copy" style="width: 14px; height: 14px;"></i>
                                 </button>
                             </div>
@@ -245,7 +245,7 @@
                                 <a href="{{ route('admin.vouchers.edit', $voucher) }}" class="btn btn-sm btn-light border text-secondary" title="Chỉnh sửa voucher">
                                     <i data-lucide="edit-3" style="width: 15px; height: 15px;"></i>
                                 </a>
-                                <form action="{{ route('admin.vouchers.destroy', $voucher) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa/vô hiệu hóa voucher {{ $voucher->code }}?');">
+                                <form action="{{ route('admin.vouchers.destroy', $voucher) }}" method="POST" class="d-inline" data-confirm="Bạn có chắc chắn muốn xóa/vô hiệu hóa voucher {{ $voucher->code }}?" data-confirm-title="Xóa voucher">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-light border text-danger" title="Xóa voucher">

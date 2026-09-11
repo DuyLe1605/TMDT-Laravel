@@ -598,8 +598,15 @@
             toastContainer.appendChild(toastEl);
             if (typeof lucide !== 'undefined') lucide.createIcons();
             setTimeout(() => toastEl.remove(), 4000);
-        } else {
-            alert(message);
+        } else if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                text: message,
+                icon: type === 'success' ? 'success' : 'info',
+                timer: 3000,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
         }
     }
 </script>

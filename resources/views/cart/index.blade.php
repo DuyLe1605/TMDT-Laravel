@@ -475,54 +475,70 @@
 
     // Delete single item
     async function deleteCartItem(itemId, productName) {
-        if (!confirm(`Bạn có chắc muốn xóa "${productName}" khỏi giỏ hàng?`)) {
-            return;
-        }
+        Swal.fire({
+            title: 'Xác nhận xóa',
+            text: `Bạn có chắc muốn xóa "${productName}" khỏi giỏ hàng?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#e11d48',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Xóa sản phẩm',
+            cancelButtonText: 'Giữ lại',
+            customClass: { popup: 'rounded-4 shadow-lg' }
+        }).then(async (dialogRes) => {
+            if (!dialogRes.isConfirmed) return;
 
-        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-        try {
-            const response = await fetch(`/cart/remove/${itemId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            try {
+                const response = await fetch(`/cart/remove/${itemId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    }
+                });
+
+                const result = await response.json();
+                if (response.ok && result.success) {
+                    const row = document.getElementById(`cart-item-row-${itemId}`);
+                    if (row) {
+                        row.remove();
+                    }
+
+                    if (typeof updateCartBadge === 'function') {
+                        updateCartBadge(result.cart_count);
+                    }
+
+                    // If no more items, reload to show empty state
+                    const remaining = document.querySelectorAll('.cart-item-row');
+                    if (remaining.length === 0) {
+                        window.location.reload();
+                        return;
+                    }
+
+                    const totalItemsCount = document.getElementById('totalItemsCount');
+                    if (totalItemsCount) totalItemsCount.textContent = remaining.length;
+
+                    onItemCheckboxChanged();
+                    if (window.showToast) window.showToast('Đã xóa sản phẩm khỏi giỏ hàng!', 'success');
                 }
-            });
-
-            const result = await response.json();
-            if (response.ok && result.success) {
-                const row = document.getElementById(`cart-item-row-${itemId}`);
-                if (row) {
-                    row.remove();
-                }
-
-                if (typeof updateCartBadge === 'function') {
-                    updateCartBadge(result.cart_count);
-                }
-
-                // If no more items, reload to show empty state
-                const remaining = document.querySelectorAll('.cart-item-row');
-                if (remaining.length === 0) {
-                    window.location.reload();
-                    return;
-                }
-
-                const totalItemsCount = document.getElementById('totalItemsCount');
-                if (totalItemsCount) totalItemsCount.textContent = remaining.length;
-
-                onItemCheckboxChanged();
-                if (window.showToast) window.showToast('Đã xóa sản phẩm khỏi giỏ hàng!', 'success');
+            } catch (err) {
+                console.error(err);
             }
-        } catch (err) {
-            console.error(err);
-        }
+        });
     }
 
     // Bulk Delete
     function confirmBulkDelete() {
         const checked = document.querySelectorAll('.item-checkbox:checked');
         if (checked.length === 0) {
-            alert('Vui lòng tích chọn ít nhất 1 sản phẩm để xóa.');
+            Swal.fire({
+                title: 'Chưa chọn sản phẩm',
+                text: 'Vui lòng tích chọn ít nhất 1 sản phẩm để xóa.',
+                icon: 'warning',
+                confirmButtonColor: '#e11d48',
+                customClass: { popup: 'rounded-4 shadow-lg' }
+            });
             return;
         }
 
@@ -559,7 +575,13 @@
                 }
                 window.location.reload();
             } else {
-                alert(result.message || 'Lỗi khi xóa sản phẩm');
+                Swal.fire({
+                    title: 'Lỗi xóa sản phẩm',
+                    text: result.message || 'Lỗi khi xóa sản phẩm',
+                    icon: 'error',
+                    confirmButtonColor: '#e11d48',
+                    customClass: { popup: 'rounded-4 shadow-lg' }
+                });
             }
         } catch (err) {
             console.error(err);

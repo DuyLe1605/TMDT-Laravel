@@ -176,9 +176,10 @@ class StorefrontController extends Controller
         // Đánh giá sản phẩm và tổng hợp số sao (Shopee-style)
         $reviewSummary = $this->reviewService->getProductReviewsSummary($product);
         $reviews = $this->reviewService->getFilteredReviews($product, [], 5);
-        $isWishlisted = Auth::check() ? $this->wishlistService->isWishlisted(Auth::id(), $product->id) : false;
+        $wishlistedIds = Auth::check() ? $this->wishlistService->getWishlistedProductIds(Auth::id()) : [];
+        $isWishlisted = in_array($product->id, $wishlistedIds);
 
-        return view('storefront.show', compact('product', 'relatedProducts', 'reviewSummary', 'reviews', 'isWishlisted'));
+        return view('storefront.show', compact('product', 'relatedProducts', 'reviewSummary', 'reviews', 'isWishlisted', 'wishlistedIds'));
     }
 
     /**
