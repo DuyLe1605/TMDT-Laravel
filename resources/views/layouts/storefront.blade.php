@@ -72,7 +72,7 @@
             </a>
 
             <!-- Nav Links -->
-            <nav class="d-none d-lg-flex align-items-center gap-1">
+            <nav class="d-none d-lg-flex align-items-center gap-2">
                 <a href="{{ route('home') }}" class="storefront-nav-link {{ request()->routeIs('home') ? 'active' : '' }}">
                     <span>Trang chủ</span>
                 </a>
@@ -82,7 +82,7 @@
             </nav>
 
             <!-- Header Right Actions (Search / Cart / Theme / Auth) -->
-            <div class="d-flex align-items-center gap-2">
+            <div class="d-flex align-items-center gap-2.5">
                 <!-- Shopping Cart Button with Dynamic Live Badge -->
                 <a href="{{ route('cart.index') }}" class="header-icon-btn" title="Giỏ hàng của bạn" aria-label="Giỏ hàng">
                     <i data-lucide="shopping-cart"></i>
@@ -114,15 +114,17 @@
 
                 <!-- Auth Navigation Buttons -->
                 @guest
-                    <a href="{{ route('login') }}" class="btn-surface py-2 px-3 text-decoration-none">
-                        <i data-lucide="log-in" style="width: 16px; height: 16px; margin-right: 0.35rem;"></i>
+                    <a href="{{ route('login') }}" class="header-auth-btn header-auth-btn-surface">
+                        <i data-lucide="log-in"></i>
                         <span>Đăng nhập</span>
                     </a>
-                    <a href="{{ route('register') }}" class="btn-brand-primary py-2 px-3 text-decoration-none d-none d-sm-inline-flex">
-                        <i data-lucide="user-plus" style="width: 16px; height: 16px; margin-right: 0.35rem;"></i>
+                    <a href="{{ route('register') }}" class="header-auth-btn header-auth-btn-primary d-none d-sm-inline-flex">
+                        <i data-lucide="user-plus"></i>
                         <span>Đăng ký</span>
                     </a>
                 @else
+                    <div class="vr mx-1 opacity-25 d-none d-sm-block" style="height: 24px;"></div>
+
                     <!-- Logged in User Dropdown -->
                     <div class="dropdown">
                         <button class="header-user-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -139,27 +141,30 @@
                             </div>
                             <i data-lucide="chevron-down" style="width: 15px; height: 15px;" class="text-secondary"></i>
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-modern dropdown-menu-end shadow">
+                        <ul class="dropdown-menu dropdown-menu-modern dropdown-menu-end shadow-lg" style="min-width: 270px;">
                             <!-- User Mini Header in Dropdown -->
-                            <li class="px-3 py-2.5 mb-1 border-bottom d-flex align-items-center gap-2.5">
-                                <img src="{{ Auth::user()->avatar_url }}" alt="{{ Auth::user()->name }}" class="rounded-circle object-fit-cover border shadow-sm flex-shrink-0" style="width: 38px; height: 38px;">
+                            <li class="dropdown-user-header d-flex align-items-center gap-2.5">
+                                <img src="{{ Auth::user()->avatar_url }}" alt="{{ Auth::user()->name }}" class="rounded-circle object-fit-cover border shadow-sm flex-shrink-0" style="width: 42px; height: 42px;">
                                 <div class="min-w-0 flex-grow-1">
-                                    <div class="fw-bold text-dark text-truncate" style="font-size: 0.88rem;">{{ Auth::user()->name }}</div>
-                                    <div class="text-secondary text-truncate" style="font-size: 0.72rem;">{{ Auth::user()->email }}</div>
+                                    <div class="fw-bold text-dark text-truncate" style="font-size: 0.9rem; letter-spacing: -0.01em;">{{ Auth::user()->name }}</div>
+                                    <div class="text-secondary text-truncate" style="font-size: 0.74rem;">{{ Auth::user()->email }}</div>
                                 </div>
                             </li>
 
                             @if (Auth::user()->isAdmin())
-                                <li>
-                                    <a href="{{ route('admin.dashboard') }}" class="dropdown-item-modern text-primary fw-semibold" style="background: rgba(99, 102, 241, 0.08);">
-                                        <i data-lucide="layout-dashboard" style="width: 16px; height: 16px; margin-right: 0.65rem;" class="text-primary"></i>
-                                        <span>Vào trang Quản trị (Admin)</span>
+                                <li class="my-1">
+                                    <a href="{{ route('admin.dashboard') }}" class="dropdown-item-modern dropdown-item-admin fw-semibold d-flex align-items-center justify-content-between">
+                                        <span class="d-flex align-items-center gap-2">
+                                            <i data-lucide="layout-dashboard" style="width: 16px; height: 16px;" class="text-primary flex-shrink-0"></i>
+                                            <span>Trang Quản trị (Admin)</span>
+                                        </span>
+                                        <i data-lucide="arrow-up-right" style="width: 14px; height: 14px;" class="text-primary opacity-50 flex-shrink-0"></i>
                                     </a>
                                 </li>
-                                <li><hr class="dropdown-divider-modern"></li>
+                                <li><hr class="dropdown-divider-modern my-1"></li>
                             @endif
 
-                            <li>
+                            <li class="{{ Auth::user()->isAdmin() ? '' : 'pt-1' }}">
                                 <a href="{{ route('account.profile') }}" class="dropdown-item-modern">
                                     <i data-lucide="user" style="width: 16px; height: 16px; margin-right: 0.65rem;" class="text-secondary"></i>
                                     <span>Thông tin tài khoản</span>

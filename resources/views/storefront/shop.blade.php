@@ -208,8 +208,8 @@
                                     @endif
                                 </a>
 
-                                <!-- Badges -->
-                                <div class="position-absolute top-0 start-0 p-2.5 d-flex flex-column gap-1.5" style="z-index: 2;">
+                                <!-- Badges (Elegant Luxury Spacing) -->
+                                <div class="position-absolute top-0 start-0 d-flex flex-column" style="z-index: 2; padding: 12px; gap: 6px;">
                                     @if ($product->has_discount)
                                         <span class="badge-discount-luxury">
                                             -{{ round(($product->price - $product->sale_price) / $product->price * 100) }}%
@@ -223,9 +223,9 @@
                                     @endif
                                 </div>
 
-                                <!-- Wishlist Heart Toggle (Top-Right on Image) -->
+                                <!-- Wishlist Heart Toggle (Top-Right on Image: Perfect Circle) -->
                                 <button type="button"
-                                    class="wishlist-heart-btn position-absolute top-0 end-0 m-2.5 shadow-sm {{ in_array($product->id, $wishlistedIds ?? []) ? 'wishlisted active' : '' }}"
+                                    class="wishlist-heart-btn {{ in_array($product->id, $wishlistedIds ?? []) ? 'wishlisted active' : '' }}"
                                     data-wishlist-id="{{ $product->id }}"
                                     title="{{ in_array($product->id, $wishlistedIds ?? []) ? 'Bỏ yêu thích' : 'Thêm vào yêu thích' }}"
                                     aria-label="Yêu thích"
@@ -275,7 +275,7 @@
                                             </div>
                                         @endif
                                     </div>
-                                    <div class="d-flex align-items-center gap-1.5 flex-shrink-0">
+                                    <div class="d-flex align-items-center gap-2 flex-shrink-0">
                                         <button 
                                             type="button" 
                                             class="btn-card-action" 
@@ -294,15 +294,6 @@
                                             })"
                                         >
                                             <i data-lucide="{{ $product->has_variants ? 'layers' : 'shopping-bag' }}" style="width: 16px; height: 16px;"></i>
-                                        </button>
-                                        <button 
-                                            type="button" 
-                                            class="btn-card-action {{ in_array($product->id, $wishlistedIds ?? []) ? 'active text-danger' : '' }}" 
-                                            data-wishlist-id="{{ $product->id }}"
-                                            title="{{ in_array($product->id, $wishlistedIds ?? []) ? 'Bỏ yêu thích' : 'Thêm vào yêu thích' }}"
-                                            onclick="toggleWishlist({{ $product->id }}, this)"
-                                        >
-                                            <i data-lucide="heart" style="width: 16px; height: 16px; {{ in_array($product->id, $wishlistedIds ?? []) ? 'fill: currentColor;' : '' }}" class="{{ in_array($product->id, $wishlistedIds ?? []) ? 'text-danger' : 'text-secondary' }}"></i>
                                         </button>
                                         <a href="{{ route('shop.show', $product) }}" class="btn-card-action" title="Xem chi tiết sản phẩm">
                                             <i data-lucide="eye" style="width: 16px; height: 16px;"></i>

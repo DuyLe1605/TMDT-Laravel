@@ -137,9 +137,49 @@ class OrderService
                 $coinsDiscountAmount = (float) ($coinsUsed * CoinService::COIN_EXCHANGE_RATE);
             }
 
-            $totalAmount = max(0, $subtotal + $shippingFee - $discountAmount - $coinsDiscountAmount);
+            // 5. Gift wrap calculation (Selected wrapping paper & greeting card)
+            $isGiftWrapped = !empty($orderData['is_gift_wrapped']);
+            $giftWrapFee = 0.0;
+            $giftPaperId = null;
+            $giftPaperName = null;
+            $giftCardId = null;
+            $giftCardName = null;
+            $giftMessage = null;
+            $hidePrice = false;
 
-            // 5. Determine payment status based on payment method
+            if ($isGiftWrapped) {
+                // Fetch selected paper
+                if (!empty($orderData['gift_paper_id'])) {
+                    $paper = \App\Models\GiftOption::where('type', 'paper')->find($orderData['gift_paper_id']);
+                    if ($paper) {
+                        $giftPaperId = $paper->id;
+                        $giftPaperName = $paper->name;
+                        $giftWrapFee += (float) $paper->price;
+                    }
+                }
+
+                // If no paper chosen but wrapped was checked, default fee 35.000₫
+                if (!$giftPaperId) {
+                    $giftWrapFee = 35000.0;
+                }
+
+                // Fetch selected card
+                if (!empty($orderData['gift_card_id'])) {
+                    $card = \App\Models\GiftOption::where('type', 'card')->find($orderData['gift_card_id']);
+                    if ($card) {
+                        $giftCardId = $card->id;
+                        $giftCardName = $card->name;
+                        $giftWrapFee += (float) $card->price;
+                    }
+                }
+
+                $giftMessage = !empty($orderData['gift_message']) ? trim($orderData['gift_message']) : null;
+                $hidePrice = !empty($orderData['hide_price']);
+            }
+
+            $totalAmount = max(0, $subtotal + $shippingFee + $giftWrapFee - $discountAmount - $coinsDiscountAmount);
+
+            // 6. Determine payment status based on payment method
             $paymentStatus = Order::PAYMENT_PENDING;
             $paidAt = null;
 
@@ -149,7 +189,7 @@ class OrderService
                 $paidAt = now();
             }
 
-            // 6. Parse expected delivery from GHN if available
+            // 7. Parse expected delivery from GHN if available
             $expectedDeliveryAt = null;
             if (!empty($orderData['expected_delivery_at'])) {
                 try {
@@ -159,7 +199,7 @@ class OrderService
                 }
             }
 
-            // 7. Create Order
+            // 8. Create Order
             $order = Order::create([
                 'user_id'               => $user?->id,
                 'order_code'            => $this->generateOrderCode(),
@@ -173,6 +213,14 @@ class OrderService
                 'payment_method'        => $paymentMethod,
                 'payment_status'        => $paymentStatus,
                 'shipping_status'       => Order::STATUS_PENDING,
+                'is_gift_wrapped'       => $isGiftWrapped,
+                'gift_paper_id'         => $giftPaperId,
+                'gift_paper_name'       => $giftPaperName,
+                'gift_card_id'          => $giftCardId,
+                'gift_card_name'        => $giftCardName,
+                'gift_wrap_fee'         => $giftWrapFee,
+                'gift_message'          => $giftMessage,
+                'hide_price'            => $hidePrice,
                 'subtotal'              => $subtotal,
                 'shipping_fee'          => $shippingFee,
                 'voucher_id'            => $voucherId,

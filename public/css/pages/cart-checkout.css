@@ -1,49 +1,52 @@
 /* ==========================================================================
-   PAGE: CART & CHECKOUT
-   Ultra-luxury design system for shopping cart, checkout flow & order receipt
+   PAGES: CART & CHECKOUT (AURELIA LUXURY)
+   Cart Items, Checkout Summary, Order Steps, Coin & Gift Options
+   ========================================================================== */
+
+/* ==========================================================================
+   CART & CHECKOUT ENHANCEMENTS
    ========================================================================== */
 
 /* Custom Checkbox */
 .custom-checkbox {
-    width: 20px !important;
-    height: 20px !important;
-    border-radius: 6px !important;
-    border: 2px solid var(--border-strong) !important;
-    background-color: var(--bg-surface);
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+    border-radius: 0.35rem !important;
+    border: 1.5px solid var(--border-strong) !important;
     cursor: pointer;
-    transition: all 0.18s ease;
+    background-color: var(--bg-surface);
 }
 
 .custom-checkbox:checked {
     background-color: var(--brand-600) !important;
     border-color: var(--brand-600) !important;
-    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.25) !important;
+}
+
+.custom-checkbox:focus {
+    box-shadow: 0 0 0 3px rgba(194, 91, 58, 0.2) !important;
 }
 
 /* Quantity Stepper */
 .qty-stepper {
-    background: var(--bg-surface-elevated);
-    border-color: var(--border-strong) !important;
+    background: var(--bg-surface);
+    border-color: var(--border-default) !important;
     overflow: hidden;
-    border-radius: var(--radius-sm);
 }
 
-.qty-stepper .btn-stepper {
-    width: 32px;
-    height: 32px;
-    padding: 0;
+.btn-stepper {
+    padding: 0.4rem 0.65rem;
     border: none;
     background: transparent;
-    color: var(--text-primary);
+    color: var(--text-secondary);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     transition: all 0.15s ease;
 }
 
-.qty-stepper .btn-stepper:hover {
-    background: var(--bg-surface-hover);
-    color: var(--brand-500);
+.btn-stepper:hover {
+    background: var(--bg-surface-subtle);
+    color: var(--text-primary);
 }
 
 .qty-input {
@@ -58,35 +61,62 @@
     margin: 0;
 }
 
-/* Cart Item Row */
-.cart-item-row {
-    padding: 1.2rem 1.35rem;
+/* Address & Shipping / Payment Method Cards */
+.address-item-card,
+.shipping-method-card,
+.payment-method-card {
     background: var(--bg-surface);
+    border-color: var(--border-default) !important;
+    transition: all 0.2s ease;
+}
+
+.address-item-card:hover,
+.shipping-method-card:hover,
+.payment-method-card:hover {
+    border-color: var(--brand-400) !important;
+    background: var(--bg-surface-subtle);
+}
+
+.shipping-method-card.active,
+.payment-method-card.active {
+    border-color: var(--brand-600) !important;
+    background: rgba(194, 91, 58, 0.04);
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.pointer-events-none {
+    pointer-events: none;
+}
+
+.transition-all {
+    transition: all 0.2s ease-in-out;
+}
+
+/* Cart badge pulse */
+.cart-badge-count {
+    animation: cartBounce 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes cartBounce {
+    0% { transform: translate(-50%, -50%) scale(0.5); }
+    100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+
+/* ==========================================================================
+   CART TABLE & SUMMARY REFINEMENTS (Dark/Light Mode & Flex Sizing)
+   ========================================================================== */
+.cart-item-row {
+    padding: 1.1rem 1.25rem !important;
     border-bottom: 1px solid var(--border-default);
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    position: relative;
+    transition: background-color 0.15s ease;
 }
 
 .cart-item-row:hover {
-    background: var(--bg-surface-hover);
-}
-
-.cart-item-row.is-selected {
-    background: rgba(99, 102, 241, 0.04);
-}
-
-[data-theme="dark"] .cart-item-row.is-selected {
-    background: rgba(99, 102, 241, 0.08);
-}
-
-.cart-item-thumb {
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-    border-color: var(--border-default) !important;
-}
-
-.cart-item-thumb:hover {
-    transform: scale(1.04);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+    background-color: var(--bg-surface-subtle);
 }
 
 .cart-item-info {
@@ -114,39 +144,25 @@
     line-height: 1.2;
 }
 
-/* Shipping & Payment Method Cards */
-.shipping-method-card,
-.payment-method-card,
-.address-item-card {
-    background: var(--bg-surface) !important;
-    border: 1.5px solid var(--border-default) !important;
-    border-radius: var(--radius-md) !important;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+/* Warning alert in cart summary (Dark mode fix) */
+[data-theme="dark"] #noSelectionNotice {
+    background: rgba(245, 158, 11, 0.12) !important;
+    border-color: rgba(245, 158, 11, 0.3) !important;
+    color: #fbbf24 !important;
 }
 
-.shipping-method-card:hover,
-.payment-method-card:hover,
-.address-item-card:hover {
-    border-color: var(--brand-400) !important;
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-sm);
+/* Checkout button disabled state in dark mode */
+[data-theme="dark"] #checkoutSubmitBtn.opacity-50 {
+    opacity: 0.6 !important;
+    background: #312e81 !important;
+    color: #a5b4fc !important;
+    border: 1px solid rgba(99, 102, 241, 0.3) !important;
 }
 
-.shipping-method-card.active,
-.payment-method-card.active {
-    border-color: var(--brand-600) !important;
-    background: rgba(99, 102, 241, 0.05) !important;
-    box-shadow: 0 0 0 1px var(--brand-600), var(--shadow-sm);
-}
 
-[data-theme="dark"] .shipping-method-card.active,
-[data-theme="dark"] .payment-method-card.active {
-    background: rgba(99, 102, 241, 0.12) !important;
-    border-color: var(--brand-400) !important;
-    box-shadow: 0 0 0 1px var(--brand-400), 0 4px 14px rgba(0, 0, 0, 0.4);
-}
-
-/* Checkout Address Display Card */
+/* ==========================================================================
+   CHECKOUT ADDRESS CARD (Padding, Spacing & Brand Accent Border)
+   ========================================================================== */
 .checkout-address-card,
 #activeAddressDisplay,
 #guestActiveAddressBox {
@@ -176,7 +192,79 @@
     color: var(--text-primary);
 }
 
-/* MoMo Multi-channel Cards */
+
+/* ==========================================================================
+   CART & CHECKOUT ULTRA-LUXURY DESIGN SYSTEM (LIGHT & DARK THEMES)
+   ========================================================================== */
+
+/* Cart item row styling */
+.cart-item-row {
+    padding: 1.2rem 1.35rem;
+    background: var(--bg-surface);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+}
+
+.cart-item-row:hover {
+    background: var(--bg-surface-hover);
+}
+
+.cart-item-row.is-selected {
+    background: rgba(99, 102, 241, 0.04);
+}
+
+[data-theme="dark"] .cart-item-row.is-selected {
+    background: rgba(99, 102, 241, 0.08);
+}
+
+/* Custom Checkbox */
+.custom-checkbox {
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    border: 2px solid var(--border-strong);
+    background-color: var(--bg-surface);
+    cursor: pointer;
+    transition: all 0.18s ease;
+}
+
+.custom-checkbox:checked {
+    background-color: var(--brand-600);
+    border-color: var(--brand-600);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.25);
+}
+
+/* Cart Item Thumbnail */
+.cart-item-thumb {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    border-color: var(--border-default) !important;
+}
+
+.cart-item-thumb:hover {
+    transform: scale(1.04);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+
+/* Stepper */
+.qty-stepper {
+    background: var(--bg-surface-elevated);
+    border-color: var(--border-strong) !important;
+    overflow: hidden;
+}
+
+.qty-stepper .btn-stepper {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    color: var(--text-primary);
+}
+
+.qty-stepper .btn-stepper:hover {
+    background: var(--bg-surface-hover);
+    color: var(--brand-500);
+}
+
+/* MoMo Multi-channel Cards (Adaptive Dark/Light) */
 .momo-sub-card {
     background: var(--bg-surface-elevated) !important;
     border: 1px solid var(--border-default) !important;
@@ -203,6 +291,7 @@
     box-shadow: 0 0 0 2px rgba(244, 63, 94, 0.3), 0 6px 18px rgba(165, 0, 100, 0.3);
 }
 
+/* Adaptive MoMo Table */
 .momo-adaptive-table {
     background: var(--bg-surface-elevated) !important;
     border: 1px solid var(--border-default) !important;
@@ -227,7 +316,37 @@
     border-radius: 4px;
 }
 
-/* Luxury Summary Card & Gold Gradient */
+/* Shipping & Payment Method Cards */
+.shipping-method-card,
+.payment-method-card {
+    background: var(--bg-surface) !important;
+    border: 1.5px solid var(--border-default) !important;
+    border-radius: var(--radius-md) !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.shipping-method-card:hover,
+.payment-method-card:hover {
+    border-color: var(--brand-400) !important;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.shipping-method-card.active,
+.payment-method-card.active {
+    border-color: var(--brand-600) !important;
+    background: rgba(99, 102, 241, 0.05) !important;
+    box-shadow: 0 0 0 1px var(--brand-600), var(--shadow-sm);
+}
+
+[data-theme="dark"] .shipping-method-card.active,
+[data-theme="dark"] .payment-method-card.active {
+    background: rgba(99, 102, 241, 0.12) !important;
+    border-color: var(--brand-400) !important;
+    box-shadow: 0 0 0 1px var(--brand-400), 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+/* Summary Gold Gradient Text */
 .text-luxury-gradient {
     background: linear-gradient(135deg, #f59e0b 0%, #ec4899 50%, #8b5cf6 100%);
     -webkit-background-clip: text;
@@ -235,6 +354,7 @@
     font-weight: 800;
 }
 
+/* Luxury Card Modern Glow */
 .card-modern {
     background: var(--bg-surface);
     border: 1px solid var(--border-default) !important;
@@ -265,11 +385,137 @@
     background: linear-gradient(90deg, #10b981, #06b6d4, #6366f1, #ec4899);
 }
 
-.cart-badge-count {
-    animation: cartBounce 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+
+/* Feature 3: Gift Wrapping & Greeting Card Styling */
+.gift-service-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    transition: all 0.25s ease;
+}
+.gift-service-card.active {
+    border-color: var(--brand-500) !important;
+    box-shadow: 0 4px 20px rgba(194, 91, 58, 0.08);
+}
+.gift-icon-container {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.1));
+    color: #d97706;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.gift-badge-signature {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.2rem 0.65rem;
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    color: #92400e;
+    font-weight: 700;
+    font-size: 0.72rem;
+    border-radius: 9999px;
+    letter-spacing: 0.02em;
+}
+[data-theme="dark"] .gift-badge-signature {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
 }
 
-@keyframes cartBounce {
-    0% { transform: scale(0.5); }
-    100% { transform: scale(1); }
+/* Choice Cards (Paper & Greeting Card) */
+.gift-choice-card {
+    background: var(--bg-surface);
+    border: 1.5px solid var(--border-default) !important;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    user-select: none;
+}
+.gift-choice-card:hover {
+    border-color: var(--brand-400) !important;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+.gift-choice-card.active {
+    border-color: var(--brand-600) !important;
+    background: rgba(194, 91, 58, 0.04) !important;
+    box-shadow: 0 0 0 1px var(--brand-600), 0 4px 12px rgba(194, 91, 58, 0.12);
+}
+[data-theme="dark"] .gift-choice-card.active {
+    background: rgba(194, 91, 58, 0.12) !important;
+    border-color: var(--brand-400) !important;
+    box-shadow: 0 0 0 1px var(--brand-400), 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+.gift-preview-thumb {
+    position: relative;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+
+.gift-check-icon {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--brand-600);
+    color: #ffffff;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+.gift-choice-card.active .gift-check-icon {
+    display: flex;
+}
+
+/* Suggestion Chips */
+.btn-gift-chip {
+    background: var(--bg-surface-subtle);
+    border: 1px solid var(--border-default);
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    padding: 0.2rem 0.65rem;
+    border-radius: 9999px;
+    transition: all 0.15s ease;
+    cursor: pointer;
+}
+.btn-gift-chip:hover {
+    background: var(--brand-50);
+    border-color: var(--brand-300);
+    color: var(--brand-700);
+    transform: translateY(-1px);
+}
+[data-theme="dark"] .btn-gift-chip:hover {
+    background: rgba(194, 91, 58, 0.15);
+    border-color: var(--brand-500);
+    color: var(--brand-300);
+}
+
+.gift-message-box {
+    background: var(--bg-surface-subtle);
+    border: 1px dashed var(--border-default);
+    border-radius: var(--radius-md);
+}
+.gift-message-textarea {
+    border: none;
+    background: transparent;
+    font-size: 0.82rem;
+    resize: none;
+    box-shadow: none !important;
+}
+.gift-message-textarea:focus {
+    background: transparent;
+}
+
+/* Checkout Clean Voucher Trigger */
+.checkout-voucher-trigger-box {
+    transition: border-color 0.2s ease;
+}
+.checkout-voucher-trigger-box:hover {
+    border-color: var(--brand-400) !important;
 }

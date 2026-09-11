@@ -1,14 +1,5 @@
 /* ==========================================================================
-   TMDT E-COMMERCE DESIGN SYSTEM - MASTER BUNDLE
-   Modular Architecture:
-   - base.css: Tokens, typography, reset, buttons, modals, utilities
-   - storefront.css: Header, navigation, user dropdown, hero banner, footer
-   - admin.css: Sidebar, topbar, KPI cards, admin data tables
-   - components/product-card.css: Product cards, badges, wishlist heart button
-   - pages/product-detail.css: Gallery, variant selector, luxury CTA cluster
-   - pages/cart-checkout.css: Cart items, checkout stepper, payment cards
-   - pages/account.css: Account sidebar, profile avatar, orders, coins
-   - pages/auth.css: Login, register, forgot password, error pages
+   AURELIA LUXURY BAGS — DESIGN SYSTEM (MODULAR MASTER BUNDLE)
    ========================================================================== */
 
 @import url('base.css');

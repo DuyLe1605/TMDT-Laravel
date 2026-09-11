@@ -238,7 +238,178 @@
                     </div>
                 </div>
 
-                <!-- 3. Shipping & Payment Methods -->
+                <!-- 3. Aurelia Luxury Gift Packaging & Greeting Card Experience -->
+                <div class="card-modern p-4 mb-4 shadow-sm border gift-service-card" id="giftServiceCard">
+                    <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+                        <div class="d-flex align-items-center gap-2.5">
+                            <div class="gift-icon-container">
+                                <i data-lucide="gift" style="width: 22px; height: 22px;"></i>
+                            </div>
+                            <div>
+                                <div class="fw-bold text-dark fs-6 d-flex align-items-center gap-2">
+                                    <span>Dịch Vụ Gói Quà & Thiệp Chúc Mừng</span>
+                                    <span class="gift-badge-signature">Signature Packaging</span>
+                                </div>
+                                <div class="text-secondary small">
+                                    Hộp cứng nam châm cao cấp, giấy bọc nghệ thuật & thiệp mừng viết tay trao gửi yêu thương
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-check form-switch m-0">
+                            <input 
+                                type="checkbox" 
+                                name="is_gift_wrapped" 
+                                value="1" 
+                                id="isGiftWrappedCheckbox" 
+                                class="form-check-input" 
+                                style="cursor: pointer; width: 2.4rem; height: 1.25rem;"
+                                {{ old('is_gift_wrapped') ? 'checked' : '' }}
+                                onchange="onToggleGiftWrap(this.checked)"
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Collapsible Gift Wrap Customizer -->
+                    <div id="giftDetailsCollapse" class="{{ old('is_gift_wrapped') ? '' : 'd-none' }}">
+                        <!-- 1. Paper Selection Grid -->
+                        <div class="mb-4">
+                            <label class="form-label-modern small fw-bold mb-2.5 d-flex align-items-center justify-content-between">
+                                <span class="d-flex align-items-center gap-1.5 text-dark">
+                                    <i data-lucide="sparkles" class="text-warning" style="width: 15px; height: 15px;"></i>
+                                    <span>1. Chọn Loại Giấy & Phong Cách Gói Quà:</span>
+                                </span>
+                                <span class="text-primary small fw-semibold font-monospace" id="selectedPaperNameDisplay">
+                                    {{ $giftPapers->first() ? $giftPapers->first()->name : 'Mặc định' }}
+                                </span>
+                            </label>
+
+                            <div class="row g-3">
+                                @foreach ($giftPapers as $index => $paper)
+                                    <div class="col-6 col-md-3">
+                                        <label class="gift-choice-card h-100 p-2.5 rounded-3 border d-flex flex-column align-items-center text-center cursor-pointer position-relative {{ (old('gift_paper_id', $giftPapers->first()->id ?? 0) == $paper->id) ? 'active' : '' }}" id="giftPaperCard_{{ $paper->id }}" onclick="selectGiftPaper({{ $paper->id }}, '{{ addslashes($paper->name) }}', {{ (float) $paper->price }})">
+                                            <input type="radio" name="gift_paper_id" value="{{ $paper->id }}" class="d-none" {{ (old('gift_paper_id', $giftPapers->first()->id ?? 0) == $paper->id) ? 'checked' : '' }}>
+                                            
+                                            <!-- Visual Swatch / Thumbnail -->
+                                            <div class="gift-preview-thumb rounded-2 mb-2 overflow-hidden position-relative w-100" style="height: 72px; background: {{ $paper->code === 'velvet_burgundy' ? '#722F37' : ($paper->code === 'midnight_navy' ? '#1E2A38' : ($paper->code === 'classic_ivory' ? '#FBF9F1' : '#FCE4EC')) }};">
+                                                @if ($paper->image)
+                                                    <img src="{{ $paper->image }}" alt="{{ $paper->name }}" class="w-100 h-100 object-fit-cover">
+                                                @else
+                                                    <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center text-white text-opacity-75">
+                                                        <i data-lucide="package" style="width: 24px; height: 24px;"></i>
+                                                    </div>
+                                                @endif
+                                                <div class="gift-check-icon">
+                                                    <i data-lucide="check" style="width: 13px; height: 13px;"></i>
+                                                </div>
+                                            </div>
+
+                                            <div class="fw-bold text-dark small text-truncate w-100" style="font-size: 0.78rem;">{{ $paper->name }}</div>
+                                            <div class="text-primary fw-extrabold small mt-0.5" style="font-size: 0.74rem;">
+                                                {{ $paper->price > 0 ? '+' . number_format($paper->price, 0, ',', '.') . ' ₫' : 'Miễn phí' }}
+                                            </div>
+                                        </label>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <!-- 2. Greeting Card Selection Grid -->
+                        <div class="mb-4">
+                            <label class="form-label-modern small fw-bold mb-2.5 d-flex align-items-center justify-content-between">
+                                <span class="d-flex align-items-center gap-1.5 text-dark">
+                                    <i data-lucide="mail" class="text-primary" style="width: 15px; height: 15px;"></i>
+                                    <span>2. Chọn Mẫu Thiệp Chúc Mừng:</span>
+                                </span>
+                                <span class="text-primary small fw-semibold font-monospace" id="selectedCardNameDisplay">
+                                    {{ $giftCards->first() ? $giftCards->first()->name : 'Mặc định' }}
+                                </span>
+                            </label>
+
+                            <div class="row g-3">
+                                @foreach ($giftCards as $index => $card)
+                                    <div class="col-6 col-md-3">
+                                        <label class="gift-choice-card h-100 p-2.5 rounded-3 border d-flex flex-column align-items-center text-center cursor-pointer position-relative {{ (old('gift_card_id', $giftCards->first()->id ?? 0) == $card->id) ? 'active' : '' }}" id="giftCardCard_{{ $card->id }}" onclick="selectGiftCard({{ $card->id }}, '{{ addslashes($card->name) }}', {{ (float) $card->price }})">
+                                            <input type="radio" name="gift_card_id" value="{{ $card->id }}" class="d-none" {{ (old('gift_card_id', $giftCards->first()->id ?? 0) == $card->id) ? 'checked' : '' }}>
+                                            
+                                            <!-- Visual Card Thumb -->
+                                            <div class="gift-preview-thumb rounded-2 mb-2 overflow-hidden position-relative w-100" style="height: 64px; background: var(--bg-surface-subtle); border: 1px dashed var(--border-default);">
+                                                @if ($card->image)
+                                                    <img src="{{ $card->image }}" alt="{{ $card->name }}" class="w-100 h-100 object-fit-cover">
+                                                @else
+                                                    <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center text-secondary">
+                                                        <i data-lucide="heart-handshake" style="width: 22px; height: 22px;"></i>
+                                                    </div>
+                                                @endif
+                                                <div class="gift-check-icon">
+                                                    <i data-lucide="check" style="width: 13px; height: 13px;"></i>
+                                                </div>
+                                            </div>
+
+                                            <div class="fw-bold text-dark small text-truncate w-100" style="font-size: 0.78rem;">{{ $card->name }}</div>
+                                            <div class="text-primary fw-extrabold small mt-0.5" style="font-size: 0.74rem;">
+                                                {{ $card->price > 0 ? '+' . number_format($card->price, 0, ',', '.') . ' ₫' : 'Miễn phí' }}
+                                            </div>
+                                        </label>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <!-- 3. Handwritten Message & Quick Suggestions -->
+                        <div class="mb-3">
+                            <div class="d-flex align-items-center justify-content-between mb-1.5">
+                                <label for="giftMessageInput" class="form-label-modern small fw-bold d-flex align-items-center gap-1.5 text-dark mb-0">
+                                    <i data-lucide="feather" class="text-danger" style="width: 15px; height: 15px;"></i>
+                                    <span>3. Lời chúc viết tay trên thiệp (Miễn phí viết tay nắn nót):</span>
+                                </label>
+                                <span class="text-secondary small font-monospace" id="giftMessageCounter" style="font-size: 0.72rem;">0/250</span>
+                            </div>
+
+                            <!-- Quick Suggestion Chips -->
+                            <div class="d-flex flex-wrap gap-1.5 mb-2">
+                                <span class="text-secondary small d-flex align-items-center me-1" style="font-size: 0.74rem;">Gợi ý:</span>
+                                <button type="button" class="btn btn-sm btn-gift-chip" onclick="insertGiftTemplate('Chúc bạn một sinh nhật thật rực rỡ, ngập tràn niềm vui, luôn xinh đẹp và hạnh phúc!')">🎂 Sinh nhật</button>
+                                <button type="button" class="btn btn-sm btn-gift-chip" onclick="insertGiftTemplate('Cảm ơn em vì đã luôn bên anh. Chúc người con gái anh yêu luôn rạng ngời và hạnh phúc!')">💖 Tình yêu</button>
+                                <button type="button" class="btn btn-sm btn-gift-chip" onclick="insertGiftTemplate('Kính chúc Quý khách luôn an khang thịnh vượng, vạn sự hanh thông và tràn đầy niềm vui!')">🎁 Tri ân</button>
+                                <button type="button" class="btn btn-sm btn-gift-chip" onclick="insertGiftTemplate('Chúc mừng ngày kỷ niệm ngọt ngào của chúng ta! Mãi luôn bên nhau nhé!')">🥂 Kỷ niệm</button>
+                            </div>
+
+                            <div class="gift-message-box p-2.5 rounded-3">
+                                <textarea 
+                                    name="gift_message" 
+                                    id="giftMessageInput" 
+                                    rows="3" 
+                                    maxlength="250" 
+                                    class="form-control gift-message-textarea w-100" 
+                                    placeholder="Nhập lời nhắn gửi gắm (ví dụ: Chúc mừng sinh nhật người thương yêu nhất, mong em luôn rạng rỡ và hạnh phúc!)..."
+                                    oninput="onUpdateGiftMessageLength(this)"
+                                >{{ old('gift_message') }}</textarea>
+                            </div>
+                        </div>
+
+                        <!-- 4. Hide Price Receipt Checkbox -->
+                        <div class="p-2.5 rounded-3 border" style="background: var(--bg-surface-subtle);">
+                            <div class="form-check d-flex align-items-center gap-2 m-0 p-0">
+                                <input 
+                                    type="checkbox" 
+                                    name="hide_price" 
+                                    value="1" 
+                                    id="hidePriceCheckbox" 
+                                    class="form-check-input mt-0 ms-0 me-1" 
+                                    style="cursor: pointer; width: 18px; height: 18px;"
+                                    {{ old('hide_price') ? 'checked' : '' }}
+                                >
+                                <label for="hidePriceCheckbox" class="form-check-label text-dark small fw-medium cursor-pointer" style="font-size: 0.78rem;">
+                                    <i data-lucide="eye-off" style="width: 14px; height: 14px; margin-right: 0.2rem;" class="text-secondary"></i>
+                                    Che giá sản phẩm trên hóa đơn / phiếu giao hàng (Dành riêng cho đơn hàng gửi tặng)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Shipping & Payment Methods -->
                 <div class="card-modern p-4 mb-4 shadow-sm border">
                     <!-- Shipping Method -->
                     <div class="mb-4 pb-3 border-bottom">
@@ -545,31 +716,24 @@
                         </div>
                     </div>
 
-                    <!-- Aurelia Voucher Section (Shopee Style) -->
-                    <div class="p-3 rounded-3 mb-3" style="background: var(--bg-surface-subtle); border: 1px dashed var(--brand-500);">
-                        <div class="d-flex align-items-center justify-content-between mb-2">
+                    <!-- Aurelia Voucher Section (Shopee Clean Trigger Style) -->
+                    <div class="p-3 rounded-3 mb-3 border checkout-voucher-trigger-box" style="background: var(--bg-surface-subtle); border-color: var(--border-default) !important;">
+                        <div class="d-flex align-items-center justify-content-between">
                             <div class="d-flex align-items-center gap-2">
-                                <div class="rounded-2 d-flex align-items-center justify-content-center" style="width: 28px; height: 28px; background: #fff3e0; color: #e65100;">
+                                <div class="rounded-2 d-flex align-items-center justify-content-center" style="width: 28px; height: 28px; background: rgba(230, 81, 0, 0.1); color: #e65100;">
                                     <i data-lucide="ticket" style="width: 16px; height: 16px;"></i>
                                 </div>
                                 <span class="fw-bold text-dark small">Aurelia Voucher</span>
                             </div>
-                            <button type="button" class="btn btn-sm btn-link text-primary p-0 text-decoration-none fw-semibold small d-flex align-items-center gap-1" onclick="openVoucherModal()">
-                                <span>Chọn mã ưu đãi</span>
+
+                            <button type="button" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1 fw-semibold" onclick="openVoucherModal()" style="font-size: 0.78rem;">
+                                <span>Chọn / Nhập mã</span>
                                 <i data-lucide="chevron-right" style="width: 14px; height: 14px;"></i>
                             </button>
                         </div>
 
-                        <!-- Quick input field -->
-                        <div class="input-group input-group-sm mb-1" id="voucherQuickInputContainer">
-                            <input type="text" id="quickVoucherInput" class="form-control text-uppercase font-monospace" placeholder="Nhập mã ưu đãi..." style="letter-spacing: 0.05em;">
-                            <button type="button" class="btn btn-brand-primary fw-bold px-3" onclick="applyVoucherFromInput()">
-                                Áp Dụng
-                            </button>
-                        </div>
-
                         <!-- Applied voucher tag banner -->
-                        <div id="appliedVoucherBanner" class="p-2.5 rounded-2 d-none mt-2" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3);">
+                        <div id="appliedVoucherBanner" class="p-2 rounded-2 d-none mt-2" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3);">
                             <div class="d-flex align-items-center justify-content-between">
                                 <div class="d-flex align-items-center gap-2 min-w-0">
                                     <span class="badge bg-success font-monospace" id="appliedVoucherCodeBadge">AURELIA20</span>
@@ -643,6 +807,14 @@
                                 </span>
                                 <div id="shippingLeadtimeDisplay" class="text-success small fw-medium" style="font-size: 0.72rem;"></div>
                             </div>
+                        </div>
+                        <!-- Dynamic Gift Wrap Fee Row -->
+                        <div class="d-flex justify-content-between text-warning-emphasis d-none" id="giftWrapFeeRow">
+                            <span class="d-inline-flex align-items-center gap-1">
+                                <i data-lucide="gift" style="width: 14px; height: 14px;"></i>
+                                <span>Phí gói quà hộp cao cấp:</span>
+                            </span>
+                            <span class="fw-bold" id="summaryGiftWrapFee">+35.000 ₫</span>
                         </div>
                         <!-- Dynamic Voucher Discount Row -->
                         <div class="d-flex justify-content-between text-success d-none" id="voucherDiscountRow">
@@ -1033,6 +1205,105 @@
     let currentCoinsUsed = 0;
     let currentCoinsDiscount = 0;
 
+    // Gift Wrap Configuration
+    @php
+        $firstPaperPrice = $giftPapers->first() ? (float) $giftPapers->first()->price : 0;
+        $firstCardPrice = $giftCards->first() ? (float) $giftCards->first()->price : 0;
+    @endphp
+    let selectedPaperPrice = {{ $firstPaperPrice }};
+    let selectedCardPrice = {{ $firstCardPrice }};
+    let currentGiftWrapFee = {{ old('is_gift_wrapped') ? ($firstPaperPrice + $firstCardPrice) : 0 }};
+
+    function onToggleGiftWrap(isChecked) {
+        const wrapCard = document.getElementById('giftServiceCard');
+        const giftDetailsCollapse = document.getElementById('giftDetailsCollapse');
+        const giftWrapFeeRow = document.getElementById('giftWrapFeeRow');
+        const summaryGiftWrapFee = document.getElementById('summaryGiftWrapFee');
+
+        if (isChecked) {
+            currentGiftWrapFee = selectedPaperPrice + selectedCardPrice;
+            if (wrapCard) wrapCard.classList.add('active');
+            if (giftDetailsCollapse) giftDetailsCollapse.classList.remove('d-none');
+            if (giftWrapFeeRow) {
+                giftWrapFeeRow.classList.remove('d-none');
+                if (summaryGiftWrapFee) summaryGiftWrapFee.textContent = '+' + formatCurrency(currentGiftWrapFee);
+            }
+        } else {
+            currentGiftWrapFee = 0;
+            if (wrapCard) wrapCard.classList.remove('active');
+            if (giftDetailsCollapse) giftDetailsCollapse.classList.add('d-none');
+            if (giftWrapFeeRow) giftWrapFeeRow.classList.add('d-none');
+        }
+
+        recalculateGrandTotal();
+    }
+
+    function selectGiftPaper(id, name, price) {
+        selectedPaperPrice = parseFloat(price) || 0;
+        
+        // Update active class on paper cards
+        document.querySelectorAll('[id^="giftPaperCard_"]').forEach(c => c.classList.remove('active'));
+        const activeCard = document.getElementById('giftPaperCard_' + id);
+        if (activeCard) {
+            activeCard.classList.add('active');
+            const radio = activeCard.querySelector('input[type="radio"]');
+            if (radio) radio.checked = true;
+        }
+
+        const nameDisplay = document.getElementById('selectedPaperNameDisplay');
+        if (nameDisplay) nameDisplay.textContent = name;
+
+        // Recalculate if gift wrap is on
+        const giftCheckbox = document.getElementById('isGiftWrappedCheckbox');
+        if (giftCheckbox && giftCheckbox.checked) {
+            currentGiftWrapFee = selectedPaperPrice + selectedCardPrice;
+            const summaryGiftWrapFee = document.getElementById('summaryGiftWrapFee');
+            if (summaryGiftWrapFee) summaryGiftWrapFee.textContent = '+' + formatCurrency(currentGiftWrapFee);
+            recalculateGrandTotal();
+        }
+    }
+
+    function selectGiftCard(id, name, price) {
+        selectedCardPrice = parseFloat(price) || 0;
+
+        // Update active class on card cards
+        document.querySelectorAll('[id^="giftCardCard_"]').forEach(c => c.classList.remove('active'));
+        const activeCard = document.getElementById('giftCardCard_' + id);
+        if (activeCard) {
+            activeCard.classList.add('active');
+            const radio = activeCard.querySelector('input[type="radio"]');
+            if (radio) radio.checked = true;
+        }
+
+        const nameDisplay = document.getElementById('selectedCardNameDisplay');
+        if (nameDisplay) nameDisplay.textContent = name;
+
+        // Recalculate if gift wrap is on
+        const giftCheckbox = document.getElementById('isGiftWrappedCheckbox');
+        if (giftCheckbox && giftCheckbox.checked) {
+            currentGiftWrapFee = selectedPaperPrice + selectedCardPrice;
+            const summaryGiftWrapFee = document.getElementById('summaryGiftWrapFee');
+            if (summaryGiftWrapFee) summaryGiftWrapFee.textContent = '+' + formatCurrency(currentGiftWrapFee);
+            recalculateGrandTotal();
+        }
+    }
+
+    function insertGiftTemplate(text) {
+        const textarea = document.getElementById('giftMessageInput');
+        if (textarea) {
+            textarea.value = text;
+            onUpdateGiftMessageLength(textarea);
+            textarea.focus();
+        }
+    }
+
+    function onUpdateGiftMessageLength(textarea) {
+        const counterEl = document.getElementById('giftMessageCounter');
+        if (counterEl) {
+            counterEl.textContent = `${textarea.value.length}/250`;
+        }
+    }
+
     function formatCurrency(amount) {
         return new Intl.NumberFormat('vi-VN').format(Math.max(0, amount)) + ' ₫';
     }
@@ -1097,7 +1368,7 @@
 
         updateCoinsNotice();
 
-        const finalTotal = Math.max(0, subtotalAmount + currentShippingFee - currentVoucherDiscount - currentCoinsDiscount);
+        const finalTotal = Math.max(0, subtotalAmount + currentShippingFee + currentGiftWrapFee - currentVoucherDiscount - currentCoinsDiscount);
         const grandTotalEl = document.getElementById('displayGrandTotal');
         if (grandTotalEl) {
             grandTotalEl.textContent = formatCurrency(finalTotal);
@@ -1846,6 +2117,7 @@
 
     function applyVoucherFromInput() {
         const input = document.getElementById('quickVoucherInput');
+        if (!input) return;
         const code = (input.value || '').trim();
         if (!code) {
             showVoucherError('Vui lòng nhập mã giảm giá.');
@@ -1882,19 +2154,28 @@
                 tempSelectedVoucher = data.voucher;
 
                 // Update UI state
-                document.getElementById('hiddenVoucherCode').value = data.voucher.code;
-                document.getElementById('quickVoucherInput').value = data.voucher.code;
+                const hiddenVoucherEl = document.getElementById('hiddenVoucherCode');
+                if (hiddenVoucherEl) hiddenVoucherEl.value = data.voucher.code;
+                const quickInputEl = document.getElementById('quickVoucherInput');
+                if (quickInputEl) quickInputEl.value = data.voucher.code;
 
                 // Show applied banner
-                document.getElementById('appliedVoucherCodeBadge').textContent = data.voucher.code;
-                document.getElementById('appliedVoucherText').textContent = data.voucher.formatted_discount;
-                document.getElementById('appliedVoucherBanner').classList.remove('d-none');
-                document.getElementById('voucherQuickInputContainer').classList.add('d-none');
+                const appliedBadge = document.getElementById('appliedVoucherCodeBadge');
+                if (appliedBadge) appliedBadge.textContent = data.voucher.code;
+                const appliedText = document.getElementById('appliedVoucherText');
+                if (appliedText) appliedText.textContent = data.voucher.formatted_discount;
+                const appliedBanner = document.getElementById('appliedVoucherBanner');
+                if (appliedBanner) appliedBanner.classList.remove('d-none');
+                const quickContainer = document.getElementById('voucherQuickInputContainer');
+                if (quickContainer) quickContainer.classList.add('d-none');
 
                 // Update summary discount line
-                document.getElementById('summaryVoucherCode').textContent = data.voucher.code;
-                document.getElementById('summaryVoucherDiscount').textContent = data.voucher.formatted_discount;
-                document.getElementById('voucherDiscountRow').classList.remove('d-none');
+                const summaryCode = document.getElementById('summaryVoucherCode');
+                if (summaryCode) summaryCode.textContent = data.voucher.code;
+                const summaryDiscount = document.getElementById('summaryVoucherDiscount');
+                if (summaryDiscount) summaryDiscount.textContent = data.voucher.formatted_discount;
+                const voucherRow = document.getElementById('voucherDiscountRow');
+                if (voucherRow) voucherRow.classList.remove('d-none');
 
                 // Recalculate grand total
                 recalculateGrandTotal();
@@ -1920,11 +2201,16 @@
         currentVoucherDiscount = 0;
         tempSelectedVoucher = null;
 
-        document.getElementById('hiddenVoucherCode').value = '';
-        document.getElementById('quickVoucherInput').value = '';
-        document.getElementById('appliedVoucherBanner').classList.add('d-none');
-        document.getElementById('voucherQuickInputContainer').classList.remove('d-none');
-        document.getElementById('voucherDiscountRow').classList.add('d-none');
+        const hiddenVoucherEl = document.getElementById('hiddenVoucherCode');
+        if (hiddenVoucherEl) hiddenVoucherEl.value = '';
+        const quickInputEl = document.getElementById('quickVoucherInput');
+        if (quickInputEl) quickInputEl.value = '';
+        const appliedBanner = document.getElementById('appliedVoucherBanner');
+        if (appliedBanner) appliedBanner.classList.add('d-none');
+        const quickContainer = document.getElementById('voucherQuickInputContainer');
+        if (quickContainer) quickContainer.classList.remove('d-none');
+        const voucherRow = document.getElementById('voucherDiscountRow');
+        if (voucherRow) voucherRow.classList.add('d-none');
         hideVoucherError();
 
         recalculateGrandTotal();
@@ -1987,6 +2273,14 @@
 
         // Init Coins Notice if applicable
         updateCoinsNotice();
+
+        // Init Gift Wrap state if old input was checked
+        const giftCheckbox = document.getElementById('isGiftWrappedCheckbox');
+        if (giftCheckbox && giftCheckbox.checked) {
+            onToggleGiftWrap(true);
+            const msgInput = document.getElementById('giftMessageInput');
+            if (msgInput) onUpdateGiftMessageLength(msgInput);
+        }
     });
 </script>
 @endsection

@@ -41,7 +41,7 @@
         </a>
 
         <!-- Section: E-Commerce Operations -->
-        <div class="sidebar-section-title mt-3">QUẢN LÝ E-COMMERCE</div>
+        <div class="sidebar-section-title mt-3">QUẢN LÝ CỬA HÀNG</div>
         
         <!-- Active Orders Module -->
         <a href="{{ route('admin.orders.index') }}" class="sidebar-nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
@@ -49,13 +49,13 @@
                 <span class="sidebar-icon-box">
                     <i data-lucide="shopping-bag" style="width: 18px; height: 18px;"></i>
                 </span>
-                <span>Quản lý Đơn hàng</span>
+                <span>Đơn hàng</span>
             </div>
             @php
                 $pendingOrdersCount = \App\Models\Order::where('shipping_status', 'pending')->count();
             @endphp
             @if($pendingOrdersCount > 0)
-                <span class="badge bg-warning text-dark px-2 py-0.5 rounded-pill fw-bold" style="font-size: 0.72rem;">{{ $pendingOrdersCount }}</span>
+                <span class="sidebar-badge badge-warning">{{ $pendingOrdersCount }}</span>
             @endif
         </a>
 
@@ -65,9 +65,8 @@
                 <span class="sidebar-icon-box">
                     <i data-lucide="package" style="width: 18px; height: 18px;"></i>
                 </span>
-                <span>Sản phẩm túi xách</span>
+                <span>Sản phẩm</span>
             </div>
-            <span class="badge bg-primary bg-opacity-25 text-primary-emphasis px-2 py-0.5 rounded-pill" style="font-size: 0.7rem;">Active</span>
         </a>
 
         <!-- Active Categories Module -->
@@ -76,7 +75,7 @@
                 <span class="sidebar-icon-box">
                     <i data-lucide="folder-tree" style="width: 18px; height: 18px;"></i>
                 </span>
-                <span>Dòng túi xách (Danh mục)</span>
+                <span>Danh mục</span>
             </div>
         </a>
 
@@ -86,7 +85,7 @@
                 <span class="sidebar-icon-box">
                     <i data-lucide="award" style="width: 18px; height: 18px;"></i>
                 </span>
-                <span>Thương hiệu thời trang</span>
+                <span>Thương hiệu</span>
             </div>
         </a>
 
@@ -96,14 +95,8 @@
                 <span class="sidebar-icon-box">
                     <i data-lucide="ticket" style="width: 18px; height: 18px;"></i>
                 </span>
-                <span>Mã giảm giá (Voucher)</span>
+                <span>Mã giảm giá</span>
             </div>
-            @php
-                $activeVouchersCount = \App\Models\Voucher::active()->count();
-            @endphp
-            @if($activeVouchersCount > 0)
-                <span class="badge bg-success bg-opacity-20 text-success px-2 py-0.5 rounded-pill fw-bold" style="font-size: 0.72rem;">{{ $activeVouchersCount }} đang chạy</span>
-            @endif
         </a>
 
         <!-- Product Reviews Module -->
@@ -112,18 +105,28 @@
                 <span class="sidebar-icon-box">
                     <i data-lucide="star" style="width: 18px; height: 18px;"></i>
                 </span>
-                <span>Đánh giá sản phẩm</span>
+                <span>Đánh giá</span>
             </div>
             @php
                 $pendingReviewsCount = \App\Models\Review::whereNull('admin_reply')->count();
             @endphp
             @if($pendingReviewsCount > 0)
-                <span class="badge bg-warning bg-opacity-20 text-warning-emphasis px-2 py-0.5 rounded-pill fw-bold" style="font-size: 0.72rem;">{{ $pendingReviewsCount }} chờ trả lời</span>
+                <span class="sidebar-badge badge-info">{{ $pendingReviewsCount }}</span>
             @endif
         </a>
 
+        <!-- Gift Wrapping & Greeting Cards Module -->
+        <a href="{{ route('admin.gift-options.index') }}" class="sidebar-nav-link {{ request()->routeIs('admin.gift-options.*') ? 'active' : '' }}">
+            <div class="d-flex align-items-center">
+                <span class="sidebar-icon-box">
+                    <i data-lucide="gift" style="width: 18px; height: 18px;"></i>
+                </span>
+                <span>Gói quà & Thiệp</span>
+            </div>
+        </a>
+
         <!-- Section: System & Users -->
-        <div class="sidebar-section-title mt-3">HỆ THỐNG & TÀI KHOẢN</div>
+        <div class="sidebar-section-title mt-3">HỆ THỐNG</div>
 
         <!-- Users Management Module -->
         <a href="{{ route('admin.users.index') }}" class="sidebar-nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
@@ -131,7 +134,7 @@
                 <span class="sidebar-icon-box">
                     <i data-lucide="users" style="width: 18px; height: 18px;"></i>
                 </span>
-                <span>Quản lý Tài khoản</span>
+                <span>Tài khoản</span>
             </div>
         </a>
     </div>

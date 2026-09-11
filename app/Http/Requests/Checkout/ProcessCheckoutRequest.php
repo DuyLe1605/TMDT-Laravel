@@ -37,6 +37,11 @@ class ProcessCheckoutRequest extends FormRequest
             'voucher_code' => ['nullable', 'string', 'max:50'],
             'use_coins' => ['nullable', 'boolean'],
             'coins_to_use' => ['nullable', 'integer', 'min:0'],
+            'is_gift_wrapped' => ['nullable', 'boolean'],
+            'gift_paper_id' => ['nullable', 'integer', 'exists:gift_options,id'],
+            'gift_card_id' => ['nullable', 'integer', 'exists:gift_options,id'],
+            'gift_message' => ['nullable', 'string', 'max:250'],
+            'hide_price' => ['nullable', 'boolean'],
             'notes' => ['nullable', 'string', 'max:1000'],
         ];
     }

@@ -27,6 +27,7 @@ use App\Http\Controllers\Admin\AdminVoucherController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\CoinController;
 use App\Http\Controllers\Admin\AdminReviewController;
+use App\Http\Controllers\Admin\AdminGiftOptionController;
 use App\Http\Controllers\WishlistController;
 
 use App\Http\Controllers\MomoPaymentController;
@@ -220,6 +221,10 @@ Route::middleware(['auth', 'admin'])->prefix(RouteConstants::PREFIX_ADMIN)->name
     Route::get('/reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
     Route::post('/reviews/{review}/reply', [AdminReviewController::class, 'reply'])->name('reviews.reply');
     Route::post('/reviews/{review}/toggle', [AdminReviewController::class, 'toggleVisibility'])->name('reviews.toggle');
+
+    // Admin Gift Options Management (Wrapping Papers & Greeting Cards)
+    Route::resource('gift-options', AdminGiftOptionController::class);
+    Route::post('/gift-options/{giftOption}/toggle', [AdminGiftOptionController::class, 'toggleStatus'])->name('gift-options.toggle');
 });
 
 // =============================================================================

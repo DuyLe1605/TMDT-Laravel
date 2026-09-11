@@ -47,6 +47,14 @@ class Order extends Model
         'payment_method',
         'payment_status',
         'shipping_status',
+        'is_gift_wrapped',
+        'gift_paper_id',
+        'gift_paper_name',
+        'gift_card_id',
+        'gift_card_name',
+        'gift_wrap_fee',
+        'gift_message',
+        'hide_price',
         'subtotal',
         'shipping_fee',
         'voucher_id',
@@ -66,6 +74,9 @@ class Order extends Model
         'voucher_id'            => 'integer',
         'to_district_id'        => 'integer',
         'total_weight'          => 'integer',
+        'is_gift_wrapped'       => 'boolean',
+        'gift_wrap_fee'         => 'decimal:2',
+        'hide_price'            => 'boolean',
         'coins_used'            => 'integer',
         'coins_discount_amount' => 'decimal:2',
         'subtotal'              => 'decimal:2',
@@ -123,6 +134,22 @@ class Order extends Model
     public function latestPaymentTransaction(): HasOne
     {
         return $this->hasOne(PaymentTransaction::class)->latestOfMany();
+    }
+
+    /**
+     * Get the selected wrapping paper option.
+     */
+    public function giftPaper()
+    {
+        return $this->belongsTo(GiftOption::class, 'gift_paper_id');
+    }
+
+    /**
+     * Get the selected greeting card option.
+     */
+    public function giftCard()
+    {
+        return $this->belongsTo(GiftOption::class, 'gift_card_id');
     }
 
     // =========================================================================
@@ -417,5 +444,13 @@ class Order extends Model
     public function getTotalItemsCountAttribute(): int
     {
         return $this->items->sum('quantity');
+    }
+
+    /**
+     * Format gift wrap fee as currency string.
+     */
+    public function getFormattedGiftWrapFeeAttribute(): string
+    {
+        return number_format((float) $this->gift_wrap_fee, 0, ',', '.') . ' ₫';
     }
 }

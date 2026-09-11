@@ -58,13 +58,19 @@ class CheckoutController extends Controller
         $shippingFee = 30000;
         $grandTotal = $summary['total_amount'] + $shippingFee;
 
+        // Fetch active gift wrapping options
+        $giftPapers = \App\Models\GiftOption::active()->papers()->get();
+        $giftCards = \App\Models\GiftOption::active()->cards()->get();
+
         return view('checkout.index', compact(
             'selectedItems',
             'summary',
             'addresses',
             'defaultAddress',
             'shippingFee',
-            'grandTotal'
+            'grandTotal',
+            'giftPapers',
+            'giftCards'
         ));
     }
 

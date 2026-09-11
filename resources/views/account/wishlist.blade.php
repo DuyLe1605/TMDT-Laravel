@@ -99,12 +99,12 @@
                         @if ($item->product)
                             <div class="col-sm-6 col-md-4" id="wishlist-item-{{ $item->product->id }}">
                                 <div class="card-modern border shadow-sm overflow-hidden h-100 position-relative">
-                                    <!-- Remove from Wishlist Button -->
+                                    <!-- Remove from Wishlist Button (Perfect Circle) -->
                                     <form action="{{ route('wishlist.remove', $item->product) }}" method="POST" class="position-absolute top-0 end-0 m-2" style="z-index: 5;">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 34px; height: 34px; background: white; border: 1px solid var(--border-default);" title="Bỏ yêu thích">
-                                            <i data-lucide="x" style="width: 16px; height: 16px;" class="text-danger"></i>
+                                        <button type="submit" class="btn-wishlist-remove" title="Bỏ yêu thích">
+                                            <i data-lucide="x" style="width: 15px; height: 15px;" class="text-danger"></i>
                                         </button>
                                     </form>
 

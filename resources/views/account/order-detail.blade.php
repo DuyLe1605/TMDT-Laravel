@@ -221,6 +221,57 @@
                 </div>
             </div>
 
+            <!-- Gift Wrap & Greeting Card Info -->
+            @if ($order->is_gift_wrapped)
+                <div class="card-modern p-4 mb-4 shadow-sm border" style="background: linear-gradient(135deg, rgba(217, 119, 6, 0.04), rgba(245, 158, 11, 0.02)); border-color: rgba(217, 119, 6, 0.25) !important;">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3 pb-2 border-bottom border-secondary border-opacity-10">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; background: #fef3c7; color: #b45309;">
+                                <i data-lucide="gift" style="width: 17px; height: 17px;"></i>
+                            </div>
+                            <h6 class="fw-bold text-dark mb-0">Dịch Vụ Gói Quà & Thiệp Mừng</h6>
+                        </div>
+                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2.5 py-1 fw-bold" style="font-size: 0.72rem;">
+                            Hộp Quà Cao Cấp (+{{ $order->formatted_gift_wrap_fee }})
+                        </span>
+                    </div>
+
+                    <div class="row g-2 mb-3 small">
+                        @if ($order->gift_paper_name)
+                            <div class="col-sm-6">
+                                <span class="text-secondary">Loại giấy bọc quà:</span>
+                                <strong class="text-dark ms-1">{{ $order->gift_paper_name }}</strong>
+                            </div>
+                        @endif
+                        @if ($order->gift_card_name)
+                            <div class="col-sm-6">
+                                <span class="text-secondary">Mẫu thiệp mừng:</span>
+                                <strong class="text-dark ms-1">{{ $order->gift_card_name }}</strong>
+                            </div>
+                        @endif
+                    </div>
+
+                    @if ($order->gift_message)
+                        <div class="mb-2">
+                            <span class="text-secondary small d-flex align-items-center gap-1 mb-1">
+                                <i data-lucide="heart" class="text-danger" style="width: 13px; height: 13px;"></i>
+                                <span>Nội dung thiệp chúc mừng viết tay:</span>
+                            </span>
+                            <div class="p-3 rounded-3 border fst-italic text-dark small" style="background: var(--bg-surface); line-height: 1.6; border-left: 3px solid #d97706 !important;">
+                                &ldquo;{{ $order->gift_message }}&rdquo;
+                            </div>
+                        </div>
+                    @endif
+
+                    @if ($order->hide_price)
+                        <div class="d-flex align-items-center gap-1.5 text-secondary small mt-2">
+                            <i data-lucide="eye-off" class="text-primary" style="width: 14px; height: 14px;"></i>
+                            <span>Yêu cầu: <strong>Giấu thông tin giá tiền</strong> khi giao hàng tới người nhận.</span>
+                        </div>
+                    @endif
+                </div>
+            @endif
+
             <!-- Items table -->
             <div class="card-modern p-4 shadow-sm border">
                 <h6 class="fw-bold text-dark mb-3 pb-2 border-bottom d-flex align-items-center gap-2">
@@ -300,6 +351,15 @@
                         <span>Phí vận chuyển GHN:</span>
                         <span class="fw-bold text-dark">{{ $order->formatted_shipping_fee }}</span>
                     </div>
+                    @if ($order->is_gift_wrapped)
+                        <div class="d-flex justify-content-between text-warning-emphasis align-items-center">
+                            <span class="d-flex align-items-center gap-1">
+                                <i data-lucide="gift" style="width: 14px; height: 14px;"></i>
+                                <span>Phí gói quà hộp cao cấp:</span>
+                            </span>
+                            <span class="fw-bold">+{{ $order->formatted_gift_wrap_fee }}</span>
+                        </div>
+                    @endif
                     @if ($order->discount_amount > 0 || $order->voucher_code)
                         <div class="d-flex justify-content-between text-success align-items-center">
                             <span class="d-flex align-items-center gap-1">

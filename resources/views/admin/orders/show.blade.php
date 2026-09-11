@@ -252,6 +252,71 @@
             @endif
         </div>
 
+        <!-- Gift Packaging Alert & Preparation Instructions (Admin/Warehouse) -->
+        @if ($order->is_gift_wrapped)
+            <div class="card-modern p-4 mb-4 shadow-sm border" style="background: linear-gradient(135deg, #fffbeb, #fef3c7); border-color: #f59e0b !important;">
+                <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom border-warning border-opacity-30">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center shadow-xs" style="width: 36px; height: 36px; background: #b45309; color: #fff;">
+                            <i data-lucide="gift" style="width: 20px; height: 20px;"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold text-dark mb-0">YÊU CẦU ĐÓNG GÓI QUÀ CAO CẤP (AURELIA SIGNATURE BOX)</h6>
+                            <span class="text-warning-emphasis small" style="font-size: 0.72rem;">Phụ thu gói quà & thiệp mừng: +{{ $order->formatted_gift_wrap_fee }}</span>
+                        </div>
+                    </div>
+                    <span class="badge bg-warning text-dark px-3 py-1.5 fw-bold shadow-xs">
+                        HỘP QUÀ + THIỆP MỪNG
+                    </span>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <div class="p-2.5 bg-white rounded-2 border border-warning border-opacity-30">
+                            <span class="text-secondary small d-block">Giấy bọc quà yêu cầu:</span>
+                            <strong class="text-dark fs-6">{{ $order->gift_paper_name ?? 'Mặc định' }}</strong>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-2.5 bg-white rounded-2 border border-warning border-opacity-30">
+                            <span class="text-secondary small d-block">Mẫu thiệp mừng yêu cầu:</span>
+                            <strong class="text-dark fs-6">{{ $order->gift_card_name ?? 'Mặc định' }}</strong>
+                        </div>
+                    </div>
+
+                    @if ($order->gift_message)
+                        <div class="col-12">
+                            <span class="text-secondary small fw-semibold d-flex align-items-center gap-1 mb-1">
+                                <i data-lucide="mail" style="width: 14px; height: 14px;"></i>
+                                <span>Lời chúc thiệp mừng cần in / viết tay nắn nót:</span>
+                            </span>
+                            <div class="p-3 bg-white rounded-3 border border-warning border-opacity-50 text-dark fst-italic small shadow-xs" style="font-family: Georgia, serif; line-height: 1.6;">
+                                &ldquo;{{ $order->gift_message }}&rdquo;
+                            </div>
+                        </div>
+                    @else
+                        <div class="col-12">
+                            <span class="text-secondary small">Thiệp mừng: Khách hàng không để lại lời chúc (Gửi kèm thiệp chúc mừng Aurelia mặc định).</span>
+                        </div>
+                    @endif
+
+                    <div class="col-12">
+                        @if ($order->hide_price)
+                            <div class="alert alert-danger py-2 px-3 mb-0 d-flex align-items-center gap-2 small fw-bold">
+                                <i data-lucide="alert-triangle" style="width: 16px; height: 16px; flex-shrink: 0;"></i>
+                                <span>LƯU Ý KHO: Khách yêu cầu GIẤU GIÁ TIỀN! Không bỏ phiếu xuất kho/hóa đơn có in giá vào kiện hàng.</span>
+                            </div>
+                        @else
+                            <div class="text-muted small">
+                                <i data-lucide="check" style="width: 13px; height: 13px; margin-right: 0.2rem;"></i>
+                                Hóa đơn kèm giá bình thường (Khách không chọn giấu giá).
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        @endif
+
         <!-- Recipient & Delivery Information Card -->
         <div class="card-modern p-4 mb-4 shadow-sm border">
             <h6 class="fw-bold text-dark mb-3 pb-2 border-bottom d-flex align-items-center gap-2">
@@ -389,6 +454,15 @@
                     <span>Phí vận chuyển GHN:</span>
                     <span class="fw-bold text-dark">{{ $order->formatted_shipping_fee }}</span>
                 </div>
+                @if ($order->is_gift_wrapped)
+                    <div class="d-flex justify-content-between text-warning-emphasis align-items-center">
+                        <span class="d-flex align-items-center gap-1">
+                            <i data-lucide="gift" style="width: 14px; height: 14px;"></i>
+                            <span>Phí gói quà hộp cao cấp:</span>
+                        </span>
+                        <span class="fw-bold">+{{ $order->formatted_gift_wrap_fee }}</span>
+                    </div>
+                @endif
                 @if ($order->discount_amount > 0 || $order->voucher_code)
                     <div class="d-flex justify-content-between text-success align-items-center">
                         <span class="d-flex align-items-center gap-1">
@@ -399,6 +473,15 @@
                             @endif
                         </span>
                         <span class="fw-bold">-{{ number_format($order->discount_amount, 0, ',', '.') }} ₫</span>
+                    </div>
+                @endif
+                @if ($order->coins_used > 0)
+                    <div class="d-flex justify-content-between text-warning-emphasis align-items-center">
+                        <span class="d-flex align-items-center gap-1">
+                            <i class="bi bi-coin text-warning"></i>
+                            <span>Xu Aurelia đã dùng (-{{ number_format($order->coins_used, 0, ',', '.') }} Xu):</span>
+                        </span>
+                        <span class="fw-bold">-{{ number_format($order->coins_discount_amount, 0, ',', '.') }} ₫</span>
                     </div>
                 @endif
                 <div class="d-flex justify-content-between align-items-baseline pt-2 border-top">
