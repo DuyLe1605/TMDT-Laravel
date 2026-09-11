@@ -1,0 +1,215 @@
+/* ==========================================================================
+   ADMIN LAYOUT & PORTAL STYLES
+   Sidebar, Topbar, KPI Metric Cards, SaaS DataTables & Admin Layout Overrides
+   ========================================================================== */
+
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+}
+
+/* Sidebar Styling - Fully Responsive to Theme */
+.admin-sidebar {
+    width: 260px;
+    background-color: var(--sidebar-bg);
+    border-right: 1px solid var(--sidebar-border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1040;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.25s ease;
+}
+
+.sidebar-brand {
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-bottom: 1px solid var(--sidebar-border);
+    text-decoration: none;
+}
+
+.sidebar-brand-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-sm);
+    background: var(--brand-gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    box-shadow: 0 2px 6px var(--brand-glow);
+    flex-shrink: 0;
+}
+
+.sidebar-brand-text {
+    font-weight: 800;
+    font-size: 1.05rem;
+    color: var(--sidebar-title);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+}
+
+.sidebar-brand-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.15rem 0.45rem;
+    border-radius: 999px;
+    background: var(--brand-50);
+    color: var(--brand-600);
+    border: 1px solid var(--brand-200);
+}
+
+.sidebar-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.25rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.sidebar-section-title {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--sidebar-section);
+    padding: 0 0.75rem 0.5rem;
+    margin: 0;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.65rem 0.85rem;
+    color: var(--sidebar-text);
+    font-weight: 500;
+    font-size: 0.875rem;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.sidebar-link:hover {
+    color: var(--sidebar-title);
+    background-color: var(--sidebar-hover);
+}
+
+.sidebar-link.active {
+    color: var(--sidebar-text-active);
+    background-color: var(--sidebar-active-bg);
+    font-weight: 600;
+}
+
+.sidebar-link.active svg {
+    color: var(--sidebar-text-active);
+}
+
+.sidebar-footer {
+    padding: 1rem 1.25rem;
+    border-top: 1px solid var(--sidebar-border);
+    background-color: var(--sidebar-bg);
+}
+
+.sidebar-user-btn {
+    transition: background 0.15s ease;
+    text-decoration: none;
+}
+
+.sidebar-user-btn:hover {
+    background: var(--bg-surface-hover) !important;
+}
+
+.sidebar-user-btn:focus {
+    outline: none;
+}
+
+/* Main Area */
+.admin-main {
+    flex: 1;
+    margin-left: 260px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: var(--bg-body);
+}
+
+/* Admin Header */
+.admin-header {
+    height: 70px;
+    background-color: var(--bg-surface);
+    border-bottom: 1px solid var(--border-default);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+    transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+/* System Status Pill */
+.system-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.85rem;
+    background-color: var(--bg-surface-subtle);
+    border: 1px solid var(--border-default);
+    border-radius: 9999px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.status-pulse-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #10b981;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
+    animation: statusPulse 2s infinite;
+}
+
+@keyframes statusPulse {
+    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+    70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+/* Admin Spacing Overrides */
+.admin-main .container-fluid > .mb-4:first-child {
+    margin-bottom: 1.75rem !important;
+}
+
+.admin-main .row.g-4.mb-4 {
+    margin-bottom: 2rem !important;
+}
+
+@media (max-width: 991.98px) {
+    .admin-sidebar {
+        transform: translateX(-100%);
+    }
+    .admin-sidebar.show {
+        transform: translateX(0);
+    }
+    .admin-main {
+        margin-left: 0;
+    }
+}

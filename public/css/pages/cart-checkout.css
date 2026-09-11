@@ -1,0 +1,275 @@
+/* ==========================================================================
+   PAGE: CART & CHECKOUT
+   Ultra-luxury design system for shopping cart, checkout flow & order receipt
+   ========================================================================== */
+
+/* Custom Checkbox */
+.custom-checkbox {
+    width: 20px !important;
+    height: 20px !important;
+    border-radius: 6px !important;
+    border: 2px solid var(--border-strong) !important;
+    background-color: var(--bg-surface);
+    cursor: pointer;
+    transition: all 0.18s ease;
+}
+
+.custom-checkbox:checked {
+    background-color: var(--brand-600) !important;
+    border-color: var(--brand-600) !important;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.25) !important;
+}
+
+/* Quantity Stepper */
+.qty-stepper {
+    background: var(--bg-surface-elevated);
+    border-color: var(--border-strong) !important;
+    overflow: hidden;
+    border-radius: var(--radius-sm);
+}
+
+.qty-stepper .btn-stepper {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--text-primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+}
+
+.qty-stepper .btn-stepper:hover {
+    background: var(--bg-surface-hover);
+    color: var(--brand-500);
+}
+
+.qty-input {
+    padding: 0.25rem 0.5rem;
+    color: var(--text-primary);
+    -moz-appearance: textfield;
+}
+
+.qty-input::-webkit-outer-spin-button,
+.qty-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Cart Item Row */
+.cart-item-row {
+    padding: 1.2rem 1.35rem;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border-default);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+}
+
+.cart-item-row:hover {
+    background: var(--bg-surface-hover);
+}
+
+.cart-item-row.is-selected {
+    background: rgba(99, 102, 241, 0.04);
+}
+
+[data-theme="dark"] .cart-item-row.is-selected {
+    background: rgba(99, 102, 241, 0.08);
+}
+
+.cart-item-thumb {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    border-color: var(--border-default) !important;
+}
+
+.cart-item-thumb:hover {
+    transform: scale(1.04);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+
+.cart-item-info {
+    min-width: 0;
+    flex-grow: 1;
+}
+
+.cart-item-actions-box {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1.25rem;
+    flex-shrink: 0;
+}
+
+.cart-item-subtotal-box {
+    min-width: 130px;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.cart-item-subtotal-box .item-subtotal-text {
+    white-space: nowrap;
+    font-size: 1.05rem;
+    line-height: 1.2;
+}
+
+/* Shipping & Payment Method Cards */
+.shipping-method-card,
+.payment-method-card,
+.address-item-card {
+    background: var(--bg-surface) !important;
+    border: 1.5px solid var(--border-default) !important;
+    border-radius: var(--radius-md) !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.shipping-method-card:hover,
+.payment-method-card:hover,
+.address-item-card:hover {
+    border-color: var(--brand-400) !important;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.shipping-method-card.active,
+.payment-method-card.active {
+    border-color: var(--brand-600) !important;
+    background: rgba(99, 102, 241, 0.05) !important;
+    box-shadow: 0 0 0 1px var(--brand-600), var(--shadow-sm);
+}
+
+[data-theme="dark"] .shipping-method-card.active,
+[data-theme="dark"] .payment-method-card.active {
+    background: rgba(99, 102, 241, 0.12) !important;
+    border-color: var(--brand-400) !important;
+    box-shadow: 0 0 0 1px var(--brand-400), 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+/* Checkout Address Display Card */
+.checkout-address-card,
+#activeAddressDisplay,
+#guestActiveAddressBox {
+    padding: 1.1rem 1.25rem 1.1rem 1.4rem !important;
+    border-radius: var(--radius-lg) !important;
+    border: 1px solid var(--border-default);
+    border-left: 4px solid var(--brand-500) !important;
+    background: var(--bg-surface-subtle) !important;
+}
+
+.checkout-address-card .address-header,
+#activeAddressDisplay .address-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.45rem;
+}
+
+.checkout-address-card .address-detail,
+#activeAddressDisplay .address-detail,
+#guestActiveAddressBox .address-detail {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    line-height: 1.55;
+    color: var(--text-primary);
+}
+
+/* MoMo Multi-channel Cards */
+.momo-sub-card {
+    background: var(--bg-surface-elevated) !important;
+    border: 1px solid var(--border-default) !important;
+    color: var(--text-primary) !important;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: var(--shadow-xs);
+}
+
+.momo-sub-card:hover {
+    transform: translateY(-2px);
+    border-color: #a50064 !important;
+    box-shadow: 0 4px 12px rgba(165, 0, 100, 0.15);
+}
+
+.momo-sub-card.active {
+    background: rgba(165, 0, 100, 0.08) !important;
+    border-color: #a50064 !important;
+    box-shadow: 0 0 0 2px rgba(165, 0, 100, 0.25), 0 6px 16px rgba(165, 0, 100, 0.15);
+}
+
+[data-theme="dark"] .momo-sub-card.active {
+    background: rgba(165, 0, 100, 0.18) !important;
+    border-color: #f43f5e !important;
+    box-shadow: 0 0 0 2px rgba(244, 63, 94, 0.3), 0 6px 18px rgba(165, 0, 100, 0.3);
+}
+
+.momo-adaptive-table {
+    background: var(--bg-surface-elevated) !important;
+    border: 1px solid var(--border-default) !important;
+    color: var(--text-primary) !important;
+}
+
+.momo-adaptive-table th {
+    background: var(--bg-surface-subtle) !important;
+    color: var(--text-secondary) !important;
+    border-color: var(--border-default) !important;
+}
+
+.momo-adaptive-table td {
+    background: transparent !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-default) !important;
+}
+
+.momo-adaptive-table code {
+    background: rgba(99, 102, 241, 0.12);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* Luxury Summary Card & Gold Gradient */
+.text-luxury-gradient {
+    background: linear-gradient(135deg, #f59e0b 0%, #ec4899 50%, #8b5cf6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 800;
+}
+
+.card-modern {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default) !important;
+    border-radius: var(--radius-xl);
+    transition: box-shadow 0.3s ease;
+}
+
+[data-theme="dark"] .card-modern {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35) !important;
+}
+
+/* Success Receipt Card */
+.receipt-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-xl);
+    position: relative;
+    overflow: hidden;
+}
+
+.receipt-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, #10b981, #06b6d4, #6366f1, #ec4899);
+}
+
+.cart-badge-count {
+    animation: cartBounce 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes cartBounce {
+    0% { transform: scale(0.5); }
+    100% { transform: scale(1); }
+}

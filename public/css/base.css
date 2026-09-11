@@ -1,0 +1,336 @@
+/* ==========================================================================
+   TMDT E-COMMERCE DESIGN SYSTEM - BASE DESIGN TOKENS & UTILITIES
+   Architecture: Adaptive CSS Variables, Dynamic Light/Dark Theme, Typography, Buttons & Modals
+   ========================================================================== */
+
+:root {
+    /* ----------------------------------------------------------------------
+       LIGHT THEME TOKENS (Crisp Modern SaaS White & Slate)
+       ---------------------------------------------------------------------- */
+    --bg-body: #f4f6f8;
+    --bg-surface: #ffffff;
+    --bg-surface-elevated: #ffffff;
+    --bg-surface-subtle: #f8fafc;
+    --bg-surface-hover: #f1f5f9;
+    --bg-input: #ffffff;
+    
+    /* Dynamic Sidebar in Light Mode */
+    --sidebar-bg: #ffffff;
+    --sidebar-border: #e2e8f0;
+    --sidebar-title: #0f172a;
+    --sidebar-section: #64748b;
+    --sidebar-text: #475569;
+    --sidebar-text-active: #4f46e5;
+    --sidebar-hover: #f1f5f9;
+    --sidebar-active-bg: #eef2ff;
+
+    /* Text Hierarchy */
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-tertiary: #94a3b8;
+    --text-inverse: #ffffff;
+
+    /* Structural Borders */
+    --border-default: #e2e8f0;
+    --border-subtle: #f1f5f9;
+    --border-strong: #cbd5e1;
+
+    /* Core Brand Accent: Deep Indigo / Violet Royal */
+    --brand-50: #eef2ff;
+    --brand-100: #e0e7ff;
+    --brand-200: #c7d2fe;
+    --brand-300: #a5b4fc;
+    --brand-400: #818cf8;
+    --brand-500: #6366f1;
+    --brand-600: #4f46e5;
+    --brand-700: #4338ca;
+    --brand-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    --brand-gradient-hover: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%);
+    --brand-glow: rgba(79, 70, 229, 0.25);
+
+    /* Elevation Shadows */
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+    --shadow-sm: 0 2px 6px -1px rgba(0, 0, 0, 0.06), 0 1px 3px -1px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 6px 16px -2px rgba(0, 0, 0, 0.06), 0 3px 6px -2px rgba(0, 0, 0, 0.04);
+    --shadow-lg: 0 12px 28px -4px rgba(0, 0, 0, 0.08), 0 6px 12px -3px rgba(0, 0, 0, 0.04);
+    --shadow-modal: 0 24px 48px -12px rgba(0, 0, 0, 0.18);
+    --shadow-dropdown: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+
+    /* Radii */
+    --radius-sm: 8px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-xl: 18px;
+
+    /* Typography */
+    --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-mono: 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* --------------------------------------------------------------------------
+   DARK THEME TOKENS (Deep Space Charcoal / Obsidian)
+   -------------------------------------------------------------------------- */
+[data-theme="dark"] {
+    --bg-body: #0b0f19;
+    --bg-surface: #111827;
+    --bg-surface-elevated: #1a2234;
+    --bg-surface-subtle: #162032;
+    --bg-surface-hover: #1e293b;
+    --bg-input: #162032;
+
+    /* Dynamic Sidebar in Dark Mode */
+    --sidebar-bg: #0f172a;
+    --sidebar-border: #1e293b;
+    --sidebar-title: #f8fafc;
+    --sidebar-section: #64748b;
+    --sidebar-text: #94a3b8;
+    --sidebar-text-active: #818cf8;
+    --sidebar-hover: #1e293b;
+    --sidebar-active-bg: rgba(79, 70, 229, 0.15);
+
+    /* Text Hierarchy */
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-tertiary: #64748b;
+    --text-inverse: #0f172a;
+
+    /* Structural Borders */
+    --border-default: #1e293b;
+    --border-subtle: #172033;
+    --border-strong: #334155;
+
+    /* Core Brand Accent in Dark Mode (Vibrant Violet / Indigo) */
+    --brand-50: rgba(79, 70, 229, 0.1);
+    --brand-100: rgba(79, 70, 229, 0.18);
+    --brand-200: rgba(79, 70, 229, 0.25);
+    --brand-300: #818cf8;
+    --brand-400: #a5b4fc;
+    --brand-500: #6366f1;
+    --brand-600: #4f46e5;
+    --brand-700: #4338ca;
+    --brand-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    --brand-gradient-hover: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    --brand-glow: rgba(99, 102, 241, 0.35);
+
+    /* Shadows in Dark Mode */
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-sm: 0 2px 6px -1px rgba(0, 0, 0, 0.4), 0 1px 3px -1px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 6px 16px -2px rgba(0, 0, 0, 0.5), 0 3px 6px -2px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 12px 28px -4px rgba(0, 0, 0, 0.6), 0 6px 12px -3px rgba(0, 0, 0, 0.4);
+    --shadow-modal: 0 24px 48px -12px rgba(0, 0, 0, 0.7);
+    --shadow-dropdown: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+}
+
+/* ==========================================================================
+   GLOBAL RESET & TYPOGRAPHY FOUNDATIONS
+   ========================================================================== */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-sans);
+    background-color: var(--bg-body);
+    color: var(--text-primary);
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.25s ease, color 0.25s ease;
+    margin: 0;
+    padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text-primary);
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    margin-top: 0;
+}
+
+code, kbd, samp, pre {
+    font-family: var(--font-mono);
+}
+
+/* Lucide SVG Icons Integration */
+.lucide, svg.lucide {
+    display: inline-block;
+    vertical-align: -0.125em;
+    stroke-width: 1.85px;
+    flex-shrink: 0;
+}
+
+/* Global Icon Spacing Rules */
+.btn svg, .btn i,
+.btn-brand-primary svg, .btn-brand-primary i,
+.btn-surface svg, .btn-surface i,
+.btn-danger svg, .btn-danger i,
+.btn-outline-danger svg, .btn-outline-danger i,
+.btn-warning svg, .btn-warning i,
+.btn-outline-warning svg, .btn-outline-warning i,
+.dropdown-item-modern svg, .dropdown-item-modern i {
+    margin-right: 0.6rem !important;
+    flex-shrink: 0;
+}
+
+/* Zero out margin for icon-only buttons so icons are 100% centered */
+.btn:has(> svg:only-child) svg,
+.btn:has(> i:only-child) i,
+.btn-surface:has(> svg:only-child) svg,
+.btn-surface:has(> i:only-child) i,
+.btn-icon svg, .btn-icon i,
+.header-icon-btn svg, .header-icon-btn i,
+.wishlist-heart-btn svg, .wishlist-heart-btn i,
+.btn-card-action svg, .btn-card-action i,
+.btn-detail-wishlist svg, .btn-detail-wishlist i,
+.theme-toggle-btn svg, .theme-toggle-btn i {
+    margin: 0 !important;
+    margin-right: 0 !important;
+    padding: 0 !important;
+}
+
+/* ==========================================================================
+   BUTTONS (MODERN SAAS AESTHETIC)
+   ========================================================================== */
+.btn {
+    font-weight: 600;
+    font-size: 0.885rem;
+    padding: 0.55rem 1.15rem;
+    border-radius: var(--radius-md);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+.btn-brand-primary {
+    background: var(--brand-gradient);
+    color: #ffffff !important;
+    border: 1px solid transparent;
+    box-shadow: 0 2px 8px var(--brand-glow);
+}
+
+.btn-brand-primary:hover {
+    background: var(--brand-gradient-hover);
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px var(--brand-glow);
+    transform: translateY(-1px);
+}
+
+.btn-surface {
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    border: 1px solid var(--border-default);
+    box-shadow: var(--shadow-xs);
+}
+
+.btn-surface:hover {
+    background-color: var(--bg-surface-hover);
+    border-color: var(--border-strong);
+    color: var(--text-primary);
+}
+
+.btn-surface:active {
+    background-color: var(--bg-surface-subtle);
+}
+
+.btn-primary-subtle {
+    background-color: var(--brand-50);
+    color: var(--brand-600);
+    border: 1px solid var(--brand-200);
+}
+
+.btn-primary-subtle:hover {
+    background-color: var(--brand-100);
+    color: var(--brand-700);
+}
+
+[data-theme="dark"] .btn-primary-subtle {
+    background-color: rgba(99, 102, 241, 0.15);
+    color: var(--brand-300);
+    border-color: rgba(99, 102, 241, 0.3);
+}
+
+[data-theme="dark"] .btn-primary-subtle:hover {
+    background-color: rgba(99, 102, 241, 0.25);
+    color: #ffffff;
+}
+
+/* ==========================================================================
+   MODAL DIALOGS (SaaS Standard with Comfortable Spacing)
+   ========================================================================== */
+.modal-content-modern {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-modal);
+    overflow: hidden;
+    transition: background-color 0.25s ease;
+}
+
+.modal-header-modern {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--border-default);
+    background-color: var(--bg-surface);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.modal-body-modern {
+    padding: 2rem;
+    color: var(--text-primary);
+}
+
+.modal-footer-modern {
+    padding: 1.35rem 2rem;
+    border-top: 1px solid var(--border-default);
+    background-color: var(--bg-surface-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.85rem;
+}
+
+/* Floating Toast Alerts */
+.toast-container-custom {
+    position: fixed;
+    top: 76px;
+    right: 24px;
+    z-index: 1080;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-width: 420px;
+    width: calc(100% - 48px);
+    pointer-events: none;
+}
+
+.toast-modern {
+    pointer-events: auto;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-dropdown);
+    padding: 1.1rem 1.35rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.95rem;
+}
+
+/* Decimal Spacing Utilities (Bootstrap compatibility) */
+.p-3\.5 { padding: 0.875rem !important; }
+.px-3\.5 { padding-left: 0.875rem !important; padding-right: 0.875rem !important; }
+.py-3\.5 { padding-top: 0.875rem !important; padding-bottom: 0.875rem !important; }
+.pt-3\.5 { padding-top: 0.875rem !important; }
+.pb-3\.5 { padding-bottom: 0.875rem !important; }
+.mb-1\.5 { margin-bottom: 0.375rem !important; }
+.mt-1\.5 { margin-top: 0.375rem !important; }
+.gap-1\.5 { gap: 0.375rem !important; }
+.gap-2\.5 { gap: 0.625rem !important; }
+.gap-3\.5 { gap: 0.875rem !important; }
